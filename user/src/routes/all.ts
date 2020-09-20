@@ -7,4 +7,4 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
   const users = await User.find({});
   res.status(200).send({ data: users });
 });
-export { router as AllUserRouter };
+export { router as allUserRouter };
