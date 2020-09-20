@@ -4,7 +4,7 @@ import { User } from "../models/user";
 const router = express.Router();
 
 router.get("/", async (req: Request, res: Response, next: NextFunction) => {
-  const users = await User.find({});
+  const users = await User.find({}).populate("addresses");
   res.status(200).send({ data: users });
 });
 export { router as allUserRouter };

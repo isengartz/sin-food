@@ -5,5 +5,5 @@ import {
 } from "@sin-nombre/sinfood-common";
 
 export class UserUpdatedPublisher extends Publisher<UserUpdatedEvent> {
-  subject = Subjects.UserUpdated;
+  readonly subject = Subjects.UserUpdated;
 }

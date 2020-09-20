@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import { Password } from "@sin-nombre/sinfood-common";
+import { UserAddressDoc } from "./user_address";
 
 // Describes the attributes that we accept from Request
 interface UserAttrs {
@@ -8,13 +9,7 @@ interface UserAttrs {
   password: string;
   first_name: string;
   last_name: string;
-  addresses: {
-    description: string;
-    floor: string;
-    full_address: string;
-    latitude: string;
-    longitude: string;
-  }[];
+  addresses?: UserAddressDoc[];
   phone: string;
 }
 // Describes the actual Document returned by Mongoose
@@ -24,21 +19,12 @@ interface UserDoc extends mongoose.Document {
   password?: string;
   first_name: string;
   last_name: string;
-  addresses: {
-    description: string;
-    floor: string;
-    full_address: string;
-    latitude: string;
-    longitude: string;
-  }[];
+  addresses: UserAddressDoc[];
   phone: string;
-  created_at: Date;
-  password_changed_at: Date;
-  password_reset_token: string;
-  password_reset_expires: Date;
 }
 
 interface UserModel extends mongoose.Model<UserDoc> {
+  // eslint-disable-next-line no-unused-vars
   build(attrs: UserAttrs): UserDoc;
 }
 
@@ -72,17 +58,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Phone is required"],
     },
-    addresses: {
-      type: [
-        {
-          description: String,
-          floor: String,
-          full_address: String,
-          latitude: String,
-          longitude: String,
-        },
-      ],
-    },
+    addresses: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "UserAddress",
+      },
+    ],
+
     created_at: {
       type: Date,
       default: Date.now(),

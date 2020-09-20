@@ -14,9 +14,6 @@
     }
   },
   "globals": {
-    "localStorage": true,
-    "fetch": true,
-    "IntersectionObserver": true,
     "window": true
   },
   "extends": [
@@ -29,7 +26,7 @@
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "sourceType": "module",
-    "ecmaVersion": 2017,
+    "ecmaVersion": 2018,
     "ecmaFeatures": {
       "jsx": true,
       "experimentalObjectRestSpread": true,

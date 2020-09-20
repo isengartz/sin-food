@@ -8,7 +8,7 @@ import { createUserRouter } from "./routes/create";
 import { currentUserRouter } from "./routes/current-user";
 import { signinRouter } from "./routes/signin";
 import { signoutRouter } from "./routes/signout";
-
+import { createUserAddressRouter } from "./routes/address/create";
 const app = express();
 app.set("trust proxy", true); //used for ingress-nginx
 
@@ -22,6 +22,10 @@ app.use(
 );
 
 // Routes
+
+// Address
+app.use("/api/users", createUserAddressRouter);
+
 app.use("/api/users", allUserRouter);
 app.use("/api/users", createUserRouter);
 app.use("/api/users", signinRouter);

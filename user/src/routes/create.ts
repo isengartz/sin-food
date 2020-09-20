@@ -11,7 +11,6 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
     password,
     first_name,
     last_name,
-    addresses,
     phone,
     password_confirm,
   } = req.body;
@@ -25,7 +24,6 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
     password,
     first_name,
     last_name,
-    addresses,
     phone,
   });
   await user.save();
