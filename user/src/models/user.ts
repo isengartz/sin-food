@@ -1,10 +1,12 @@
+/* eslint-disable no-unused-vars */
 import mongoose from "mongoose";
+import { randomBytes, createHash } from "crypto";
 import validator from "validator";
 import { Password } from "@sin-nombre/sinfood-common";
 import { UserAddressDoc } from "./user_address";
 
 // Describes the attributes that we accept from Request
-interface UserAttrs {
+export interface UserAttrs {
   email: string;
   password: string;
   first_name: string;
@@ -13,7 +15,7 @@ interface UserAttrs {
   phone: string;
 }
 // Describes the actual Document returned by Mongoose
-interface UserDoc extends mongoose.Document {
+export interface UserDoc extends mongoose.Document {
   id: string;
   email: string;
   password?: string;
@@ -21,10 +23,13 @@ interface UserDoc extends mongoose.Document {
   last_name: string;
   addresses: UserAddressDoc[];
   phone: string;
+  password_reset_token?: string;
+  password_expires_at?: Date;
+  createPasswordResetToken(): string;
+  changedPasswordAfter(JWTTimestamp: number): boolean;
 }
 
 interface UserModel extends mongoose.Model<UserDoc> {
-  // eslint-disable-next-line no-unused-vars
   build(attrs: UserAttrs): UserDoc;
 }
 
@@ -82,7 +87,7 @@ const userSchema = new mongoose.Schema(
         ret.id = ret._id;
         delete ret._id;
         delete ret.created_at;
-        delete ret.password_changed_at;
+        // delete ret.password_changed_at;
         delete ret.password_reset_token;
         delete ret.password_reset_expires;
         delete ret.password;
@@ -91,6 +96,8 @@ const userSchema = new mongoose.Schema(
     },
   }
 );
+
+// Hash password before Save
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
     const hashed = await Password.toHash(this.get("password"));
@@ -99,9 +106,46 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
+// If updated password add the passwordChangedAt field too
+userSchema.pre("save", function (next) {
+  if (!this.isModified("password") || this.isNew) {
+    return next();
+  }
+  // @ts-ignore
+  this.password_changed_at = Date.now() - 1000;
+  next();
+});
+
+// Checks if a password was changed after a given timestamp
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp: number) {
+  if (this.password_changed_at) {
+    const changedTimestamp = parseInt(
+      // @ts-ignore
+      this.password_changed_at.getTime() / 1000,
+      10
+    );
+    return JWTTimestamp < changedTimestamp;
+  }
+  // False means NOT changed
+  return false;
+};
+
+// Creates and persist the passwordResetToken and passwordResetExpires
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = randomBytes(32).toString("hex");
+
+  this.password_reset_token = createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+  this.password_reset_expires = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
+};
+
 // Hack so we can use TS with mongoose
 userSchema.statics.build = (attrs: UserAttrs) => {
   return new User(attrs);
 };
+
 const User = mongoose.model<UserDoc, UserModel>("User", userSchema);
 export { User };

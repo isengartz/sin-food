@@ -18,7 +18,7 @@ router.post(
 
     const user = await User.findById(userId);
     if (!user) {
-      throw new NotFoundError();
+      throw new NotFoundError(`User ${userId} Not Found`);
     }
 
     const { full_address, floor, latitude, longitude, description } = req.body;

@@ -10,7 +10,7 @@ spec:
     - host: sinfood.dev
       http:
         paths:
-          - path: /api/users/?(.*)
+          - path: /api/v1/users/?(.*)
             backend:
               serviceName: user-srv # Name of the pod
               servicePort: 3000

@@ -9,7 +9,9 @@ const start = async () => {
   if (!process.env.MONGO_URI) {
     throw new Error("MONGO_URI must be defined");
   }
-
+  if (!process.env.JWT_COOKIE_EXPIRES_IN) {
+    throw new Error("JWT_COOKIE_EXPIRES_IN must be defined");
+  }
   try {
     // Init mongoose instance
     await mongoose.connect(process.env.MONGO_URI, {

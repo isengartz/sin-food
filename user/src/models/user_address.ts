@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 // Describes the attributes that we accept from Request
-interface UserAddressAttrs {
+export interface UserAddressAttrs {
   description: string;
   floor: string;
   full_address: string;

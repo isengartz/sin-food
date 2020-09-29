@@ -2,13 +2,15 @@ import express from "express";
 import "express-async-errors";
 import { json } from "body-parser";
 import cookieSession from "cookie-session";
-import { errorHandler, NotFoundError } from "@sin-nombre/sinfood-common";
-import { allUserRouter } from "./routes/all";
-import { createUserRouter } from "./routes/create";
-import { currentUserRouter } from "./routes/current-user";
-import { signinRouter } from "./routes/signin";
-import { signoutRouter } from "./routes/signout";
+// @ts-ignore
+import xss from "xss-clean"; // @todo: add Typescript declaration some day
+import hpp from "hpp";
+import mongoSanitize from "express-mongo-sanitize";
+import { errorHandler, RouteNotFoundError } from "@sin-nombre/sinfood-common";
 import { createUserAddressRouter } from "./routes/address/create";
+import { authRoutes } from "./routes/authRoutes";
+import { API_ROOT_ENDPOINT } from "./utils/constants";
+
 const app = express();
 app.set("trust proxy", true); //used for ingress-nginx
 
@@ -18,23 +20,33 @@ app.use(
   cookieSession({
     signed: false,
     secure: process.env.NODE_ENV !== "test", // dont force https when testing
+    expires: new Date(
+      Date.now() +
+        // eslint-disable-next-line radix
+        parseInt(process.env.JWT_COOKIE_EXPIRES_IN!) * 24 * 60 * 60 * 1000
+    ),
   })
 );
 
-// Routes
+// Security Middleware
+app.use(mongoSanitize());
+app.use(xss());
+app.use(hpp());
+
+/**
+ * Routes
+ */
+app.use(`${API_ROOT_ENDPOINT}/users`, authRoutes);
 
 // Address
 app.use("/api/users", createUserAddressRouter);
 
-app.use("/api/users", allUserRouter);
-app.use("/api/users", createUserRouter);
-app.use("/api/users", signinRouter);
-app.use("/api/users", signoutRouter);
-app.use("/api/users", currentUserRouter);
-
 // Not Found Route
 app.all("*", () => {
-  throw new NotFoundError();
+  throw new RouteNotFoundError();
 });
+
+// Attach Global Error Handler
 app.use(errorHandler);
+
 export { app };
