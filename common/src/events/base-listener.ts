@@ -6,15 +6,20 @@ interface Event {
   data: any;
 }
 export abstract class Listener<T extends Event> {
-  abstract subject: T["subject"];
-  abstract queueGroupName: string;
+  abstract readonly subject: T["subject"];
+
+  abstract readonly queueGroupName: string;
+
   abstract onMessage(data: T["data"], msg: Message): void;
+
   protected ackWait: number = 5000;
 
   private client: Stan;
+
   constructor(client: Stan) {
     this.client = client;
   }
+
   subcriptionOptions() {
     return this.client
       .subscriptionOptions()
@@ -36,6 +41,7 @@ export abstract class Listener<T extends Event> {
       this.onMessage(parsedData, msg);
     });
   }
+
   parseMessage(msg: Message) {
     const data = msg.getData();
     return typeof data === "string"

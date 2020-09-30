@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars,no-shadow */
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
@@ -42,6 +43,8 @@ export const currentUser = (
       process.env.JWT_KEY!
     ) as UserPayload;
     req.currentUser = payload;
-  } catch (e) {}
+  } catch (e) {
+    // No need to do something
+  }
   next();
 };
