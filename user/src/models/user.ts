@@ -62,6 +62,14 @@ const userSchema = new mongoose.Schema(
     phone: {
       type: String,
       required: [true, "Phone is required"],
+      validate: {
+        validator: function (v: string) {
+          return validator.isMobilePhone(v, "any", {
+            strictMode: true,
+          });
+        },
+        message: "Provide a valid phone",
+      },
     },
     addresses: [
       {

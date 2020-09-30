@@ -1,17 +1,13 @@
-import mongoose from "mongoose";
 import { app } from "./app";
 import { natsWrapper } from "./events/nats-wrapper";
+import { EmailSendingListener } from "./events/listeners/email-sending-listener";
 
 const start = async () => {
-  // Check for ENV Vars so TS stfu and also throw an error if we forgot to define them in Kubernetes
-  if (!process.env.JWT_KEY) {
-    throw new Error("JWT_KEY must be defined");
+  if (!process.env.TRANSPORTER_EMAIL_USERNAME) {
+    throw new Error(`TRANSPORTER_EMAIL_USERNAME must be define`);
   }
-  if (!process.env.MONGO_URI) {
-    throw new Error("MONGO_URI must be defined");
-  }
-  if (!process.env.JWT_COOKIE_EXPIRES_IN) {
-    throw new Error("JWT_COOKIE_EXPIRES_IN must be defined");
+  if (!process.env.TRANSPORTER_EMAIL_PASSWORD) {
+    throw new Error(`TRANSPORTER_EMAIL_PASSWORD must be define`);
   }
   if (!process.env.NATS_CLIENT_ID) {
     throw new Error(`NATS_CLIENT_ID must be defined`);
@@ -24,19 +20,15 @@ const start = async () => {
   }
 
   try {
-    // Init mongoose instance
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-    });
-
     // Initialize NATS
     await natsWrapper.connect(
       process.env.NATS_CLUSTER_ID,
       process.env.NATS_CLIENT_ID,
       process.env.NATS_URL
     );
+
+    // Listen for Events
+    new EmailSendingListener(natsWrapper.client).listen();
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);

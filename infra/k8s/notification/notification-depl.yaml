@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-depl
+  name: notification-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: user
+      app: notification
   template:
     metadata:
       labels:
-        app: user
+        app: notification
     spec:
       containers:
-        - name: user
-          image: isengart/food-user #docker image
+        - name: notification
+          image: isengart/food-notification #docker image
           env:
             - name: NATS_CLIENT_ID
               valueFrom:
@@ -24,25 +24,26 @@ spec:
               value: 'http://nats-srv:4222'
             - name: NATS_CLUSTER_ID
               value: sinfood
-            - name: MONGO_URI
-              value: "mongodb://user-mongo-srv:27017/user"
-            - name: JWT_COOKIE_EXPIRES_IN
-              value: "30"
-            - name: JWT_KEY
+            - name: TRANSPORTER_EMAIL_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: jwt-secret
-                  key: JWT_KEY
+                  name: transporter-email-username
+                  key: TRANSPORTER_EMAIL_USERNAME
+            - name: TRANSPORTER_EMAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: transporter-email-password
+                  key: TRANSPORTER_EMAIL_PASSWORD
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: user-srv
+  name: notification-srv
 spec:
   selector:
-    app: user
+    app: notification
   ports:
-    - name: user
+    - name: notification
       protocol: TCP
       port: 3000
       targetPort: 3000

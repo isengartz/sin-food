@@ -63,7 +63,7 @@
     "no-underscore-dangle": "off",
     "class-methods-use-this": "off",
     "prefer-destructuring": ["error", { "object": true, "array": false }],
-    "no-unused-vars": ["error", { "argsIgnorePattern": "req|res|next|val" }],
+    "no-unused-vars": [1, { "argsIgnorePattern": "req|res|next|val" }],
     "no-use-before-define": ["error", { "variables": false }],
     "import/prefer-default-export": "off",
     "import/no-extraneous-dependencies": ["error", {"devDependencies": ["**/*.test.ts", "**/test/setup.ts"]}],

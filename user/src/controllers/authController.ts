@@ -9,6 +9,8 @@ import {
 import { User } from "../models/user";
 import { Helper } from "../utils/helper";
 import { API_ROOT_ENDPOINT } from "../utils/constants";
+import { EmailSendingPublisher } from "../events/publishers/email-sending-publisher";
+import { natsWrapper } from "../events/nats-wrapper";
 
 /**
  * Return all users with addresses populated
@@ -152,14 +154,15 @@ export const forgotPassword = async (
     "host"
   )}${API_ROOT_ENDPOINT}users/resetPassword/${resetToken}`;
 
-  // const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to ${resetURL}`;
+  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to ${resetURL}`;
 
   try {
-    // await sendEmail({
-    //   email: user.email,
-    //   subject: `Password Reset (Valid for 10 mins)`,
-    //   message: message,
-    // });
+    // Publish an Email Sending Event
+    await new EmailSendingPublisher(natsWrapper.client).publish({
+      subject: `Password Reset Token (Valid for 10 mins)`,
+      emailBody: message,
+      receiver: user.email,
+    });
 
     res.status(200).json({
       status: "success",
