@@ -5,7 +5,9 @@ import {
   NotAuthorizedError,
   NotFoundError,
   Password,
+  QueryModelHelper,
 } from "@sin-nombre/sinfood-common";
+
 import { User } from "../models/user";
 import { Helper } from "../utils/helper";
 import { API_ROOT_ENDPOINT } from "../utils/constants";
@@ -23,8 +25,21 @@ export const allUsers = async (
   res: Response,
   next: NextFunction
 ) => {
-  const users = await User.find({}).populate("addresses");
-  res.status(200).send({ status: "success", data: users });
+  const helper = new QueryModelHelper(User.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+
+  // @ts-ignore
+  const totalCount = helper.getTotalCount();
+  const users = await helper.getQuery().populate("addresses");
+  res.status(200).send({
+    status: "success",
+    results: users.length,
+    totalCount,
+    data: users,
+  });
 };
 
 /**

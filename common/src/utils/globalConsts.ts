@@ -1,0 +1,1 @@
+export const GLOBAL_PAGINATION_SIZE = 20;

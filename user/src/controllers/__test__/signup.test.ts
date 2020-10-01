@@ -83,7 +83,7 @@ it("should return 400 when any of the required fields are empty and the same cou
   expect(response.body.errors.length).toEqual(4);
 });
 
-it("should return 201 given a correct payload", async () => {
+it("should return 201 given a correct payload", () => {
   request(app)
     .post(`${API_ROOT_ENDPOINT}/users/signup`)
     .send(USER_CREATE_VALID_PAYLOAD)

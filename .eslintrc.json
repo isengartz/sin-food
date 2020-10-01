@@ -22,7 +22,12 @@
     "prettier",
     "plugin:react/recommended"
   ],
-  "plugins": ["prettier", "prefer-object-spread", "eslint-plugin-import","@typescript-eslint"],
+  "plugins": [
+    "prettier",
+    "prefer-object-spread",
+    "eslint-plugin-import",
+    "@typescript-eslint"
+  ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "sourceType": "module",
@@ -31,7 +36,6 @@
       "jsx": true,
       "experimentalObjectRestSpread": true,
       "modules": true
-
     }
   },
   "rules": {
@@ -51,7 +55,7 @@
       { "extensions": [".js", ".jsx", ".ts"] }
     ],
     "prefer-object-spread/prefer-object-spread": 2,
-    "prettier/prettier": "error",
+    "prettier/prettier": "warn",
     "spaced-comment": "off",
     "no-console": "warn",
     "consistent-return": "off",
@@ -66,7 +70,10 @@
     "no-unused-vars": [1, { "argsIgnorePattern": "req|res|next|val" }],
     "no-use-before-define": ["error", { "variables": false }],
     "import/prefer-default-export": "off",
-    "import/no-extraneous-dependencies": ["error", {"devDependencies": ["**/*.test.ts", "**/test/setup.ts"]}],
+    "import/no-extraneous-dependencies": [
+      "error",
+      { "devDependencies": ["**/*.test.ts", "**/test/setup.ts"] }
+    ],
     "react/display-name": [
       "error",
       {
