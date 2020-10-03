@@ -6,7 +6,7 @@ import {
   login,
   forgotPassword,
   resetPassword,
-  updatedPassword,
+  updatePassword,
   currentU,
   signout,
   allUsers,
@@ -20,7 +20,7 @@ router.post("/login", login);
 router.get("/currentUser", currentUser, currentU);
 router.post("/forgotPassword", forgotPassword);
 router.patch("/resetPassword/:token", resetPassword);
-router.patch("/updatedPassword", currentUser, requireAuth, updatedPassword);
+router.patch("/updatePassword", currentUser, requireAuth, updatePassword);
 router.get("/", allUsers);
 
 export { router as authRoutes };

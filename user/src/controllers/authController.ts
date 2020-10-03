@@ -1,3 +1,4 @@
+/* eslint-disable no-unreachable */
 import { Request, Response, NextFunction } from "express";
 import { createHash } from "crypto";
 import {
@@ -25,15 +26,15 @@ export const allUsers = async (
   res: Response,
   next: NextFunction
 ) => {
-  const helper = new QueryModelHelper(User.find(), req.query)
+  const queryHelper = new QueryModelHelper(User.find(), req.query)
     .filter()
     .sort()
     .limitFields()
     .paginate();
 
-  // @ts-ignore
-  const totalCount = helper.getTotalCount();
-  const users = await helper.getQuery().populate("addresses");
+  const totalCount = await User.countDocuments(queryHelper.getTotalCount());
+
+  const users = await queryHelper.getQuery().populate("addresses");
   res.status(200).send({
     status: "success",
     results: users.length,
@@ -107,8 +108,9 @@ export const login = async (
   if (!user) {
     throw new NotFoundError(`User with email ${email} not found`);
   }
+
   // Check if password is correct
-  if (!Password.compare(user.password!, password)) {
+  if (!(await Password.compare(user.password!, password))) {
     throw new NotFoundError(
       `Incorrect Email / Password or email doesnt exists`
     ); // Dont expose that the user exist
@@ -164,12 +166,12 @@ export const forgotPassword = async (
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
-  // @todo: add url prefix to const
+  // @todo: change the url for the frontend endpoint that will handle the reset password
   const resetURL = `${req.protocol}://${req.get(
     "host"
-  )}${API_ROOT_ENDPOINT}users/resetPassword/${resetToken}`;
+  )}${API_ROOT_ENDPOINT}/users/resetPassword/${resetToken}`;
 
-  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to ${resetURL}`;
+  const message = `Forgot your password? You must be a retard but no problem! Submit a PATCH request with your new password to ${resetURL}`;
 
   try {
     // Publish an Email Sending Event
@@ -181,14 +183,13 @@ export const forgotPassword = async (
 
     res.status(200).json({
       status: "success",
-      data: { resetURL },
+      data: { resetURL, resetToken },
       message: "Token sent to email!",
     });
   } catch (e) {
     user.password_reset_token = undefined;
-    user.password_expires_at = undefined;
+    user.password_reset_expires = undefined;
     await user.save({ validateBeforeSave: false });
-
     throw new Error(`Something Went wrong!`);
   }
 };
@@ -204,7 +205,7 @@ export const resetPassword = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { password, password_confirm } = req.body.params;
+  const { password, password_confirm } = req.body;
   if (!password || !password_confirm || password !== password_confirm) {
     throw new BadRequestError(
       `Password and Password Confirmation must be identical`
@@ -217,8 +218,8 @@ export const resetPassword = async (
 
   const user = await User.findOne({
     password_reset_token: hashedToken,
-    password_expires_at: {
-      $gt: new Date(),
+    password_reset_expires: {
+      $gt: Date.now(),
     },
   });
 
@@ -228,8 +229,9 @@ export const resetPassword = async (
   }
   user.password = req.body.password;
   user.password_reset_token = undefined;
-  user.password_expires_at = undefined;
-  user.save();
+  user.password_reset_expires = undefined;
+  await user.save();
+  delete user.password;
 
   // Add JWT to express session
   req.session = Helper.serializeToken(
@@ -249,26 +251,30 @@ export const resetPassword = async (
  * @param res
  * @param next
  */
-export const updatedPassword = async (
+export const updatePassword = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   const { password, new_password } = req.body;
-
+  if (!password || !new_password) {
+    throw new BadRequestError(`Password and new_password fields are required`);
+  }
   const user = await User.findById(req.currentUser!.id).select("+password");
+
   // The moment he is here it means that he passed the requireAth middleware
   // So there is a user with this id. Although add the check so TS STFU!
   if (!user) {
     throw new BadRequestError(`User Not found`);
   }
   // Check if Posted password is correct
-  if (!Password.compare(password, user.password!)) {
+  if (!(await Password.compare(user.password!, password))) {
     throw new NotAuthorizedError();
   }
   // Update password
   user.password = new_password;
   await user.save({ validateBeforeSave: false });
+  delete user.password;
 
   // Add JWT to express session
   req.session = Helper.serializeToken(

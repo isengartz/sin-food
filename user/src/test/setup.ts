@@ -3,7 +3,12 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 import request from "supertest";
 import mongoose from "mongoose";
 import { app } from "../app";
-import { API_ROOT_ENDPOINT } from "../utils/constants";
+import {
+  API_ROOT_ENDPOINT,
+  USER_CREATE_VALID_PAYLOAD,
+} from "../utils/constants";
+
+jest.mock("../events/nats-wrapper"); // Mock file into the fake
 
 declare global {
   namespace NodeJS {
@@ -38,19 +43,20 @@ beforeEach(async () => {
 
 // Close MongoMemoryServer and detach mongoose from it
 afterAll(async () => {
-  await mongo.stop();
-  await mongoose.connection.close();
+  try {
+    await mongo.stop();
+    await mongoose.connection.close();
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.debug(e);
+  }
 });
 
 global.signin = async () => {
-  const email = "test@test.com";
-  const password = "password";
+
   const response = await request(app)
-    .post(`${API_ROOT_ENDPOINT}users/signup`)
-    .send({
-      email,
-      password,
-    })
+    .post(`${API_ROOT_ENDPOINT}/users/signup`)
+    .send(USER_CREATE_VALID_PAYLOAD)
     .expect(201);
 
   return response.get("Set-Cookie");

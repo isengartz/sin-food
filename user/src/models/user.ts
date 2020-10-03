@@ -24,7 +24,8 @@ export interface UserDoc extends mongoose.Document {
   addresses: UserAddressDoc[];
   phone: string;
   password_reset_token?: string;
-  password_expires_at?: Date;
+  password_reset_expires?: number;
+  password_changed_at?: number;
   createPasswordResetToken(): string;
   changedPasswordAfter(JWTTimestamp: number): boolean;
 }
@@ -81,12 +82,20 @@ const userSchema = new mongoose.Schema(
     created_at: {
       type: Date,
       default: Date.now(),
+      select: false,
     },
     password_changed_at: {
       type: Date,
+      select: false,
     },
-    password_reset_token: String,
-    password_reset_expires: Date,
+    password_reset_token: {
+      type: String,
+      select: false,
+    },
+    password_reset_expires: {
+      type: Number,
+      select: false,
+    },
   },
   {
     toJSON: {
@@ -94,11 +103,6 @@ const userSchema = new mongoose.Schema(
       transform(doc, ret) {
         ret.id = ret._id;
         delete ret._id;
-        delete ret.created_at;
-        // delete ret.password_changed_at;
-        delete ret.password_reset_token;
-        delete ret.password_reset_expires;
-        delete ret.password;
         delete ret.__v;
       },
     },

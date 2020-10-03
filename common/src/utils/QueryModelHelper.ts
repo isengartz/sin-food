@@ -9,7 +9,11 @@ export class QueryModelHelper {
 
   private readonly queryString;
 
-  public totalCount: any;
+  private totalCount?: mongoose.DocumentQuery<
+    mongoose.Document[],
+    mongoose.Document,
+    {}
+  >;
 
   constructor(
     query: mongoose.DocumentQuery<mongoose.Document[], mongoose.Document, {}>,
@@ -24,13 +28,7 @@ export class QueryModelHelper {
   }
 
   async getTotalCount() {
-    // @ts-ignore
-    return await this.totalCount.countDocuments((err, count) => {
-      if (err) {
-        throw new Error(err.message);
-      }
-      return count;
-    });
+    return this.totalCount;
   }
 
   // Filters the query based on params;
@@ -76,9 +74,9 @@ export class QueryModelHelper {
 
   // Paginate the query
   paginate() {
+    // find total count before limiting
+    this.totalCount = _.cloneDeep(this.query);
     if (!this.queryString.nopaginate) {
-      // find total count before limiting
-      this.totalCount = _.cloneDeep(this.query);
       // @ts-ignore
       const page = this.queryString.page * 1 || 1;
       // @ts-ignore

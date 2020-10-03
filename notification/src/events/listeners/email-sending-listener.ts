@@ -28,12 +28,11 @@ export class EmailSendingListener extends Listener<EmailSendingEvent> {
       subject: data.subject,
       html: data.emailBody,
     };
+    if (process.env.NODE_ENV !== "test") {
+      // @todo: Im commenting this so I wont spam my mailbox
+      // await transporter.sendMail(mailOptions);
+    }
 
-    transporter.sendMail(mailOptions, (error) => {
-      if (error) {
-        throw new Error(error.message);
-      }
-    });
     msg.ack();
   }
 }
