@@ -66,6 +66,8 @@
     "no-return-await": "off",
     "no-underscore-dangle": "off",
     "class-methods-use-this": "off",
+    "no-shadow": "off", // replaced by ts-eslint rule below
+    "@typescript-eslint/no-shadow": "error",
     "prefer-destructuring": ["error", { "object": true, "array": false }],
     "no-unused-vars": [1, { "argsIgnorePattern": "req|res|next|val" }],
     "no-use-before-define": ["error", { "variables": false }],

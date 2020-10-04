@@ -2,7 +2,7 @@
 import mongoose from "mongoose";
 import { randomBytes, createHash } from "crypto";
 import validator from "validator";
-import { Password } from "@sin-nombre/sinfood-common";
+import { Password, UserRole } from "@sin-nombre/sinfood-common";
 import { UserAddressDoc } from "./user_address";
 
 // Describes the attributes that we accept from Request
@@ -13,6 +13,7 @@ export interface UserAttrs {
   last_name: string;
   addresses?: UserAddressDoc[];
   phone: string;
+  role?: UserRole;
 }
 // Describes the actual Document returned by Mongoose
 export interface UserDoc extends mongoose.Document {
@@ -23,6 +24,7 @@ export interface UserDoc extends mongoose.Document {
   last_name: string;
   addresses: UserAddressDoc[];
   phone: string;
+  role: UserRole;
   password_reset_token?: string;
   password_reset_expires?: number;
   password_changed_at?: number;
@@ -78,7 +80,12 @@ const userSchema = new mongoose.Schema(
         ref: "UserAddress",
       },
     ],
-
+    role: {
+      type: String,
+      required: true,
+      enum: Object.values(UserRole),
+      default: UserRole.User
+    },
     created_at: {
       type: Date,
       default: Date.now(),
@@ -142,7 +149,7 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp: number) {
   return false;
 };
 
-// Creates and persist the passwordResetToken and passwordResetExpires
+// Creates and persist the password_reset_token and password_reset_expires
 userSchema.methods.createPasswordResetToken = function () {
   const resetToken = randomBytes(32).toString("hex");
 

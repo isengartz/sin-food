@@ -14,6 +14,14 @@ it("should return 404 when user doesnt exist", async () => {
     .expect(404);
 });
 
+it("should return 404 when email isn't defined ", async () => {
+  await User.build(USER_CREATE_VALID_PAYLOAD).save();
+  await request(app)
+    .post(`${API_ROOT_ENDPOINT}/users/forgotPassword`)
+    .send({})
+    .expect(404);
+});
+
 it("should return the password reset token on success", async () => {
   await User.build(USER_CREATE_VALID_PAYLOAD).save();
   const response = await request(app)

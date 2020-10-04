@@ -7,9 +7,9 @@ import xss from "xss-clean"; // @todo: add Typescript declaration some day
 import hpp from "hpp";
 import mongoSanitize from "express-mongo-sanitize";
 import { errorHandler, RouteNotFoundError } from "@sin-nombre/sinfood-common";
-import { createUserAddressRouter } from "./routes/address/create";
 import { authRoutes } from "./routes/authRoutes";
 import { API_ROOT_ENDPOINT } from "./utils/constants";
+import { userAddressRoutes } from "./routes/userAddressRoutes";
 
 const app = express();
 app.set("trust proxy", true); //used for ingress-nginx
@@ -36,10 +36,13 @@ app.use(hpp());
 /**
  * Routes
  */
-app.use(`${API_ROOT_ENDPOINT}/users`, authRoutes);
 
 // Address
-app.use("/api/users", createUserAddressRouter);
+app.use(`${API_ROOT_ENDPOINT}/users`, userAddressRoutes);
+// User
+app.use(`${API_ROOT_ENDPOINT}/users`, authRoutes);
+
+
 
 // Not Found Route
 app.all("*", () => {

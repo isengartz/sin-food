@@ -27,7 +27,7 @@ export class QueryModelHelper {
     return this.query;
   }
 
-  async getTotalCount() {
+  getTotalCount() {
     return this.totalCount;
   }
 

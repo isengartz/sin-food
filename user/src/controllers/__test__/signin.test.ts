@@ -11,6 +11,7 @@ it("should return 400 when email or password are undefined", async () => {
     .post(`${API_ROOT_ENDPOINT}/users/login`)
     .send({ email: "test@test.com" })
     .expect(400);
+
   await request(app)
     .post(`${API_ROOT_ENDPOINT}/users/login`)
     .send({ password: "password" })

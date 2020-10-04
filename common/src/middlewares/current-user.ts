@@ -1,6 +1,6 @@
-/* eslint-disable no-unused-vars,no-shadow */
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { UserRole } from "..";
 
 interface UserPayload {
   id: string;
@@ -15,6 +15,7 @@ interface UserPayload {
     longitude: string;
   }[];
   phone: string;
+  role: UserRole;
   created_at: Date;
   password_changed_at: Date;
   password_reset_token: string;
