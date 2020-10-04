@@ -1,3 +1,5 @@
+import { UserRole } from "@sin-nombre/sinfood-common";
+
 export const API_ROOT_ENDPOINT = "/api/v1";
 
 export const USER_CREATE_VALID_PAYLOAD = {
@@ -7,4 +9,13 @@ export const USER_CREATE_VALID_PAYLOAD = {
   password: "test12345",
   password_confirm: "test12345",
   phone: "+306980000000",
+  role: UserRole.User,
+};
+
+export const USER_ADDRESS_CREATE_VALID_PAYLOAD = {
+  description: "Home Address",
+  floor: "3",
+  full_address: "White Tower , 54645, Thessaloniki, Greece",
+  latitude: "12.12321312",
+  longitude: "12.1234123",
 };

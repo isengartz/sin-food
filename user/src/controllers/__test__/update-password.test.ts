@@ -10,7 +10,7 @@ it("should return 401 when user isn't logged in", async () => {
 });
 
 it("should return 400 when password or new_password aren't provided", async () => {
-  const cookie = await global.signin();
+  const {cookie} = await global.signin();
   await request(app)
     .patch(`${API_ROOT_ENDPOINT}/users/updatePassword`)
     .set("Cookie", cookie)
@@ -19,7 +19,7 @@ it("should return 400 when password or new_password aren't provided", async () =
 });
 
 it("should return 401 when password is invalid", async () => {
-  const cookie = await global.signin();
+  const {cookie} = await global.signin();
   await request(app)
     .patch(`${API_ROOT_ENDPOINT}/users/updatePassword`)
     .set("Cookie", cookie)
@@ -28,8 +28,8 @@ it("should return 401 when password is invalid", async () => {
 });
 
 it("should return 200 on valid request", async () => {
-  const cookie = await global.signin();
-  const response = await request(app)
+  const { cookie } = await global.signin();
+  await request(app)
     .patch(`${API_ROOT_ENDPOINT}/users/updatePassword`)
     .set("Cookie", cookie)
     .send({
@@ -37,5 +37,4 @@ it("should return 200 on valid request", async () => {
       new_password: "new_password",
     })
     .expect(200);
-
 });

@@ -1,10 +1,11 @@
 import { Response } from "express";
 import jwt from "jsonwebtoken";
+import { UserRole } from "@sin-nombre/sinfood-common";
 import { UserDoc } from "../models/user";
 
 class Helper {
   // Sign the User Token
-  static signToken(payload: { id: string; email: string }) {
+  static signToken(payload: { id: string; email: string; role: UserRole }) {
     return jwt.sign(payload, process.env.JWT_KEY!); // add the ! to remove TS error
   }
 
@@ -23,6 +24,7 @@ class Helper {
     const token = Helper.signToken({
       id: user.id,
       email: user.email,
+      role: user.role
     });
 
     res.status(statusCode).json({

@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
+
 // Describes the attributes that we accept from Request
 export interface UserAddressAttrs {
   description: string;
@@ -6,6 +8,7 @@ export interface UserAddressAttrs {
   full_address: string;
   latitude: string;
   longitude: string;
+  user_id: string;
 }
 // Describes the actual Document returned by Mongoose
 export interface UserAddressDoc extends mongoose.Document {
@@ -14,6 +17,8 @@ export interface UserAddressDoc extends mongoose.Document {
   full_address: string;
   latitude: string;
   longitude: string;
+  version: number;
+  user_id: string;
 }
 
 interface UserAddressModel extends mongoose.Model<UserAddressDoc> {
@@ -42,6 +47,11 @@ const userAddressSchema = new mongoose.Schema(
       type: Number,
       required: [true, "Latitude is Required"],
     },
+    user_id: {
+      type: String,
+      required: [true, "User id is required"],
+      // select: false,
+    },
   },
   {
     toJSON: {
@@ -53,6 +63,12 @@ const userAddressSchema = new mongoose.Schema(
     },
   }
 );
+
+// Insert updateIfCurrentPlugin and change the default version key from __v to version
+userAddressSchema.set("versionKey", "version");
+userAddressSchema.plugin(updateIfCurrentPlugin);
+
+
 // Hack so we can use TS with mongoose
 userAddressSchema.statics.build = (attrs: UserAddressAttrs) => {
   return new UserAddress(attrs);

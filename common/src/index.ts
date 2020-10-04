@@ -10,6 +10,8 @@ export * from "./middlewares/current-user";
 export * from "./middlewares/error-handler";
 export * from "./middlewares/require-auth";
 export * from "./middlewares/validate-request";
+export * from "./middlewares/restrict-to";
+export * from "./middlewares/is-admin-or-current-user";
 
 export * from "./events/event-interfaces/user-created-event";
 export * from "./events/event-interfaces/user-updated-event";
@@ -22,3 +24,5 @@ export * from "./events/subjects";
 export * from "./utils/password";
 export * from "./utils/globalConsts";
 export * from "./utils/QueryModelHelper";
+
+export * from "./enums/user-roles";

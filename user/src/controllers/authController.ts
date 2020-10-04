@@ -32,6 +32,7 @@ export const allUsers = async (
     .limitFields()
     .paginate();
 
+  // @ts-ignore
   const totalCount = await User.countDocuments(queryHelper.getTotalCount());
 
   const users = await queryHelper.getQuery().populate("addresses");
@@ -54,6 +55,16 @@ export const signup = async (
   res: Response,
   next: NextFunction
 ) => {
+
+  // leave this for testing so I can add admins without accessing Mongo Pods
+  // @todo: remove on production
+  if (
+    !req.body.admin_passphrase ||
+    req.body.admin_passphrase !== process.env.ADMIN_ALLOW_PASSWORD
+  ) {
+    delete req.body.role;
+  }
+
   const {
     email,
     password,
@@ -61,6 +72,7 @@ export const signup = async (
     last_name,
     phone,
     password_confirm,
+    role,
   } = req.body;
 
   // Check for Password Confirmation
@@ -69,12 +81,14 @@ export const signup = async (
       `Password & Password Confirmation must be identical`
     );
   }
+  // @todo: remove role on production
   const user = User.build({
     email,
     password,
     first_name,
     last_name,
     phone,
+    role,
   });
   await user.save();
   // Add JWT to express session
@@ -82,6 +96,7 @@ export const signup = async (
     Helper.signToken({
       id: user.id,
       email: user.email,
+      role: user.role,
     })
   );
   // Send Data + JWT Back
@@ -121,6 +136,7 @@ export const login = async (
     Helper.signToken({
       id: user.id,
       email: user.email,
+      role: user.role,
     })
   );
   // Send Data + JWT Back
@@ -238,6 +254,7 @@ export const resetPassword = async (
     Helper.signToken({
       id: user.id,
       email: user.email,
+      role: user.role,
     })
   );
 
@@ -281,6 +298,7 @@ export const updatePassword = async (
     Helper.signToken({
       id: user.id,
       email: user.email,
+      role: user.role,
     })
   );
 
