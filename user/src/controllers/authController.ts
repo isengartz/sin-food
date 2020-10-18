@@ -55,7 +55,6 @@ export const signup = async (
   res: Response,
   next: NextFunction
 ) => {
-
   // leave this for testing so I can add admins without accessing Mongo Pods
   // @todo: remove on production
   if (

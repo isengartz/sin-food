@@ -5,7 +5,6 @@ import {
   UserRole,
 } from "@sin-nombre/sinfood-common";
 import { UserAddress } from "../models/user_address";
-import { User } from "../models/user";
 
 export const createAddress = async (
   req: Request,
@@ -13,30 +12,20 @@ export const createAddress = async (
   next: NextFunction
 ) => {
   const user_id = req.currentUser!.id;
-  const { description, floor, full_address, latitude, longitude } = req.body;
+  const { description, floor, full_address, location } = req.body;
 
   // Save Address
   const addressDoc = await UserAddress.build({
     description,
     floor,
     full_address,
-    latitude,
-    longitude,
+    location,
     user_id,
   }).save();
 
-  await User.findByIdAndUpdate(
-    user_id,
-    {
-      $push: {
-        addresses: addressDoc,
-      },
-    },
-    { new: true, runValidators: true }
-  );
   res.status(201).send({
+    status: "success",
     data: {
-      status: "success",
       address: addressDoc,
     },
   });
@@ -48,7 +37,7 @@ export const updateAddress = async (
   next: NextFunction
 ) => {
   const { addressId } = req.params;
-  const { description, floor, full_address, latitude, longitude } = req.body;
+  const { description, floor, full_address, location } = req.body;
 
   const address = await UserAddress.findOne({
     _id: addressId,
@@ -59,15 +48,16 @@ export const updateAddress = async (
     throw new NotFoundError(`User Address with id ${addressId} not found`);
   }
 
+  // Update Address
   address.description = description;
   address.floor = floor;
   address.full_address = full_address;
-  address.latitude = latitude;
-  address.longitude = longitude;
+  address.location = location;
   await address.save();
+
   res.status(200).send({
+    status: "success",
     data: {
-      status: "success",
       address,
     },
   });
@@ -78,7 +68,9 @@ export const deleteAddress = async (
   res: Response,
   next: NextFunction
 ) => {
-  const address = await UserAddress.findOneAndDelete({
+  // Instead of using findOneAndDelete use .delete on Document
+  // So the remove middleware will fire
+  const address = await UserAddress.findOne({
     _id: req.params.addressId,
     user_id: req.currentUser!.id,
   });
@@ -87,15 +79,8 @@ export const deleteAddress = async (
       `Address with id ${req.params.addressId} not found`
     );
   }
-  await User.findByIdAndUpdate(
-    address.user_id,
-    {
-      $pull: {
-        addresses: req.params.addressId
-      },
-    },
-    { new: true, runValidators: true }
-  );
+  address.remove();
+
   res.status(204).json({
     status: "success",
     data: null,

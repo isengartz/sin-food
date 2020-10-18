@@ -16,6 +16,7 @@ export const USER_ADDRESS_CREATE_VALID_PAYLOAD = {
   description: "Home Address",
   floor: "3",
   full_address: "White Tower , 54645, Thessaloniki, Greece",
-  latitude: "12.12321312",
-  longitude: "12.1234123",
+  location: {
+    coordinates: [12.12321312, -12.12321312],
+  },
 };

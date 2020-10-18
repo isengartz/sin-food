@@ -84,7 +84,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       enum: Object.values(UserRole),
-      default: UserRole.User
+      default: UserRole.User,
     },
     created_at: {
       type: Date,
@@ -160,6 +160,18 @@ userSchema.methods.createPasswordResetToken = function () {
 
   return resetToken;
 };
+
+userSchema.pre("remove", async function (next) {
+  const UserAddress = mongoose.model("UserAddress");
+
+  await UserAddress.remove({
+    _id: {
+      // @ts-ignore
+      $in: this.addresses,
+    },
+  });
+  next();
+});
 
 // Hack so we can use TS with mongoose
 userSchema.statics.build = (attrs: UserAttrs) => {

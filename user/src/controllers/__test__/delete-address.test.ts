@@ -45,6 +45,6 @@ it("should return 204 on success and user has 0 addresses", async () => {
     .expect(204);
 
   const updatedUser = await User.findById(user.id);
-  console.debug(updatedUser);
+
   expect(updatedUser!.addresses.length).toEqual(0);
 });
