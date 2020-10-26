@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: restaurant-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: restaurant
+  template:
+    metadata:
+      labels:
+        app: restaurant
+    spec:
+      containers:
+        - name: restaurant
+          image: isengart/food-restaurant #docker image
+          env:
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name # we add the same name as the POD generated from Kubernetes
+            - name: NATS_URL
+              value: "http://nats-srv:4222"
+            - name: NATS_CLUSTER_ID
+              value: sinfood
+            - name: MONGO_URI
+              value: "mongodb://restaurant-mongo-srv:27017/restaurant"
+            - name: JWT_COOKIE_EXPIRES_IN
+              value: "30"
+            - name: JWT_RESTAURANT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-restaurant-secret
+                  key: JWT_RESTAURANT_SECRET
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: restaurant-srv
+spec:
+  selector:
+    app: restaurant
+  ports:
+    - name: restaurant
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
