@@ -55,6 +55,7 @@ const userAddressSchema = new mongoose.Schema(
     location: {
       type: { type: String, enum: ["Point"], default: "Point" },
       coordinates: {
+        required: [true, "The geolocation is required"],
         type: [Number],
         index: "2dsphere",
       },

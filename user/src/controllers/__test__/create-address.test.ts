@@ -22,8 +22,8 @@ it("should return 400 when required fields missing", async () => {
     .send({})
     .expect(400);
 
-  // 4 are the required fields of UserAddress Model
-  expect(response.body.errors.length).toEqual(4);
+  // 3 are the required fields of UserAddress Model
+  expect(response.body.errors.length).toEqual(3);
 });
 it("should attach the userAddress  ", async () => {
   // Create / get a cookie

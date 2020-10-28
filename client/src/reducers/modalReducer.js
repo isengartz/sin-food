@@ -10,3 +10,5 @@ export default (state = { loginModal: false }, action) => {
       return state;
   }
 };
+
+
