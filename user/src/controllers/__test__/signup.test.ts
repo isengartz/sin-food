@@ -21,7 +21,7 @@ it("should return 400 when a bad email provided", () => {
     .send(faultyUserPayload)
     .expect(400);
 });
-it("should return 400 when a phone is provided", async () => {
+it("should return 400 when a bad phone is provided", async () => {
   const faultyUserPayload = {
     email: "test@test.com",
     first_name: "Jon",

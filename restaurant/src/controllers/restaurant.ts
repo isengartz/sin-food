@@ -1,20 +1,25 @@
-import express, { Request, Response, NextFunction } from "express";
-import { BadRequestError } from "@sin-nombre/sinfood-common";
-import { Restaurant } from "../../models/restaurant";
-import { Helper } from "../../utils/helper";
+import { Request, Response, NextFunction } from "express";
+import { BadRequestError, findAll } from "@sin-nombre/sinfood-common";
+import { Restaurant } from "../models/restaurant";
+import { Helper } from "../utils/helper";
 
-const router = express.Router();
+export const findAllRestaurants = findAll(Restaurant, {});
 
-router.post("/signup", async (req, res, next) => {
+export const createRestaurant = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const {
     email,
-    password,
     name,
-    password_confirm,
+    phone,
     description,
     full_address,
-    location,
     delivers_to,
+    location,
+    password,
+    password_confirm,
   } = req.body;
 
   // Check for Password Confirmation
@@ -24,8 +29,9 @@ router.post("/signup", async (req, res, next) => {
     );
   }
 
-  const restaurant = await Restaurant.build({
+  const restaurant = Restaurant.build({
     email,
+    phone,
     name,
     password,
     description,
@@ -33,6 +39,8 @@ router.post("/signup", async (req, res, next) => {
     location,
     delivers_to,
   });
+
+  await restaurant.save();
 
   req.session = Helper.serializeToken(
     Helper.signToken({
@@ -42,6 +50,4 @@ router.post("/signup", async (req, res, next) => {
   );
   // Send Data + JWT Back
   Helper.createSendToken(restaurant, 201, res);
-});
-
-export { router as signupRestaurant };
+};

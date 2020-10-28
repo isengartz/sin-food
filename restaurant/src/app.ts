@@ -8,7 +8,7 @@ import hpp from "hpp";
 import mongoSanitize from "express-mongo-sanitize";
 import { errorHandler, RouteNotFoundError } from "@sin-nombre/sinfood-common";
 import { API_ROOT_ENDPOINT } from "./utils/constants";
-import { signupRestaurant } from "./routes/restaurant/create";
+import { restaurantRoutes } from "./routes/restaurantRoutes";
 
 const app = express();
 app.set("trust proxy", true); //used for ingress-nginx
@@ -36,8 +36,7 @@ app.use(hpp());
  * Routes
  */
 // Restaurant
-app.use(`${API_ROOT_ENDPOINT}/restaurants/`, signupRestaurant);
-
+app.use(`${API_ROOT_ENDPOINT}/restaurants/`, restaurantRoutes);
 
 // Not Found Route
 app.all("*", () => {

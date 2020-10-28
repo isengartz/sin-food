@@ -13,13 +13,14 @@ export interface RestaurantAttrs {
   full_address: string;
   logo?: string;
   location: {
-    type: string;
+    type?: string;
     coordinates: number[];
   };
   delivers_to: {
-    type: string;
+    type?: string;
     coordinates: number[][][];
   };
+  phone: string;
 }
 // Describes the actual Document returned by Mongoose
 export interface RestaurantDoc extends mongoose.Document {
@@ -38,6 +39,8 @@ export interface RestaurantDoc extends mongoose.Document {
     type: string;
     coordinates: number[][][];
   };
+  categories: string[];
+  phone: string;
   enabled: boolean;
   password_reset_token?: string;
   password_reset_expires?: number;
@@ -54,13 +57,13 @@ const restaurantSchema = new mongoose.Schema(
   {
     email: {
       type: String,
+      unique: [true, "Email already in use. Use a different one."],
+      required: [true, "Email is required"],
+      lowercase: true,
       validate: {
         validator: validator.isEmail,
         message: "Provide a valid Email",
       },
-      unique: [true, "Email already in use. Use a different one."],
-      required: [true, "Email is required"],
-      lowercase: true,
     },
     password: {
       type: String,
@@ -70,7 +73,7 @@ const restaurantSchema = new mongoose.Schema(
     },
     name: {
       type: String,
-      required: [true, "Restaurant Name is required"]
+      required: [true, "Restaurant Name is required"],
     },
     description: {
       type: String,
@@ -88,6 +91,7 @@ const restaurantSchema = new mongoose.Schema(
     location: {
       type: { type: String, enum: ["Point"], default: "Point" },
       coordinates: {
+        required: [true, "Restaurant geolocation is required"],
         type: [Number],
         index: "2dsphere",
       },
@@ -97,6 +101,24 @@ const restaurantSchema = new mongoose.Schema(
       coordinates: {
         type: [[[Number]]],
         // index: "2dsphere",
+      },
+    },
+    categories: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "RestaurantCategory",
+      },
+    ],
+    phone: {
+      type: String,
+      required: [true, "Phone is required"],
+      validate: {
+        validator: function (v: string) {
+          return validator.isMobilePhone(v, "any", {
+            strictMode: true,
+          });
+        },
+        message: "Provide a valid phone",
       },
     },
     created_at: {
