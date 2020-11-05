@@ -6,12 +6,12 @@ import {
 } from "./types/utilTypes";
 
 // Display an error message
-export const setError = (errors) => {
-
+export const setError = (errors,statusCode) => {
   return (dispatch) => {
     dispatch({
       type: HAS_ERROR,
       payload: errors,
+      statusCode
     });
   };
 };
