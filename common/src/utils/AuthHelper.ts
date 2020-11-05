@@ -1,30 +1,29 @@
 import { Response } from "express";
 import jwt from "jsonwebtoken";
-import { UserRole } from "@sin-nombre/sinfood-common";
-import { UserDoc } from "../models/user";
+import { UserPayload } from "../interfaces/UserPayload";
 
-class Helper {
+class AuthHelper {
   // Sign the User Token
-  static signToken(payload: { id: string; email: string; role: UserRole }) {
+  static signToken(payload: UserPayload) {
     return jwt.sign(payload, process.env.JWT_KEY!); // add the ! to remove TS error
   }
 
   // Creates a JWT object with the token
-  static serializeToken(token: string) {
+  static serializeToken(token: string): { jwt: string } {
     return { jwt: token };
   }
 
   // Sign Serialize create cookie and send the request
-  static createSendToken = (
-    user: UserDoc,
+  static createSendToken(
+    user: UserPayload,
     statusCode: number,
     res: Response
-  ) => {
+  ): void {
     // Create Token
-    const token = Helper.signToken({
+    const token = AuthHelper.signToken({
       id: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
     });
 
     res.status(statusCode).json({
@@ -34,6 +33,6 @@ class Helper {
         user,
       },
     });
-  };
+  }
 }
-export { Helper };
+export { AuthHelper };

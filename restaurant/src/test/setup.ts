@@ -22,7 +22,7 @@ let mongo: any;
 
 // Start MongoMemoryServer
 beforeAll(async () => {
-  process.env.JWT_RESTAURANT_SECRET = "test-jwt-token-restaurant";
+  process.env.JWT_KEY = "test-jwt-token-restaurant";
   process.env.NODE_ENV = "test";
 
   mongo = new MongoMemoryServer();
@@ -65,6 +65,6 @@ global.signin = async () => {
     .expect(201);
   return {
     cookie: response.get("Set-Cookie"),
-    user: response.body.data.restaurant as RestaurantDoc,
+    user: response.body.data.user as RestaurantDoc,
   };
 };
