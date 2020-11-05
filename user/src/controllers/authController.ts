@@ -7,10 +7,10 @@ import {
   NotFoundError,
   Password,
   QueryModelHelper,
+  AuthHelper,
 } from "@sin-nombre/sinfood-common";
 
 import { User } from "../models/user";
-import { Helper } from "../utils/helper";
 import { API_ROOT_ENDPOINT } from "../utils/constants";
 import { EmailSendingPublisher } from "../events/publishers/email-sending-publisher";
 import { natsWrapper } from "../events/nats-wrapper";
@@ -91,15 +91,15 @@ export const signup = async (
   });
   await user.save();
   // Add JWT to express session
-  req.session = Helper.serializeToken(
-    Helper.signToken({
+  req.session = AuthHelper.serializeToken(
+    AuthHelper.signToken({
       id: user.id,
       email: user.email,
       role: user.role,
     })
   );
   // Send Data + JWT Back
-  Helper.createSendToken(user, 201, res);
+  AuthHelper.createSendToken(user, 201, res);
 };
 
 /**
@@ -131,15 +131,15 @@ export const login = async (
   }
 
   // Add JWT to express session
-  req.session = Helper.serializeToken(
-    Helper.signToken({
+  req.session = AuthHelper.serializeToken(
+    AuthHelper.signToken({
       id: user.id,
       email: user.email,
       role: user.role,
     })
   );
   // Send Data + JWT Back
-  Helper.createSendToken(user, 200, res);
+  AuthHelper.createSendToken(user, 200, res);
 };
 
 /**
@@ -249,8 +249,8 @@ export const resetPassword = async (
   delete user.password;
 
   // Add JWT to express session
-  req.session = Helper.serializeToken(
-    Helper.signToken({
+  req.session = AuthHelper.serializeToken(
+    AuthHelper.signToken({
       id: user.id,
       email: user.email,
       role: user.role,
@@ -258,7 +258,7 @@ export const resetPassword = async (
   );
 
   // Send JWT
-  Helper.createSendToken(user, 200, res);
+  AuthHelper.createSendToken(user, 200, res);
 };
 
 /**
@@ -293,8 +293,8 @@ export const updatePassword = async (
   delete user.password;
 
   // Add JWT to express session
-  req.session = Helper.serializeToken(
-    Helper.signToken({
+  req.session = AuthHelper.serializeToken(
+    AuthHelper.signToken({
       id: user.id,
       email: user.email,
       role: user.role,
@@ -302,7 +302,7 @@ export const updatePassword = async (
   );
 
   // Send JWT
-  Helper.createSendToken(user, 200, res);
+  AuthHelper.createSendToken(user, 200, res);
 };
 
 /**

@@ -15,18 +15,29 @@ interface RestaurantCategoryModel
   build(attrs: RestaurantCategoryAttrs): RestaurantCategoryDoc;
 }
 
-const restaurantCategorySchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "Category name is required"],
-  },
-  restaurants: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Restaurant",
+const restaurantCategorySchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Category name is required"],
     },
-  ],
-});
+    restaurants: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Restaurant",
+      },
+    ],
+  },
+  {
+    toJSON: {
+      transform(doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+      },
+    },
+  }
+);
 
 restaurantCategorySchema.statics.build = (attrs: RestaurantCategoryAttrs) => {
   return new RestaurantCategory(attrs);
@@ -35,6 +46,6 @@ restaurantCategorySchema.statics.build = (attrs: RestaurantCategoryAttrs) => {
 const RestaurantCategory = mongoose.model<
   RestaurantCategoryDoc,
   RestaurantCategoryModel
->("RestaurantCategory", restaurantCategorySchema);
+>("Restaurant_Category", restaurantCategorySchema);
 
 export default RestaurantCategory;

@@ -1,8 +1,10 @@
 /* eslint-disable no-unused-vars */
-import mongoose from "mongoose";
+// @ts-nocheck
+import mongoose, { Mongoose } from "mongoose";
 import { randomBytes, createHash } from "crypto";
 import validator from "validator";
-import { Password } from "@sin-nombre/sinfood-common";
+import { Password, UserRole } from "@sin-nombre/sinfood-common";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 
 // Describes the attributes that we accept from Request
 export interface RestaurantAttrs {
@@ -12,6 +14,7 @@ export interface RestaurantAttrs {
   description: string;
   full_address: string;
   logo?: string;
+  categories?: string[];
   location: {
     type?: string;
     coordinates: number[];
@@ -42,6 +45,7 @@ export interface RestaurantDoc extends mongoose.Document {
   categories: string[];
   phone: string;
   enabled: boolean;
+  role: UserRole;
   password_reset_token?: string;
   password_reset_expires?: number;
   password_changed_at?: number;
@@ -106,7 +110,7 @@ const restaurantSchema = new mongoose.Schema(
     categories: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "RestaurantCategory",
+        ref: "Restaurant_Category",
       },
     ],
     phone: {
@@ -120,6 +124,12 @@ const restaurantSchema = new mongoose.Schema(
         },
         message: "Provide a valid phone",
       },
+    },
+    role: {
+      type: String,
+      required: true,
+      enum: Object.values(UserRole),
+      default: UserRole.Restaurant,
     },
     created_at: {
       type: Date,
@@ -149,6 +159,73 @@ const restaurantSchema = new mongoose.Schema(
     },
   }
 );
+
+// Insert updateIfCurrentPlugin and change the default version key from __v to version
+restaurantSchema.set("versionKey", "version");
+restaurantSchema.plugin(updateIfCurrentPlugin);
+
+// Insert the reference from the Restaurant Category
+restaurantSchema.pre<RestaurantDoc>("save", async function (next) {
+  if (this.categories.length === 0) {
+    return next();
+  }
+
+  const RestaurantCategory = mongoose.model("Restaurant_Category");
+
+  // Add any new categories
+
+  await RestaurantCategory.updateMany(
+    { _id: { $in: this.categories } },
+    {
+      $addToSet: {
+        restaurants: this._id,
+      },
+    }
+  );
+
+  next();
+});
+
+restaurantSchema.post<RestaurantDoc>("findOneAndUpdate", async function (doc) {
+  if (doc) {
+    const RestaurantCategory = mongoose.model("Restaurant_Category");
+
+    // Remove any categories that got removed from the document
+    await RestaurantCategory.updateMany(
+      { _id: { $nin: doc.categories } },
+      {
+        $pull: {
+          restaurants: doc._id,
+        },
+      }
+    );
+
+    // Add any new categories
+    await RestaurantCategory.updateMany(
+      { _id: { $in: doc.categories } },
+      {
+        $addToSet: {
+          restaurants: doc._id,
+        },
+      }
+    );
+  }
+});
+
+// Remove the reference from the Restaurant Category
+restaurantSchema.pre<RestaurantDoc>("remove", async function (next) {
+  const RestaurantCategory = mongoose.model("Restaurant_Category");
+
+  await RestaurantCategory.updateMany(
+    { _id: { $in: this.categories } },
+    {
+      $pull: {
+        restaurants: this._id,
+      },
+    }
+  );
+  next();
+});
 
 // Hash password before Save
 restaurantSchema.pre("save", async function (next) {
@@ -196,18 +273,6 @@ restaurantSchema.methods.createPasswordResetToken = function () {
 
   return resetToken;
 };
-
-// restaurantSchema.pre("remove", async function (next) {
-//   const UserAddress = mongoose.model("UserAddress");
-//
-//   await UserAddress.remove({
-//     _id: {
-//       // @ts-ignore
-//       $in: this.addresses,
-//     },
-//   });
-//   next();
-// });
 
 // Hack so we can use TS with mongoose
 restaurantSchema.statics.build = (attrs: RestaurantAttrs) => {

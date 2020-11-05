@@ -28,11 +28,11 @@ spec:
               value: "mongodb://restaurant-mongo-srv:27017/restaurant"
             - name: JWT_COOKIE_EXPIRES_IN
               value: "30"
-            - name: JWT_RESTAURANT_SECRET
+            - name: JWT_KEY
               valueFrom:
                 secretKeyRef:
-                  name: jwt-restaurant-secret
-                  key: JWT_RESTAURANT_SECRET
+                  name: jwt-secret
+                  key: JWT_KEY
 ---
 apiVersion: v1
 kind: Service
