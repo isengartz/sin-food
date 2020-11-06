@@ -24,6 +24,7 @@ export interface RestaurantAttrs {
     coordinates: number[][][];
   };
   phone: string;
+  role?: UserRole;
 }
 // Describes the actual Document returned by Mongoose
 export interface RestaurantDoc extends mongoose.Document {
@@ -77,6 +78,7 @@ const restaurantSchema = new mongoose.Schema(
     },
     name: {
       type: String,
+      unique: [true, "Restaurant Name must be unique"],
       required: [true, "Restaurant Name is required"],
     },
     description: {
