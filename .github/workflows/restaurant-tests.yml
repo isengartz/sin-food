@@ -1,4 +1,4 @@
-name: restaurant-tets
+name: restaurant-tests
 
 on:
   pull_request
