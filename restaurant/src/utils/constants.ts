@@ -1,7 +1,4 @@
-import { UserRole } from "@sin-nombre/sinfood-common";
-
 export const API_ROOT_ENDPOINT = "/api/v1";
-
 export const RESTAURANT_CREATE_VALID_PAYLOAD = {
   email: "test@test.com",
   name: "Super Delivery",

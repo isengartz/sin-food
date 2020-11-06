@@ -18,7 +18,7 @@ router
 router
   .route("/")
   .get(findAllCategories)
-  // .post(currentUser, isAdmin, createCategory); // Only admin should create categories
-  .post(createCategory); // Only admin should create categories
+  .post(currentUser, isAdmin, createCategory); // Only admin should create categories
+  // .post(createCategory); // Only admin should create categories
 
 export { router as restaurantCategoryRouter };

@@ -2,6 +2,8 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 import request from "supertest";
 import mongoose from "mongoose";
 import { randomBytes } from "crypto";
+import { UserRole } from "@sin-nombre/sinfood-common";
+import faker from "faker";
 import { app } from "../app";
 import {
   API_ROOT_ENDPOINT,
@@ -15,6 +17,7 @@ declare global {
   namespace NodeJS {
     interface Global {
       signin(): Promise<{ cookie: string[]; user: RestaurantDoc }>;
+      signinAdmin(): Promise<{ cookie: string[]; user: RestaurantDoc }>;
     }
   }
 }
@@ -56,13 +59,31 @@ afterAll(async () => {
 
 global.signin = async () => {
   // So we can use it more than one to generate random users
-  RESTAURANT_CREATE_VALID_PAYLOAD.email = `${randomBytes(10).toString(
-    "base64"
-  )}@test.com`;
+  RESTAURANT_CREATE_VALID_PAYLOAD.name = faker.company.companyName();
+  RESTAURANT_CREATE_VALID_PAYLOAD.email = faker.internet.email();
   const response = await request(app)
     .post(`${API_ROOT_ENDPOINT}/restaurants`)
     .send(RESTAURANT_CREATE_VALID_PAYLOAD)
     .expect(201);
+  return {
+    cookie: response.get("Set-Cookie"),
+    user: response.body.data.user as RestaurantDoc,
+  };
+};
+global.signinAdmin = async () => {
+  // So we can use it more than one to generate random users
+
+  const response = await request(app)
+    .post(`${API_ROOT_ENDPOINT}/restaurants`)
+    .send({
+      ...RESTAURANT_CREATE_VALID_PAYLOAD,
+      email: faker.internet.email(),
+      name: faker.company.companyName(),
+      role: UserRole.Admin,
+      admin_passphrase: process.env.ADMIN_ALLOW_PASSWORD,
+    })
+    .expect(201);
+
   return {
     cookie: response.get("Set-Cookie"),
     user: response.body.data.user as RestaurantDoc,

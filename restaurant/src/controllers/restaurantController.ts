@@ -26,8 +26,15 @@ export const createRestaurant = async (
     password,
     password_confirm,
     categories,
+    role,
   } = req.body;
 
+  if (
+    !req.body.admin_passphrase ||
+    req.body.admin_passphrase !== process.env.ADMIN_ALLOW_PASSWORD
+  ) {
+    delete req.body.role;
+  }
   // Check for Password Confirmation
   if (!password_confirm || password_confirm !== password) {
     throw new BadRequestError(
@@ -45,6 +52,7 @@ export const createRestaurant = async (
     location,
     delivers_to,
     categories,
+    role
   });
 
   await restaurant.save();

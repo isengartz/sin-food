@@ -19,6 +19,7 @@ const restaurantCategorySchema = new mongoose.Schema(
   {
     name: {
       type: String,
+      unique: [true, "Category name must be unique"],
       required: [true, "Category name is required"],
     },
     restaurants: [

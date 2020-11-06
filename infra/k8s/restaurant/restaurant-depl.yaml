@@ -33,6 +33,11 @@ spec:
                 secretKeyRef:
                   name: jwt-secret
                   key: JWT_KEY
+            - name: ADMIN_ALLOW_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: admin-allow-password
+                  key: ADMIN_ALLOW_PASSWORD
 ---
 apiVersion: v1
 kind: Service
