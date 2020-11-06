@@ -60,7 +60,7 @@ it("should return 400 when password & password confirm aren't identical", async 
 
   // @ts-ignore
   faultyUserPayload.password = undefined;
-  request(app)
+  await request(app)
     .post(`${API_ROOT_ENDPOINT}/users/signup`)
     .send(faultyUserPayload)
     .expect(400);
@@ -83,8 +83,8 @@ it("should return 400 when any of the required fields are empty and the same cou
   expect(response.body.errors.length).toEqual(4);
 });
 
-it("should return 201 given a correct payload", () => {
-  request(app)
+it("should return 201 given a correct payload", async () => {
+  await request(app)
     .post(`${API_ROOT_ENDPOINT}/users/signup`)
     .send(USER_CREATE_VALID_PAYLOAD)
     .expect(201);
@@ -105,7 +105,7 @@ it("should return 400 when user with the same email exist", async () => {
     .send(USER_CREATE_VALID_PAYLOAD)
     .expect(201);
 
-  request(app)
+  await request(app)
     .post(`${API_ROOT_ENDPOINT}/users/signup`)
     .send(USER_CREATE_VALID_PAYLOAD)
     .expect(400);
