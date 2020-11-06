@@ -7,7 +7,7 @@ import {
 import { Restaurant } from "../../../models/restaurant";
 
 it("should return 401 when user isnt logged in", async () => {
-  request(app)
+  await request(app)
     .put(`${API_ROOT_ENDPOINT}/restaurants/randomid`)
     .send({ name: "New Name" })
     .expect(401);
