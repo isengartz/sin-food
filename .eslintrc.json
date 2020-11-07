@@ -17,7 +17,7 @@
     "window": true
   },
   "extends": [
-    "airbnb",
+    "airbnb-typescript/base",
     "plugin:prettier/recommended",
     "prettier",
     "plugin:react/recommended"
@@ -36,7 +36,8 @@
       "jsx": true,
       "experimentalObjectRestSpread": true,
       "modules": true
-    }
+    },
+    "project": "tsconfig.json"
   },
   "rules": {
     "import/extensions": [
@@ -54,6 +55,7 @@
       1,
       { "extensions": [".js", ".jsx", ".ts"] }
     ],
+    "suppressImplicitAnyIndexErrors": 0,
     "prefer-object-spread/prefer-object-spread": 2,
     "prettier/prettier": "warn",
     "spaced-comment": "off",

@@ -6,7 +6,7 @@ import {
   API_ROOT_ENDPOINT,
   RESTAURANT_CREATE_VALID_PAYLOAD,
 } from "../../../utils/constants";
-import RestaurantCategory from "../../../models/restaurant-category";
+import {RestaurantCategory} from "../../../models/restaurant-category";
 
 it("should return 400 when no required fields are set", async () => {
   await request(app)

@@ -1,10 +1,15 @@
 /* eslint-disable no-unused-vars */
 // @ts-nocheck
-import mongoose, { Mongoose } from "mongoose";
-import { randomBytes, createHash } from "crypto";
-import validator from "validator";
-import { Password, UserRole } from "@sin-nombre/sinfood-common";
-import { updateIfCurrentPlugin } from "mongoose-update-if-current";
+import mongoose from 'mongoose';
+import { randomBytes, createHash } from 'crypto';
+import validator from 'validator';
+import { Password, UserRole } from '@sin-nombre/sinfood-common';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
+import {
+  RestaurantCategoryDoc,
+  RestaurantCategoryModel,
+} from './restaurant-category';
+import { RelationUpdateInterface } from '../utils/test';
 
 // Describes the attributes that we accept from Request
 export interface RestaurantAttrs {
@@ -62,24 +67,24 @@ const restaurantSchema = new mongoose.Schema(
   {
     email: {
       type: String,
-      unique: [true, "Email already in use. Use a different one."],
-      required: [true, "Email is required"],
+      unique: [true, 'Email already in use. Use a different one.'],
+      required: [true, 'Email is required'],
       lowercase: true,
       validate: {
         validator: validator.isEmail,
-        message: "Provide a valid Email",
+        message: 'Provide a valid Email',
       },
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: [true, 'Password is required'],
       minlength: 8,
       select: false,
     },
     name: {
       type: String,
-      unique: [true, "Restaurant Name must be unique"],
-      required: [true, "Restaurant Name is required"],
+      unique: [true, 'Restaurant Name must be unique'],
+      required: [true, 'Restaurant Name is required'],
     },
     description: {
       type: String,
@@ -95,15 +100,15 @@ const restaurantSchema = new mongoose.Schema(
       default: false,
     },
     location: {
-      type: { type: String, enum: ["Point"], default: "Point" },
+      type: { type: String, enum: ['Point'], default: 'Point' },
       coordinates: {
-        required: [true, "Restaurant geolocation is required"],
+        required: [true, 'Restaurant geolocation is required'],
         type: [Number],
-        index: "2dsphere",
+        index: '2dsphere',
       },
     },
     delivers_to: {
-      type: { type: String, enum: ["Polygon"], default: "Polygon" },
+      type: { type: String, enum: ['Polygon'], default: 'Polygon' },
       coordinates: {
         type: [[[Number]]],
         // index: "2dsphere",
@@ -112,19 +117,19 @@ const restaurantSchema = new mongoose.Schema(
     categories: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Restaurant_Category",
+        ref: 'Restaurant_Category',
       },
     ],
     phone: {
       type: String,
-      required: [true, "Phone is required"],
+      required: [true, 'Phone is required'],
       validate: {
         validator: function (v: string) {
-          return validator.isMobilePhone(v, "any", {
+          return validator.isMobilePhone(v, 'any', {
             strictMode: true,
           });
         },
-        message: "Provide a valid phone",
+        message: 'Provide a valid phone',
       },
     },
     role: {
@@ -163,16 +168,16 @@ const restaurantSchema = new mongoose.Schema(
 );
 
 // Insert updateIfCurrentPlugin and change the default version key from __v to version
-restaurantSchema.set("versionKey", "version");
+restaurantSchema.set('versionKey', 'version');
 restaurantSchema.plugin(updateIfCurrentPlugin);
 
 // Insert the reference from the Restaurant Category
-restaurantSchema.pre<RestaurantDoc>("save", async function (next) {
+restaurantSchema.pre<RestaurantDoc>('save', async function (next) {
   if (this.categories.length === 0) {
     return next();
   }
 
-  const RestaurantCategory = mongoose.model("Restaurant_Category");
+  const RestaurantCategory = mongoose.model('Restaurant_Category');
 
   // Add any new categories
 
@@ -182,15 +187,15 @@ restaurantSchema.pre<RestaurantDoc>("save", async function (next) {
       $addToSet: {
         restaurants: this._id,
       },
-    }
+    },
   );
 
   next();
 });
 
-restaurantSchema.post<RestaurantDoc>("findOneAndUpdate", async function (doc) {
+restaurantSchema.post<RestaurantDoc>('findOneAndUpdate', async function (doc) {
   if (doc) {
-    const RestaurantCategory = mongoose.model("Restaurant_Category");
+    const RestaurantCategory = mongoose.model('Restaurant_Category');
 
     // Remove any categories that got removed from the document
     await RestaurantCategory.updateMany(
@@ -214,33 +219,46 @@ restaurantSchema.post<RestaurantDoc>("findOneAndUpdate", async function (doc) {
   }
 });
 
-// Remove the reference from the Restaurant Category
-restaurantSchema.pre<RestaurantDoc>("remove", async function (next) {
-  const RestaurantCategory = mongoose.model("Restaurant_Category");
-
-  await RestaurantCategory.updateMany(
-    { _id: { $in: this.categories } },
+const removeReferencesBasedOnId = async function (
+  relations: RelationUpdateInterface
+) {
+  await relations.model.updateMany(
+    { _id: { $in: this[relations.parentIdentifier] } },
     {
       $pull: {
-        restaurants: this._id,
+        [relations.childIdentifier]: this._id,
       },
     }
   );
+};
+
+const RelationFactory = (model: string) => {
+  const restaurantCatRelation: RelationUpdateInterface<RestaurantCategoryDoc> = {
+    model: mongoose.model('Restaurant_Category'),
+    parentIdentifier: 'categories',
+    childIdentifier: 'restaurants',
+  };
+  return restaurantCatRelation;
+};
+// Remove the reference from the Restaurant Category
+restaurantSchema.pre<RestaurantDoc>('remove', async function (next) {
+  await removeReferencesBasedOnId.bind(this)(RelationFactory());
+
   next();
 });
 
 // Hash password before Save
-restaurantSchema.pre("save", async function (next) {
-  if (this.isModified("password")) {
-    const hashed = await Password.toHash(this.get("password"));
-    this.set("password", hashed);
+restaurantSchema.pre('save', async function (next) {
+  if (this.isModified('password')) {
+    const hashed = await Password.toHash(this.get('password'));
+    this.set('password', hashed);
   }
   next();
 });
 
 // If updated password add the passwordChangedAt field too
-restaurantSchema.pre("save", function (next) {
-  if (!this.isModified("password") || this.isNew) {
+restaurantSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) {
     return next();
   }
   // @ts-ignore
@@ -266,11 +284,11 @@ restaurantSchema.methods.changedPasswordAfter = function (
 
 // Creates and persist the password_reset_token and password_reset_expires
 restaurantSchema.methods.createPasswordResetToken = function () {
-  const resetToken = randomBytes(32).toString("hex");
+  const resetToken = randomBytes(32).toString('hex');
 
-  this.password_reset_token = createHash("sha256")
+  this.password_reset_token = createHash('sha256')
     .update(resetToken)
-    .digest("hex");
+    .digest('hex');
   this.password_reset_expires = Date.now() + 10 * 60 * 1000;
 
   return resetToken;
@@ -282,7 +300,7 @@ restaurantSchema.statics.build = (attrs: RestaurantAttrs) => {
 };
 
 const Restaurant = mongoose.model<RestaurantDoc, RestaurantModel>(
-  "Restaurant",
+  'Restaurant',
   restaurantSchema
 );
 export { Restaurant };

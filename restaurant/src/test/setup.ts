@@ -1,7 +1,6 @@
 import { MongoMemoryServer } from "mongodb-memory-server";
 import request from "supertest";
 import mongoose from "mongoose";
-import { randomBytes } from "crypto";
 import { UserRole } from "@sin-nombre/sinfood-common";
 import faker from "faker";
 import { app } from "../app";
@@ -33,6 +32,8 @@ beforeAll(async () => {
   await mongoose.connect(mongoUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
   });
 });
 

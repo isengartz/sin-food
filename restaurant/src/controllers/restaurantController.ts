@@ -52,7 +52,7 @@ export const createRestaurant = async (
     location,
     delivers_to,
     categories,
-    role
+    role,
   });
 
   await restaurant.save();
@@ -98,6 +98,7 @@ export const signinRestaurant = async (
   // Send Data + JWT Back
   AuthHelper.createSendToken(restaurant, 200, res);
 };
+
 export const updateRestaurant = async (
   req: Request,
   res: Response,
@@ -142,4 +143,23 @@ export const updateRestaurant = async (
   );
   // Send Data + JWT Back
   AuthHelper.createSendToken(restaurant, 200, res);
+};
+
+export const deleteRestaurant = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (!req.params.id) {
+    throw new BadRequestError(`Id must be defined`);
+  }
+  const restaurant = await Restaurant.findById(req.params.id);
+  if (!restaurant) {
+    throw new NotFoundError(`Restaurant with id ${req.params.id} not found`);
+  }
+  await restaurant.remove();
+  res.status(204).json({
+    status: "success",
+    data: null,
+  });
 };

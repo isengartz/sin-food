@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { MongoMemoryServer } from "mongodb-memory-server";
+import { randomBytes } from "crypto";
 import request from "supertest";
 import mongoose from "mongoose";
 import { UserRole } from "@sin-nombre/sinfood-common";
@@ -9,7 +10,7 @@ import {
   USER_CREATE_VALID_PAYLOAD,
 } from "../utils/constants";
 import { UserDoc } from "../models/user";
-import { randomBytes } from "crypto";
+
 
 jest.mock("../events/nats-wrapper"); // Mock file into the fake
 
@@ -33,6 +34,8 @@ beforeAll(async () => {
   await mongoose.connect(mongoUri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
   });
 });
 

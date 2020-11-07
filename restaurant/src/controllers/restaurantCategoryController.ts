@@ -5,8 +5,7 @@ import {
   findOne,
   updateOne,
 } from "@sin-nombre/sinfood-common";
-import RestaurantCategory from "../models/restaurant-category";
-
+import { RestaurantCategory } from "../models/restaurant-category";
 
 export const findAllCategories = findAll(RestaurantCategory, {});
 export const findOneCategory = findOne(RestaurantCategory, {});

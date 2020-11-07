@@ -10,7 +10,7 @@ export interface RestaurantCategoryDoc extends mongoose.Document {
   restaurants: [string];
 }
 
-interface RestaurantCategoryModel
+export interface RestaurantCategoryModel
   extends mongoose.Model<RestaurantCategoryDoc> {
   build(attrs: RestaurantCategoryAttrs): RestaurantCategoryDoc;
 }
@@ -49,4 +49,4 @@ const RestaurantCategory = mongoose.model<
   RestaurantCategoryModel
 >("Restaurant_Category", restaurantCategorySchema);
 
-export default RestaurantCategory;
+export { RestaurantCategory };
