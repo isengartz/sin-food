@@ -18,7 +18,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@sin-nombre/sinfood-common": "^1.0.8",
+    "@sin-nombre/sinfood-common": "^1.0.32",
     "@types/express": "^4.17.8",
     "@types/hpp": "^0.2.1",
     "@types/node": "^14.10.1",
