@@ -1,4 +1,4 @@
-import nats, { Stan } from "node-nats-streaming";
+import nats, { Stan } from 'node-nats-streaming';
 
 class NatsWrapper {
   private _client?: Stan;
@@ -14,12 +14,12 @@ class NatsWrapper {
     this._client = nats.connect(clusterId, clientId, { url });
 
     return new Promise((resolve, reject) => {
-      this.client.on("connect", () => {
+      this.client.on('connect', () => {
         // eslint-disable-next-line no-console
         console.log(`Connected to NATS`);
         resolve();
       });
-      this.client.on("error", (err) => {
+      this.client.on('error', (err) => {
         reject(err);
       });
     });

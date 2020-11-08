@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 export interface RestaurantCategoryAttrs {
   name: string;
@@ -19,13 +19,13 @@ const restaurantCategorySchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      unique: [true, "Category name must be unique"],
-      required: [true, "Category name is required"],
+      unique: [true, 'Category name must be unique'],
+      required: [true, 'Category name is required'],
     },
     restaurants: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Restaurant",
+        ref: 'Restaurant',
       },
     ],
   },
@@ -37,7 +37,7 @@ const restaurantCategorySchema = new mongoose.Schema(
         delete ret.__v;
       },
     },
-  }
+  },
 );
 
 restaurantCategorySchema.statics.build = (attrs: RestaurantCategoryAttrs) => {
@@ -47,6 +47,6 @@ restaurantCategorySchema.statics.build = (attrs: RestaurantCategoryAttrs) => {
 const RestaurantCategory = mongoose.model<
   RestaurantCategoryDoc,
   RestaurantCategoryModel
->("Restaurant_Category", restaurantCategorySchema);
+>('Restaurant_Category', restaurantCategorySchema);
 
 export { RestaurantCategory };

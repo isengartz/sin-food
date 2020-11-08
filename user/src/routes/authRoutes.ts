@@ -1,6 +1,6 @@
-import { currentUser, requireAuth } from "@sin-nombre/sinfood-common";
+import { currentUser, requireAuth } from '@sin-nombre/sinfood-common';
 
-import express from "express";
+import express from 'express';
 import {
   signup,
   login,
@@ -10,17 +10,17 @@ import {
   currentU,
   signout,
   allUsers,
-} from "../controllers/authController";
+} from '../controllers/authController';
 
 const router = express.Router();
 
-router.post("/signup", signup);
-router.post("/signout", signout);
-router.post("/login", login);
-router.get("/currentUser", currentUser, currentU);
-router.post("/forgotPassword", forgotPassword);
-router.patch("/resetPassword/:token", resetPassword);
-router.patch("/updatePassword", currentUser, requireAuth, updatePassword);
-router.get("/", allUsers);
+router.post('/signup', signup);
+router.post('/signout', signout);
+router.post('/login', login);
+router.get('/currentUser', currentUser, currentU);
+router.post('/forgotPassword', forgotPassword);
+router.patch('/resetPassword/:token', resetPassword);
+router.patch('/updatePassword', currentUser, requireAuth, updatePassword);
+router.get('/', allUsers);
 
 export { router as authRoutes };

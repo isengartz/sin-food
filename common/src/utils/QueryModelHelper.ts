@@ -1,8 +1,9 @@
-import mongoose from "mongoose";
+/* eslint-disable @typescript-eslint/indent */
+import mongoose from 'mongoose';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import * as QueryString from "qs";
-import _ from "lodash";
-import { GLOBAL_PAGINATION_SIZE } from "./globalConsts";
+import * as QueryString from 'qs';
+import _ from 'lodash';
+import { GLOBAL_PAGINATION_SIZE } from './globalConsts';
 
 export class QueryModelHelper {
   private query;
@@ -17,7 +18,7 @@ export class QueryModelHelper {
 
   constructor(
     query: mongoose.DocumentQuery<mongoose.Document[], mongoose.Document, {}>,
-    queryString: QueryString.ParsedQs
+    queryString: QueryString.ParsedQs,
   ) {
     this.query = query;
     this.queryString = queryString;
@@ -37,11 +38,11 @@ export class QueryModelHelper {
 
     // add manual excluded to base excludes remove the excludedFields
     const excludedFields = [
-      "page",
-      "sort",
-      "limit",
-      "fields",
-      "nopaginate",
+      'page',
+      'sort',
+      'limit',
+      'fields',
+      'nopaginate',
     ].concat(manualExcluded);
     excludedFields.forEach((el) => delete queryObj[el]);
 
@@ -57,7 +58,7 @@ export class QueryModelHelper {
   // sort the documents
   sort() {
     if (this.queryString.sort) {
-      const sortBy = (this.queryString.sort as string).split(",").join(" ");
+      const sortBy = (this.queryString.sort as string).split(',').join(' ');
       this.query = this.query.sort(sortBy);
     }
     return this;
@@ -66,7 +67,7 @@ export class QueryModelHelper {
   // Select only specific fields
   limitFields() {
     if (this.queryString.fields) {
-      const fields = (this.queryString.fields as string).split(",").join(" ");
+      const fields = (this.queryString.fields as string).split(',').join(' ');
       this.query = this.query.select(fields);
     }
     return this;

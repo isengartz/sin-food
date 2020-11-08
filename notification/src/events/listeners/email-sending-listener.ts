@@ -2,19 +2,19 @@ import {
   EmailSendingEvent,
   Listener,
   Subjects,
-} from "@sin-nombre/sinfood-common";
-import { createTransport } from "nodemailer";
-import { Message } from "node-nats-streaming";
-import { queueGroupName } from "../../utils/constants";
+} from '@sin-nombre/sinfood-common';
+import { createTransport } from 'nodemailer';
+import { Message } from 'node-nats-streaming';
+import { queueGroupName } from '../../utils/constants';
 
 export class EmailSendingListener extends Listener<EmailSendingEvent> {
   readonly subject = Subjects.EmailSending;
 
   readonly queueGroupName = queueGroupName;
 
-  async onMessage(data: EmailSendingEvent["data"], msg: Message) {
+  async onMessage(data: EmailSendingEvent['data'], msg: Message) {
     const transporter = createTransport({
-      host: "smtp.gmail.com",
+      host: 'smtp.gmail.com',
       port: 465,
       secure: true,
       auth: {
@@ -28,7 +28,7 @@ export class EmailSendingListener extends Listener<EmailSendingEvent> {
       subject: data.subject,
       html: data.emailBody,
     };
-    if (process.env.NODE_ENV !== "test") {
+    if (process.env.NODE_ENV !== 'test') {
       // @todo: Im commenting this so I wont spam my mailbox
       // await transporter.sendMail(mailOptions);
     }

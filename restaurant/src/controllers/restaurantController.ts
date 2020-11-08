@@ -1,19 +1,19 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from 'express';
 import {
   BadRequestError,
   findAll,
   NotFoundError,
   Password,
   AuthHelper,
-} from "@sin-nombre/sinfood-common";
-import { Restaurant } from "../models/restaurant";
+} from '@sin-nombre/sinfood-common';
+import { Restaurant } from '../models/restaurant';
 
 export const findAllRestaurants = findAll(Restaurant, {});
 
 export const createRestaurant = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const {
     email,
@@ -38,7 +38,7 @@ export const createRestaurant = async (
   // Check for Password Confirmation
   if (!password_confirm || password_confirm !== password) {
     throw new BadRequestError(
-      `Password & Password Confirmation must be identical`
+      `Password & Password Confirmation must be identical`,
     );
   }
 
@@ -62,7 +62,7 @@ export const createRestaurant = async (
       id: restaurant.id,
       email: restaurant.email,
       role: restaurant.role,
-    })
+    }),
   );
   // Send Data + JWT Back
   AuthHelper.createSendToken(restaurant, 201, res);
@@ -71,13 +71,13 @@ export const createRestaurant = async (
 export const signinRestaurant = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { email, password } = req.body;
   if (!email || !password) {
     throw new BadRequestError(`Email and Password are required`);
   }
-  const restaurant = await Restaurant.findOne({ email }).select("+password");
+  const restaurant = await Restaurant.findOne({ email }).select('+password');
   if (!restaurant) {
     throw new NotFoundError(`User with email ${email} not found`);
   }
@@ -85,7 +85,7 @@ export const signinRestaurant = async (
   // Check if password is correct
   if (!(await Password.compare(restaurant.password!, password))) {
     throw new NotFoundError(
-      `Incorrect Email / Password or email doesnt exists`
+      `Incorrect Email / Password or email doesnt exists`,
     ); // Dont expose that the user exist
   }
   req.session = AuthHelper.serializeToken(
@@ -93,7 +93,7 @@ export const signinRestaurant = async (
       id: restaurant.id,
       email: restaurant.email,
       role: restaurant.role,
-    })
+    }),
   );
   // Send Data + JWT Back
   AuthHelper.createSendToken(restaurant, 200, res);
@@ -102,7 +102,7 @@ export const signinRestaurant = async (
 export const updateRestaurant = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const {
     name,
@@ -128,7 +128,7 @@ export const updateRestaurant = async (
     {
       new: true,
       runValidators: true,
-    }
+    },
   );
 
   if (!restaurant) {
@@ -139,7 +139,7 @@ export const updateRestaurant = async (
       id: restaurant.id,
       email: restaurant.email,
       role: restaurant.role,
-    })
+    }),
   );
   // Send Data + JWT Back
   AuthHelper.createSendToken(restaurant, 200, res);
@@ -148,7 +148,7 @@ export const updateRestaurant = async (
 export const deleteRestaurant = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   if (!req.params.id) {
     throw new BadRequestError(`Id must be defined`);
@@ -159,7 +159,7 @@ export const deleteRestaurant = async (
   }
   await restaurant.remove();
   res.status(204).json({
-    status: "success",
+    status: 'success',
     data: null,
   });
 };

@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from "express";
-import { UserRole } from "..";
+import { Request, Response, NextFunction } from 'express';
+import { UserRole } from '../enums/user-roles';
 
 // For routes that require userId param instead of checking if currentUser Id equal userId Param
 // Add this middleware so admin can edit anything but simple user only his collection

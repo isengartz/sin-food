@@ -1,15 +1,15 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from 'express';
 import {
   NotAuthorizedError,
   NotFoundError,
   UserRole,
-} from "@sin-nombre/sinfood-common";
-import { UserAddress } from "../models/user_address";
+} from '@sin-nombre/sinfood-common';
+import { UserAddress } from '../models/user_address';
 
 export const createAddress = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const user_id = req.currentUser!.id;
   const { description, floor, full_address, location } = req.body;
@@ -24,7 +24,7 @@ export const createAddress = async (
   }).save();
 
   res.status(201).send({
-    status: "success",
+    status: 'success',
     data: {
       address: addressDoc,
     },
@@ -34,7 +34,7 @@ export const createAddress = async (
 export const updateAddress = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { addressId } = req.params;
   const { description, floor, full_address, location } = req.body;
@@ -56,7 +56,7 @@ export const updateAddress = async (
   await address.save();
 
   res.status(200).send({
-    status: "success",
+    status: 'success',
     data: {
       address,
     },
@@ -66,7 +66,7 @@ export const updateAddress = async (
 export const deleteAddress = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   // Instead of using findOneAndDelete use .delete on Document
   // So the remove middleware will fire
@@ -76,13 +76,13 @@ export const deleteAddress = async (
   });
   if (!address) {
     throw new NotFoundError(
-      `Address with id ${req.params.addressId} not found`
+      `Address with id ${req.params.addressId} not found`,
     );
   }
   address.remove();
 
   res.status(204).json({
-    status: "success",
+    status: 'success',
     data: null,
   });
 };

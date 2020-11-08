@@ -1,16 +1,16 @@
-import { MongoMemoryServer } from "mongodb-memory-server";
-import request from "supertest";
-import mongoose from "mongoose";
-import { UserRole } from "@sin-nombre/sinfood-common";
-import faker from "faker";
-import { app } from "../app";
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import request from 'supertest';
+import mongoose from 'mongoose';
+import { UserRole } from '@sin-nombre/sinfood-common';
+import faker from 'faker';
+import { app } from '../app';
 import {
   API_ROOT_ENDPOINT,
   RESTAURANT_CREATE_VALID_PAYLOAD,
-} from "../utils/constants";
-import { RestaurantDoc } from "../models/restaurant";
+} from '../utils/constants';
+import { RestaurantDoc } from '../models/restaurant';
 
-jest.mock("../events/nats-wrapper"); // Mock file into the fake
+jest.mock('../events/nats-wrapper'); // Mock file into the fake
 
 declare global {
   namespace NodeJS {
@@ -24,8 +24,8 @@ let mongo: any;
 
 // Start MongoMemoryServer
 beforeAll(async () => {
-  process.env.JWT_KEY = "test-jwt-token-restaurant";
-  process.env.NODE_ENV = "test";
+  process.env.JWT_KEY = 'test-jwt-token-restaurant';
+  process.env.NODE_ENV = 'test';
 
   mongo = new MongoMemoryServer();
   const mongoUri = await mongo.getUri();
@@ -67,7 +67,7 @@ global.signin = async () => {
     .send(RESTAURANT_CREATE_VALID_PAYLOAD)
     .expect(201);
   return {
-    cookie: response.get("Set-Cookie"),
+    cookie: response.get('Set-Cookie'),
     user: response.body.data.user as RestaurantDoc,
   };
 };
@@ -86,7 +86,7 @@ global.signinAdmin = async () => {
     .expect(201);
 
   return {
-    cookie: response.get("Set-Cookie"),
+    cookie: response.get('Set-Cookie'),
     user: response.body.data.user as RestaurantDoc,
   };
 };

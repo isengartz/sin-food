@@ -1,6 +1,6 @@
-import { app } from "./app";
-import { natsWrapper } from "./events/nats-wrapper";
-import { EmailSendingListener } from "./events/listeners/email-sending-listener";
+import { app } from './app';
+import { natsWrapper } from './events/nats-wrapper';
+import { EmailSendingListener } from './events/listeners/email-sending-listener';
 
 const start = async () => {
   if (!process.env.TRANSPORTER_EMAIL_USERNAME) {
@@ -24,7 +24,7 @@ const start = async () => {
     await natsWrapper.connect(
       process.env.NATS_CLUSTER_ID,
       process.env.NATS_CLIENT_ID,
-      process.env.NATS_URL
+      process.env.NATS_URL,
     );
 
     // Listen for Events

@@ -1,11 +1,11 @@
-import mongoose from "mongoose";
-import { updateIfCurrentPlugin } from "mongoose-update-if-current";
+import mongoose from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
 const PointSchema = new mongoose.Schema({
-  type: { type: String, enum: ["Point"], default: "Point" },
+  type: { type: String, enum: ['Point'], default: 'Point' },
   coordinates: {
     type: [Number],
-    index: "2dsphere",
+    index: '2dsphere',
   },
 });
 
@@ -46,24 +46,24 @@ const userAddressSchema = new mongoose.Schema(
     },
     floor: {
       type: String,
-      required: [true, "Floor is required"],
+      required: [true, 'Floor is required'],
     },
     full_address: {
       type: String,
-      required: [true, "Full address is required"],
+      required: [true, 'Full address is required'],
     },
     location: {
-      type: { type: String, enum: ["Point"], default: "Point" },
+      type: { type: String, enum: ['Point'], default: 'Point' },
       coordinates: {
-        required: [true, "The geolocation is required"],
+        required: [true, 'The geolocation is required'],
         type: [Number],
-        index: "2dsphere",
+        index: '2dsphere',
       },
     },
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: [true, "User id is required"],
+      ref: 'User',
+      required: [true, 'User id is required'],
     },
   },
   {
@@ -74,11 +74,11 @@ const userAddressSchema = new mongoose.Schema(
         delete ret.__v;
       },
     },
-  }
+  },
 );
 
 // Insert updateIfCurrentPlugin and change the default version key from __v to version
-userAddressSchema.set("versionKey", "version");
+userAddressSchema.set('versionKey', 'version');
 userAddressSchema.plugin(updateIfCurrentPlugin);
 
 // Hack so we can use TS with mongoose
@@ -87,8 +87,8 @@ userAddressSchema.statics.build = (attrs: UserAddressAttrs) => {
 };
 
 // Add address tp user Document
-userAddressSchema.pre("save", async function (next) {
-  const User = mongoose.model("User");
+userAddressSchema.pre('save', async function (next) {
+  const User = mongoose.model('User');
   // @ts-ignore
   await User.findByIdAndUpdate(this.user_id, {
     $push: {
@@ -100,8 +100,8 @@ userAddressSchema.pre("save", async function (next) {
 });
 
 // Remove address from user Document
-userAddressSchema.pre("remove", async function (next) {
-  const User = mongoose.model("User");
+userAddressSchema.pre('remove', async function (next) {
+  const User = mongoose.model('User');
   // @ts-ignore
   await User.findByIdAndUpdate(this.user_id, {
     $pull: {
@@ -112,7 +112,7 @@ userAddressSchema.pre("remove", async function (next) {
   next();
 });
 const UserAddress = mongoose.model<UserAddressDoc, UserAddressModel>(
-  "UserAddress",
-  userAddressSchema
+  'UserAddress',
+  userAddressSchema,
 );
 export { UserAddress };

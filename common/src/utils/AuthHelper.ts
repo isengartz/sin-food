@@ -1,6 +1,6 @@
-import { Response } from "express";
-import jwt from "jsonwebtoken";
-import { UserPayload } from "../interfaces/UserPayload";
+import { Response } from 'express';
+import jwt from 'jsonwebtoken';
+import { UserPayload } from '../interfaces/UserPayload';
 
 class AuthHelper {
   // Sign the User Token
@@ -17,7 +17,7 @@ class AuthHelper {
   static createSendToken(
     user: UserPayload,
     statusCode: number,
-    res: Response
+    res: Response,
   ): void {
     // Create Token
     const token = AuthHelper.signToken({
@@ -27,7 +27,7 @@ class AuthHelper {
     });
 
     res.status(statusCode).json({
-      status: "success",
+      status: 'success',
       token,
       data: {
         user,

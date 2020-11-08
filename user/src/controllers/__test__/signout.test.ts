@@ -1,11 +1,11 @@
-import request from "supertest";
-import { app } from "../../app";
+import request from 'supertest';
+import { app } from '../../app';
 import {
   API_ROOT_ENDPOINT,
   USER_CREATE_VALID_PAYLOAD,
-} from "../../utils/constants";
+} from '../../utils/constants';
 
-it("should clear the cookie after successful signout", async () => {
+it('should clear the cookie after successful signout', async () => {
   // Create user
   const validResponse = await request(app)
     .post(`${API_ROOT_ENDPOINT}/users/signup`)
@@ -19,7 +19,7 @@ it("should clear the cookie after successful signout", async () => {
     .expect(200);
 
   // The express:sess will be equal to null
-  expect(response.get("Set-Cookie")).not.toEqual(
-    validResponse.get("Set-Cookie")
+  expect(response.get('Set-Cookie')).not.toEqual(
+    validResponse.get('Set-Cookie'),
   );
 });

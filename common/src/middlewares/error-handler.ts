@@ -1,14 +1,14 @@
-import { Request, Response, NextFunction } from "express";
-import { Error as MongooseError } from "mongoose";
-import { CustomError } from "..";
+import { Request, Response, NextFunction } from 'express';
+import { Error as MongooseError } from 'mongoose';
+import { CustomError } from '../errors/custom-error';
 
 export const errorHandler = (
   err: Error,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
-  const status = "error";
+  const status = 'error';
 
   // Any instance of our Customer Errors
   if (err instanceof CustomError) {
@@ -50,7 +50,7 @@ export const errorHandler = (
     status,
     errors: [
       {
-        message: "Something Went Wrong !",
+        message: 'Something Went Wrong !',
       },
     ],
   });

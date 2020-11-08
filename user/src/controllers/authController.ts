@@ -1,6 +1,6 @@
 /* eslint-disable no-unreachable */
-import { Request, Response, NextFunction } from "express";
-import { createHash } from "crypto";
+import { Request, Response, NextFunction } from 'express';
+import { createHash } from 'crypto';
 import {
   BadRequestError,
   NotAuthorizedError,
@@ -8,12 +8,12 @@ import {
   Password,
   QueryModelHelper,
   AuthHelper,
-} from "@sin-nombre/sinfood-common";
+} from '@sin-nombre/sinfood-common';
 
-import { User } from "../models/user";
-import { API_ROOT_ENDPOINT } from "../utils/constants";
-import { EmailSendingPublisher } from "../events/publishers/email-sending-publisher";
-import { natsWrapper } from "../events/nats-wrapper";
+import { User } from '../models/user';
+import { API_ROOT_ENDPOINT } from '../utils/constants';
+import { EmailSendingPublisher } from '../events/publishers/email-sending-publisher';
+import { natsWrapper } from '../events/nats-wrapper';
 
 /**
  * Return all users with addresses populated
@@ -24,7 +24,7 @@ import { natsWrapper } from "../events/nats-wrapper";
 export const allUsers = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const queryHelper = new QueryModelHelper(User.find(), req.query)
     .filter()
@@ -35,9 +35,9 @@ export const allUsers = async (
   // @ts-ignore
   const totalCount = await User.countDocuments(queryHelper.getTotalCount());
 
-  const users = await queryHelper.getQuery().populate("addresses");
+  const users = await queryHelper.getQuery().populate('addresses');
   res.status(200).send({
-    status: "success",
+    status: 'success',
     results: users.length,
     totalCount,
     data: users,
@@ -53,7 +53,7 @@ export const allUsers = async (
 export const signup = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   // leave this for testing so I can add admins without accessing Mongo Pods
   // @todo: remove on production
@@ -77,7 +77,7 @@ export const signup = async (
   // Check for Password Confirmation
   if (!password_confirm || password_confirm !== password) {
     throw new BadRequestError(
-      `Password & Password Confirmation must be identical`
+      `Password & Password Confirmation must be identical`,
     );
   }
   // @todo: remove role on production
@@ -96,7 +96,7 @@ export const signup = async (
       id: user.id,
       email: user.email,
       role: user.role,
-    })
+    }),
   );
   // Send Data + JWT Back
   AuthHelper.createSendToken(user, 201, res);
@@ -111,14 +111,14 @@ export const signup = async (
 export const login = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { email, password } = req.body;
   if (!email || !password) {
     throw new BadRequestError(`Email and Password are required`);
   }
   // check if user exist
-  const user = await User.findOne({ email }).select("+password");
+  const user = await User.findOne({ email }).select('+password');
   if (!user) {
     throw new NotFoundError(`User with email ${email} not found`);
   }
@@ -126,7 +126,7 @@ export const login = async (
   // Check if password is correct
   if (!(await Password.compare(user.password!, password))) {
     throw new NotFoundError(
-      `Incorrect Email / Password or email doesnt exists`
+      `Incorrect Email / Password or email doesnt exists`,
     ); // Dont expose that the user exist
   }
 
@@ -136,7 +136,7 @@ export const login = async (
       id: user.id,
       email: user.email,
       role: user.role,
-    })
+    }),
   );
   // Send Data + JWT Back
   AuthHelper.createSendToken(user, 200, res);
@@ -151,10 +151,10 @@ export const login = async (
 export const currentU = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   res.send({
-    status: "success",
+    status: 'success',
     data: { currentUser: req.currentUser || null },
   });
 };
@@ -168,7 +168,7 @@ export const currentU = async (
 export const forgotPassword = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const user = await User.findOne({
     email: req.body.email,
@@ -183,7 +183,7 @@ export const forgotPassword = async (
 
   // @todo: change the url for the frontend endpoint that will handle the reset password
   const resetURL = `${req.protocol}://${req.get(
-    "host"
+    'host',
   )}${API_ROOT_ENDPOINT}/users/resetPassword/${resetToken}`;
 
   const message = `Forgot your password? You must be a retard but no problem! Submit a PATCH request with your new password to ${resetURL}`;
@@ -197,9 +197,9 @@ export const forgotPassword = async (
     });
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       data: { resetURL, resetToken },
-      message: "Token sent to email!",
+      message: 'Token sent to email!',
     });
   } catch (e) {
     user.password_reset_token = undefined;
@@ -218,18 +218,18 @@ export const forgotPassword = async (
 export const resetPassword = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { password, password_confirm } = req.body;
   if (!password || !password_confirm || password !== password_confirm) {
     throw new BadRequestError(
-      `Password and Password Confirmation must be identical`
+      `Password and Password Confirmation must be identical`,
     );
   }
   // find user by token
-  const hashedToken = createHash("sha256")
+  const hashedToken = createHash('sha256')
     .update(req.params.token)
-    .digest("hex");
+    .digest('hex');
 
   const user = await User.findOne({
     password_reset_token: hashedToken,
@@ -254,7 +254,7 @@ export const resetPassword = async (
       id: user.id,
       email: user.email,
       role: user.role,
-    })
+    }),
   );
 
   // Send JWT
@@ -270,13 +270,13 @@ export const resetPassword = async (
 export const updatePassword = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const { password, new_password } = req.body;
   if (!password || !new_password) {
     throw new BadRequestError(`Password and new_password fields are required`);
   }
-  const user = await User.findById(req.currentUser!.id).select("+password");
+  const user = await User.findById(req.currentUser!.id).select('+password');
 
   // The moment he is here it means that he passed the requireAth middleware
   // So there is a user with this id. Although add the check so TS STFU!
@@ -298,7 +298,7 @@ export const updatePassword = async (
       id: user.id,
       email: user.email,
       role: user.role,
-    })
+    }),
   );
 
   // Send JWT

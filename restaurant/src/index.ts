@@ -1,21 +1,21 @@
-import mongoose from "mongoose";
-import { app } from "./app";
-import { natsWrapper } from "./events/nats-wrapper";
+import mongoose from 'mongoose';
+import { app } from './app';
+import { natsWrapper } from './events/nats-wrapper';
 
 const start = async () => {
   // Check for ENV Vars so TS stfu and also throw an error if we forgot to define them in Kubernetes
 
   if (!process.env.JWT_KEY) {
-    throw new Error("JWT_KEY must be defined");
+    throw new Error('JWT_KEY must be defined');
   }
   if (!process.env.ADMIN_ALLOW_PASSWORD) {
-    throw new Error("ADMIN_ALLOW_PASSWORD must be defined");
+    throw new Error('ADMIN_ALLOW_PASSWORD must be defined');
   }
   if (!process.env.MONGO_URI) {
-    throw new Error("MONGO_URI must be defined");
+    throw new Error('MONGO_URI must be defined');
   }
   if (!process.env.JWT_COOKIE_EXPIRES_IN) {
-    throw new Error("JWT_COOKIE_EXPIRES_IN must be defined");
+    throw new Error('JWT_COOKIE_EXPIRES_IN must be defined');
   }
   if (!process.env.NATS_CLIENT_ID) {
     throw new Error(`NATS_CLIENT_ID must be defined`);
@@ -40,7 +40,7 @@ const start = async () => {
     await natsWrapper.connect(
       process.env.NATS_CLUSTER_ID,
       process.env.NATS_CLIENT_ID,
-      process.env.NATS_URL
+      process.env.NATS_URL,
     );
   } catch (e) {
     // eslint-disable-next-line no-console

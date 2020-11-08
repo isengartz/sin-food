@@ -1,15 +1,9 @@
-/* eslint-disable no-unused-vars */
-// @ts-nocheck
 import mongoose from 'mongoose';
 import { randomBytes, createHash } from 'crypto';
 import validator from 'validator';
-import { Password, UserRole } from '@sin-nombre/sinfood-common';
+import { Password, UserRole, RelationHelper } from '@sin-nombre/sinfood-common';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
-import {
-  RestaurantCategoryDoc,
-  RestaurantCategoryModel,
-} from './restaurant-category';
-import { RelationUpdateInterface } from '../utils/test';
+import { restaurantRelationships } from '../utils/RestaurantRelations';
 
 // Describes the attributes that we accept from Request
 export interface RestaurantAttrs {
@@ -164,7 +158,7 @@ const restaurantSchema = new mongoose.Schema(
         delete ret.__v;
       },
     },
-  }
+  },
 );
 
 // Insert updateIfCurrentPlugin and change the default version key from __v to version
@@ -176,73 +170,40 @@ restaurantSchema.pre<RestaurantDoc>('save', async function (next) {
   if (this.categories.length === 0) {
     return next();
   }
-
-  const RestaurantCategory = mongoose.model('Restaurant_Category');
-
-  // Add any new categories
-
-  await RestaurantCategory.updateMany(
-    { _id: { $in: this.categories } },
-    {
-      $addToSet: {
-        restaurants: this._id,
-      },
-    },
-  );
+  const relationshipHelper = new RelationHelper<RestaurantDoc>(this);
+  relationshipHelper.addRelations(restaurantRelationships);
+  relationshipHelper.insertReferencesBasedOnId();
+  // const RestaurantCategory = mongoose.model('Restaurant_Category');
+  //
+  // // Add any new categories
+  //
+  // await RestaurantCategory.updateMany(
+  //   { _id: { $in: this.categories } },
+  //   {
+  //     $addToSet: {
+  //       restaurants: this._id,
+  //     },
+  //   },
+  // );
 
   next();
 });
 
 restaurantSchema.post<RestaurantDoc>('findOneAndUpdate', async function (doc) {
   if (doc) {
-    const RestaurantCategory = mongoose.model('Restaurant_Category');
+    const relationshipHelper = new RelationHelper<RestaurantDoc>(doc);
+    relationshipHelper.addRelations(restaurantRelationships);
+    relationshipHelper.insertReferencesBasedOnId();
+    relationshipHelper.removeUpdatedReferencesBasedOnId();
 
-    // Remove any categories that got removed from the document
-    await RestaurantCategory.updateMany(
-      { _id: { $nin: doc.categories } },
-      {
-        $pull: {
-          restaurants: doc._id,
-        },
-      }
-    );
-
-    // Add any new categories
-    await RestaurantCategory.updateMany(
-      { _id: { $in: doc.categories } },
-      {
-        $addToSet: {
-          restaurants: doc._id,
-        },
-      }
-    );
   }
 });
 
-const removeReferencesBasedOnId = async function (
-  relations: RelationUpdateInterface
-) {
-  await relations.model.updateMany(
-    { _id: { $in: this[relations.parentIdentifier] } },
-    {
-      $pull: {
-        [relations.childIdentifier]: this._id,
-      },
-    }
-  );
-};
-
-const RelationFactory = (model: string) => {
-  const restaurantCatRelation: RelationUpdateInterface<RestaurantCategoryDoc> = {
-    model: mongoose.model('Restaurant_Category'),
-    parentIdentifier: 'categories',
-    childIdentifier: 'restaurants',
-  };
-  return restaurantCatRelation;
-};
 // Remove the reference from the Restaurant Category
 restaurantSchema.pre<RestaurantDoc>('remove', async function (next) {
-  await removeReferencesBasedOnId.bind(this)(RelationFactory());
+  const relationshipHelper = new RelationHelper<RestaurantDoc>(this);
+  relationshipHelper.addRelations(restaurantRelationships);
+  relationshipHelper.removeReferencesBasedOnId();
 
   next();
 });
@@ -268,13 +229,13 @@ restaurantSchema.pre('save', function (next) {
 
 // Checks if a password was changed after a given timestamp
 restaurantSchema.methods.changedPasswordAfter = function (
-  JWTTimestamp: number
+  JWTTimestamp: number,
 ) {
   if (this.password_changed_at) {
     const changedTimestamp = parseInt(
       // @ts-ignore
       this.password_changed_at.getTime() / 1000,
-      10
+      10,
     );
     return JWTTimestamp < changedTimestamp;
   }
@@ -301,6 +262,6 @@ restaurantSchema.statics.build = (attrs: RestaurantAttrs) => {
 
 const Restaurant = mongoose.model<RestaurantDoc, RestaurantModel>(
   'Restaurant',
-  restaurantSchema
+  restaurantSchema,
 );
 export { Restaurant };

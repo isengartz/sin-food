@@ -4,11 +4,32 @@ import {
   findAll,
   findOne,
   updateOne,
-} from "@sin-nombre/sinfood-common";
-import { RestaurantCategory } from "../models/restaurant-category";
+} from '@sin-nombre/sinfood-common';
+import {
+  RestaurantCategory,
+  RestaurantCategoryDoc,
+  RestaurantCategoryModel,
+} from '../models/restaurant-category';
 
-export const findAllCategories = findAll(RestaurantCategory, {});
-export const findOneCategory = findOne(RestaurantCategory, {});
-export const createCategory = createOne(RestaurantCategory);
-export const updateOneCategory = updateOne(RestaurantCategory);
-export const deleteOneCategory = deleteOne(RestaurantCategory);
+const test = RestaurantCategory;
+
+export const findAllCategories = findAll<
+  RestaurantCategoryDoc,
+  RestaurantCategoryModel
+>(RestaurantCategory, {});
+export const findOneCategory = findOne<
+  RestaurantCategoryDoc,
+  RestaurantCategoryModel
+>(RestaurantCategory, {});
+export const createCategory = createOne<
+  RestaurantCategoryDoc,
+  RestaurantCategoryModel
+>(RestaurantCategory);
+export const updateOneCategory = updateOne<
+  RestaurantCategoryDoc,
+  RestaurantCategoryModel
+>(RestaurantCategory);
+export const deleteOneCategory = deleteOne<
+  RestaurantCategoryDoc,
+  RestaurantCategoryModel
+>(RestaurantCategory);

@@ -1,15 +1,15 @@
-import request from "supertest";
-import _ from "lodash";
-import { app } from "../../app";
+import request from 'supertest';
+import _ from 'lodash';
+import { app } from '../../app';
 import {
   API_ROOT_ENDPOINT,
   USER_CREATE_VALID_PAYLOAD,
-} from "../../utils/constants";
-import { User } from "../../models/user";
+} from '../../utils/constants';
+import { User } from '../../models/user';
 
 // jest.setTimeout(30000);
 
-it("should return all users", async () => {
+it('should return all users', async () => {
   // Create one User
   await request(app)
     .post(`${API_ROOT_ENDPOINT}/users/signup`)
@@ -17,7 +17,7 @@ it("should return all users", async () => {
     .expect(201);
 
   // Create second user
-  USER_CREATE_VALID_PAYLOAD.email = "test2@test.com";
+  USER_CREATE_VALID_PAYLOAD.email = 'test2@test.com';
   await request(app)
     .post(`${API_ROOT_ENDPOINT}/users/signup`)
     .send(USER_CREATE_VALID_PAYLOAD)
@@ -33,7 +33,7 @@ it("should return all users", async () => {
 });
 
 // Testing filtering
-it("should return only second user", async () => {
+it('should return only second user', async () => {
   // Create User one
   await request(app)
     .post(`${API_ROOT_ENDPOINT}/users/signup`)
@@ -41,8 +41,8 @@ it("should return only second user", async () => {
     .expect(201);
 
   // Create User Two
-  USER_CREATE_VALID_PAYLOAD.first_name = "testname";
-  USER_CREATE_VALID_PAYLOAD.email = "tester2@test.com";
+  USER_CREATE_VALID_PAYLOAD.first_name = 'testname';
+  USER_CREATE_VALID_PAYLOAD.email = 'tester2@test.com';
   await request(app)
     .post(`${API_ROOT_ENDPOINT}/users/signup`)
     .send(USER_CREATE_VALID_PAYLOAD)
@@ -55,11 +55,11 @@ it("should return only second user", async () => {
     .expect(200);
 
   expect(response.body.data.length).toEqual(1);
-  expect(response.body.data[0].first_name).toEqual("testname");
+  expect(response.body.data[0].first_name).toEqual('testname');
 });
 
 // Testing fields filtering
-it("should return only id, phone, email and addresses", async () => {
+it('should return only id, phone, email and addresses', async () => {
   // Create User
   await request(app)
     .post(`${API_ROOT_ENDPOINT}/users/signup`)
@@ -80,12 +80,12 @@ it("should return only id, phone, email and addresses", async () => {
 });
 
 // Testing Limit
-it("should return 1 document and totalCount equal to 2", async () => {
+it('should return 1 document and totalCount equal to 2', async () => {
   // Create user One
   await User.build(USER_CREATE_VALID_PAYLOAD).save();
 
   // Create user two
-  USER_CREATE_VALID_PAYLOAD.email = "test2@test.com";
+  USER_CREATE_VALID_PAYLOAD.email = 'test2@test.com';
   await User.build(USER_CREATE_VALID_PAYLOAD).save();
 
   // Limit query by 1
@@ -100,13 +100,13 @@ it("should return 1 document and totalCount equal to 2", async () => {
 });
 
 // Testing Sorting
-it("should return documents ordered by email ASC", async () => {
+it('should return documents ordered by email ASC', async () => {
   // Create user One
-  USER_CREATE_VALID_PAYLOAD.email = "atest@test.com";
+  USER_CREATE_VALID_PAYLOAD.email = 'atest@test.com';
   await User.build(USER_CREATE_VALID_PAYLOAD).save();
 
   // Create User Two
-  USER_CREATE_VALID_PAYLOAD.email = "aatest@test.com";
+  USER_CREATE_VALID_PAYLOAD.email = 'aatest@test.com';
   await User.build(USER_CREATE_VALID_PAYLOAD).save();
   // Sort by email
   const response = await request(app)
@@ -115,12 +115,12 @@ it("should return documents ordered by email ASC", async () => {
     .expect(200);
 
   // Instead of user one the second user should be first
-  expect(response.body.data[0].email).toEqual("aatest@test.com");
-  expect(response.body.data[1].email).toEqual("atest@test.com");
+  expect(response.body.data[0].email).toEqual('aatest@test.com');
+  expect(response.body.data[1].email).toEqual('atest@test.com');
 });
 
 // Testing Advanced Sorting
-it("should return 0 document for first and 1 document for second request", async () => {
+it('should return 0 document for first and 1 document for second request', async () => {
   // Create User
   await User.build(USER_CREATE_VALID_PAYLOAD).save();
 

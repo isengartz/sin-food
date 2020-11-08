@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from "express";
-import { NotAuthorizedError } from "..";
+import { Request, Response, NextFunction } from 'express';
+import { NotAuthorizedError } from '../errors/not-authorized-error';
 
 // Middleware to restrict access only to given roles
 export const restrictTo = (roles: string[] = []) => {

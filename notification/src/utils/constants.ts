@@ -1,2 +1,2 @@
-export const API_ROOT_ENDPOINT = "/api/v1";
-export const queueGroupName = "notification-service";
+export const API_ROOT_ENDPOINT = '/api/v1';
+export const queueGroupName = 'notification-service';

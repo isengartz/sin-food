@@ -1,1 +1,1 @@
-jest.mock("../events/nats-wrapper"); // Mock file into the fake
+jest.mock('../events/nats-wrapper'); // Mock file into the fake

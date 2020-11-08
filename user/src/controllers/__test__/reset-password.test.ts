@@ -1,26 +1,26 @@
-import request from "supertest";
-import { app } from "../../app";
+import request from 'supertest';
+import { app } from '../../app';
 import {
   API_ROOT_ENDPOINT,
   USER_CREATE_VALID_PAYLOAD,
-} from "../../utils/constants";
-import { User } from "../../models/user";
+} from '../../utils/constants';
+import { User } from '../../models/user';
 
-it("should return 400 when password or password_confirm is not defined", async () => {
+it('should return 400 when password or password_confirm is not defined', async () => {
   await request(app)
     .patch(`${API_ROOT_ENDPOINT}/users/resetPassword/testToken`)
     .send({})
     .expect(400);
 });
 
-it("should return 404 when token is invalid", async () => {
+it('should return 404 when token is invalid', async () => {
   await request(app)
     .patch(`${API_ROOT_ENDPOINT}/users/resetPassword/testToken`)
-    .send({ password: "new_password", password_confirm: "new_password" })
+    .send({ password: 'new_password', password_confirm: 'new_password' })
     .expect(404);
 });
 
-it("should return 404 when the token expired (10 mins)", async () => {
+it('should return 404 when the token expired (10 mins)', async () => {
   // Create a user
   await User.build(USER_CREATE_VALID_PAYLOAD).save();
 
@@ -39,11 +39,11 @@ it("should return 404 when the token expired (10 mins)", async () => {
 
   await request(app)
     .patch(`${API_ROOT_ENDPOINT}/users/resetPassword/${token}`)
-    .send({ password: "new_password", password_confirm: "new_password" })
+    .send({ password: 'new_password', password_confirm: 'new_password' })
     .expect(404);
 });
 
-it("should return 200 and a cookie when token is valid", async () => {
+it('should return 200 and a cookie when token is valid', async () => {
   // Create a user
   await User.build(USER_CREATE_VALID_PAYLOAD).save();
 
@@ -58,7 +58,7 @@ it("should return 200 and a cookie when token is valid", async () => {
   // It should return a cookie
   const response = await request(app)
     .patch(`${API_ROOT_ENDPOINT}/users/resetPassword/${token}`)
-    .send({ password: "new_password", password_confirm: "new_password" })
+    .send({ password: 'new_password', password_confirm: 'new_password' })
     .expect(200);
-  expect(response.get("Set-Cookie")).toBeDefined();
+  expect(response.get('Set-Cookie')).toBeDefined();
 });
