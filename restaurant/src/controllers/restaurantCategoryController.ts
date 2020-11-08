@@ -1,17 +1,19 @@
 import {
   createOne,
-  deleteOne,
   findAll,
   findOne,
+  NotFoundError,
   updateOne,
 } from '@sin-nombre/sinfood-common';
+import { NextFunction, Request, Response } from 'express';
 import {
   RestaurantCategory,
   RestaurantCategoryDoc,
   RestaurantCategoryModel,
 } from '../models/restaurant-category';
 
-const test = RestaurantCategory;
+import { RestaurantCategoryDeletedPublisher } from '../events/publishers/RestaurantCategoryDeletedPublisher';
+import { natsWrapper } from '../events/nats-wrapper';
 
 export const findAllCategories = findAll<
   RestaurantCategoryDoc,
@@ -29,7 +31,22 @@ export const updateOneCategory = updateOne<
   RestaurantCategoryDoc,
   RestaurantCategoryModel
 >(RestaurantCategory);
-export const deleteOneCategory = deleteOne<
-  RestaurantCategoryDoc,
-  RestaurantCategoryModel
->(RestaurantCategory);
+
+export const deleteOneCategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const category = await RestaurantCategory.findByIdAndDelete(req.params.id);
+  if (!category) {
+    throw new NotFoundError('No Category found with that ID');
+  }
+  await new RestaurantCategoryDeletedPublisher(natsWrapper.client).publish({
+    id: req.params.id,
+  });
+
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
+};

@@ -77,7 +77,7 @@ export const signup = async (
   // Check for Password Confirmation
   if (!password_confirm || password_confirm !== password) {
     throw new BadRequestError(
-      `Password & Password Confirmation must be identical`,
+      'Password & Password Confirmation must be identical',
     );
   }
   // @todo: remove role on production
@@ -115,7 +115,7 @@ export const login = async (
 ) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    throw new BadRequestError(`Email and Password are required`);
+    throw new BadRequestError('Email and Password are required');
   }
   // check if user exist
   const user = await User.findOne({ email }).select('+password');
@@ -126,7 +126,7 @@ export const login = async (
   // Check if password is correct
   if (!(await Password.compare(user.password!, password))) {
     throw new NotFoundError(
-      `Incorrect Email / Password or email doesnt exists`,
+      'Incorrect Email / Password or email doesnt exists',
     ); // Dont expose that the user exist
   }
 
@@ -175,7 +175,7 @@ export const forgotPassword = async (
   });
 
   if (!user) {
-    throw new NotFoundError(`User not found with that email`);
+    throw new NotFoundError('User not found with that email');
   }
   // Create a reset Token
   const resetToken = user.createPasswordResetToken();
@@ -191,7 +191,7 @@ export const forgotPassword = async (
   try {
     // Publish an Email Sending Event
     await new EmailSendingPublisher(natsWrapper.client).publish({
-      subject: `Password Reset Token (Valid for 10 mins)`,
+      subject: 'Password Reset Token (Valid for 10 mins)',
       emailBody: message,
       receiver: user.email,
     });
@@ -205,7 +205,7 @@ export const forgotPassword = async (
     user.password_reset_token = undefined;
     user.password_reset_expires = undefined;
     await user.save({ validateBeforeSave: false });
-    throw new Error(`Something Went wrong!`);
+    throw new Error('Something Went wrong!');
   }
 };
 
@@ -223,7 +223,7 @@ export const resetPassword = async (
   const { password, password_confirm } = req.body;
   if (!password || !password_confirm || password !== password_confirm) {
     throw new BadRequestError(
-      `Password and Password Confirmation must be identical`,
+      'Password and Password Confirmation must be identical',
     );
   }
   // find user by token
@@ -240,7 +240,7 @@ export const resetPassword = async (
 
   // Update password if token is not expired and there is a user
   if (!user) {
-    throw new NotFoundError(`User doesnt exist or token expired`);
+    throw new NotFoundError('User doesnt exist or token expired');
   }
   user.password = req.body.password;
   user.password_reset_token = undefined;
@@ -274,14 +274,14 @@ export const updatePassword = async (
 ) => {
   const { password, new_password } = req.body;
   if (!password || !new_password) {
-    throw new BadRequestError(`Password and new_password fields are required`);
+    throw new BadRequestError('Password and new_password fields are required');
   }
   const user = await User.findById(req.currentUser!.id).select('+password');
 
   // The moment he is here it means that he passed the requireAth middleware
   // So there is a user with this id. Although add the check so TS STFU!
   if (!user) {
-    throw new BadRequestError(`User Not found`);
+    throw new BadRequestError('User Not found');
   }
   // Check if Posted password is correct
   if (!(await Password.compare(user.password!, password))) {

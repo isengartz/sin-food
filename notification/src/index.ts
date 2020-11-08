@@ -4,19 +4,19 @@ import { EmailSendingListener } from './events/listeners/email-sending-listener'
 
 const start = async () => {
   if (!process.env.TRANSPORTER_EMAIL_USERNAME) {
-    throw new Error(`TRANSPORTER_EMAIL_USERNAME must be define`);
+    throw new Error('TRANSPORTER_EMAIL_USERNAME must be define');
   }
   if (!process.env.TRANSPORTER_EMAIL_PASSWORD) {
-    throw new Error(`TRANSPORTER_EMAIL_PASSWORD must be define`);
+    throw new Error('TRANSPORTER_EMAIL_PASSWORD must be define');
   }
   if (!process.env.NATS_CLIENT_ID) {
-    throw new Error(`NATS_CLIENT_ID must be defined`);
+    throw new Error('NATS_CLIENT_ID must be defined');
   }
   if (!process.env.NATS_URL) {
-    throw new Error(`NATS_URL must be defined`);
+    throw new Error('NATS_URL must be defined');
   }
   if (!process.env.NATS_CLUSTER_ID) {
-    throw new Error(`NATS_CLUSTER_ID must be defined`);
+    throw new Error('NATS_CLUSTER_ID must be defined');
   }
 
   try {
@@ -35,7 +35,7 @@ const start = async () => {
   }
   app.listen(3000, () => {
     // eslint-disable-next-line no-console
-    console.log(`Listening on port 3000!`);
+    console.log('Listening on port 3000!');
   });
 };
 start();

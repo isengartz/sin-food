@@ -71,6 +71,8 @@
     "no-shadow": "off", // replaced by ts-eslint rule below
     "@typescript-eslint/no-shadow": "error",
     "prefer-destructuring": ["error", { "object": true, "array": false }],
+    "@typescript-eslint/camelcase": "off",
+    "@typescript-eslint/naming-convention": "off",
     "no-unused-vars": [1, { "argsIgnorePattern": "req|res|next|val" }],
     "@typescript-eslint/no-unused-vars": [
       1,
