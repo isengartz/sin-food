@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import { RelationHelper } from '@sin-nombre/sinfood-common';
+import { restaurantCategoryRelationships } from '../utils/RestaurantCategoryRelations';
 
 export interface RestaurantCategoryAttrs {
   name: string;
@@ -7,7 +9,7 @@ export interface RestaurantCategoryAttrs {
 export interface RestaurantCategoryDoc extends mongoose.Document {
   id: string;
   name: string;
-  restaurants: [string];
+  restaurants: string[];
 }
 
 export interface RestaurantCategoryModel
@@ -44,6 +46,17 @@ restaurantCategorySchema.statics.build = (attrs: RestaurantCategoryAttrs) => {
   return new RestaurantCategory(attrs);
 };
 
+// Remove references From relations on delete
+restaurantCategorySchema.post<RestaurantCategoryDoc>(
+  'findOneAndDelete',
+  async function (doc) {
+    if (doc) {
+      const relationshipHelper = new RelationHelper<RestaurantCategoryDoc>(doc);
+      relationshipHelper.addRelations(restaurantCategoryRelationships);
+      relationshipHelper.removeReferencesBasedOnId();
+    }
+  },
+);
 const RestaurantCategory = mongoose.model<
   RestaurantCategoryDoc,
   RestaurantCategoryModel

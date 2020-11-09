@@ -8,10 +8,13 @@ import {
   deleteOneCategory,
 } from '../controllers/restaurantCategoryController';
 
+
+
+
 const router = express.Router();
 
 router
-  .route('/:id/')
+  .route('/:id')
   .get(findOneCategory)
   .put(currentUser, isAdmin, updateOneCategory) // Only admin should Update categories
   .delete(currentUser, isAdmin, deleteOneCategory); // Only admin should Delete categories

@@ -173,18 +173,6 @@ restaurantSchema.pre<RestaurantDoc>('save', async function (next) {
   const relationshipHelper = new RelationHelper<RestaurantDoc>(this);
   relationshipHelper.addRelations(restaurantRelationships);
   relationshipHelper.insertReferencesBasedOnId();
-  // const RestaurantCategory = mongoose.model('Restaurant_Category');
-  //
-  // // Add any new categories
-  //
-  // await RestaurantCategory.updateMany(
-  //   { _id: { $in: this.categories } },
-  //   {
-  //     $addToSet: {
-  //       restaurants: this._id,
-  //     },
-  //   },
-  // );
 
   next();
 });

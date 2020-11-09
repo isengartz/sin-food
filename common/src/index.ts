@@ -18,6 +18,7 @@ export * from './middlewares/is-admin';
 
 // Event Interfaces
 export * from './events/event-interfaces/email-sending-event';
+export * from './events/event-interfaces/restaurant/restaurant-category-deleted-event';
 
 // Listeners
 export * from './events/base-listener';

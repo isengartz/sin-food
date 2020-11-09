@@ -18,13 +18,13 @@ const start = async () => {
     throw new Error('JWT_COOKIE_EXPIRES_IN must be defined');
   }
   if (!process.env.NATS_CLIENT_ID) {
-    throw new Error(`NATS_CLIENT_ID must be defined`);
+    throw new Error('NATS_CLIENT_ID must be defined');
   }
   if (!process.env.NATS_URL) {
-    throw new Error(`NATS_URL must be defined`);
+    throw new Error('NATS_URL must be defined');
   }
   if (!process.env.NATS_CLUSTER_ID) {
-    throw new Error(`NATS_CLUSTER_ID must be defined`);
+    throw new Error('NATS_CLUSTER_ID must be defined');
   }
 
   try {
@@ -45,10 +45,11 @@ const start = async () => {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
+    console.log('WTF??');
   }
   app.listen(3000, () => {
     // eslint-disable-next-line no-console
-    console.log(`Listening on port 3000!`);
+    console.log('Listening on port 3000!');
   });
 };
 start();
