@@ -9,7 +9,7 @@ export const RESTAURANT_CREATE_VALID_PAYLOAD = {
   password_confirm: 'test12345',
   phone: '+306981234567',
   location: {
-    coordinates: [22.9492107, 40.6095628],
+    coordinates: [22.9522107, 40.6095628],
   },
   delivers_to: {
     coordinates: [
@@ -21,4 +21,47 @@ export const RESTAURANT_CREATE_VALID_PAYLOAD = {
       ],
     ],
   },
+  working_hours: [
+    {
+      day: 1,
+      open: 0,
+      close: 1440,
+    },
+    {
+      day: 2,
+      open: 0,
+      close: 600,
+    },
+    {
+      day: 2,
+      open: 610,
+      close: 1440,
+    },
+    {
+      day: 3,
+      open: 0,
+      close: 1440,
+    },
+    {
+      day: 4,
+      open: 0,
+      close: 1440,
+    },
+    {
+      day: 5,
+      open: 0,
+      close: 1440,
+    },
+    {
+      day: 6,
+      open: 0,
+      close: 1440,
+    },
+    {
+      day: 0,
+      open: 0,
+      close: 1440,
+    },
+  ],
+  holidays: [new Date('2020-11-10'), new Date('2020-11-11')],
 };

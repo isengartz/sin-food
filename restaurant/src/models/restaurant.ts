@@ -4,6 +4,10 @@ import validator from 'validator';
 import { Password, UserRole, RelationHelper } from '@sin-nombre/sinfood-common';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 import { restaurantRelationships } from '../utils/RestaurantRelations';
+import {
+  RestaurantWorkingHours,
+  restaurantWorkingHoursSchema,
+} from './restaurant-working-hours';
 
 // Describes the attributes that we accept from Request
 export interface RestaurantAttrs {
@@ -24,6 +28,8 @@ export interface RestaurantAttrs {
   };
   phone: string;
   role?: UserRole;
+  working_hours: RestaurantWorkingHours[];
+  holidays: Date[];
 }
 // Describes the actual Document returned by Mongoose
 export interface RestaurantDoc extends mongoose.Document {
@@ -46,6 +52,8 @@ export interface RestaurantDoc extends mongoose.Document {
   phone: string;
   enabled: boolean;
   role: UserRole;
+  working_hours: RestaurantWorkingHours[];
+  holidays: Date[];
   password_reset_token?: string;
   password_reset_expires?: number;
   password_changed_at?: number;
@@ -53,7 +61,7 @@ export interface RestaurantDoc extends mongoose.Document {
   changedPasswordAfter(JWTTimestamp: number): boolean;
 }
 
-interface RestaurantModel extends mongoose.Model<RestaurantDoc> {
+export interface RestaurantModel extends mongoose.Model<RestaurantDoc> {
   build(attrs: RestaurantAttrs): RestaurantDoc;
 }
 
@@ -96,7 +104,7 @@ const restaurantSchema = new mongoose.Schema(
     location: {
       type: { type: String, enum: ['Point'], default: 'Point' },
       coordinates: {
-        required: [true, 'Restaurant geolocation is required'],
+        // required: [true, 'Restaurant geolocation is required'],
         type: [Number],
         index: '2dsphere',
       },
@@ -105,7 +113,7 @@ const restaurantSchema = new mongoose.Schema(
       type: { type: String, enum: ['Polygon'], default: 'Polygon' },
       coordinates: {
         type: [[[Number]]],
-        // index: "2dsphere",
+        // index: '2dsphere',
       },
     },
     categories: [
@@ -132,6 +140,8 @@ const restaurantSchema = new mongoose.Schema(
       enum: Object.values(UserRole),
       default: UserRole.Restaurant,
     },
+    working_hours: [restaurantWorkingHoursSchema],
+    holidays: [Date],
     created_at: {
       type: Date,
       default: Date.now(),
@@ -183,7 +193,6 @@ restaurantSchema.post<RestaurantDoc>('findOneAndUpdate', async function (doc) {
     relationshipHelper.addRelations(restaurantRelationships);
     relationshipHelper.insertReferencesBasedOnId();
     relationshipHelper.removeUpdatedReferencesBasedOnId();
-
   }
 });
 

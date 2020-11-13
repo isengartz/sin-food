@@ -48,9 +48,12 @@ export class QueryModelHelper {
 
     // Populate filters in actual mongoose filter obj
     let queryString = JSON.stringify(queryObj);
-    queryString = queryString.replace(/\b(gte|gt|lte|lt)\b/g, (match) => {
-      return `$${match}`;
-    });
+    queryString = queryString.replace(
+      /\b(gte|gt|lte|lt|in|nin)\b/g,
+      (match) => {
+        return `$${match}`;
+      },
+    );
     this.query = this.query.find(JSON.parse(queryString));
     return this;
   }

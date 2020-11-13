@@ -106,3 +106,18 @@ it('should attach restaurant category to restaurant and the inverse', async () =
   expect(updatedCat!.restaurants.length).toEqual(1);
   expect(updatedCat!.restaurants[0].toString()).toEqual(user.id.toString());
 });
+
+it('should successfully save working_hours', async () => {
+  const response = await request(app)
+    .post(`${API_ROOT_ENDPOINT}/restaurants`)
+    .send(RESTAURANT_CREATE_VALID_PAYLOAD)
+    .expect(201);
+  expect(response.body.data.user.working_hours.length).toBeGreaterThan(0);
+});
+it('should successfully save holidays', async () => {
+  const response = await request(app)
+    .post(`${API_ROOT_ENDPOINT}/restaurants`)
+    .send(RESTAURANT_CREATE_VALID_PAYLOAD)
+    .expect(201);
+  expect(response.body.data.user.holidays.length).toBeGreaterThan(0);
+});
