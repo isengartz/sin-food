@@ -31,7 +31,7 @@ export const findOne = <U extends mongoose.Document, T extends mongoose.Model<U>
   // Populate extra data if needed
   let query = Model.findById(req.params.id);
   if (!_.isEmpty(populateOptions)) {
-    query = query.populate({ populateOptions });
+    query = query.populate( populateOptions );
   }
   const document = await query;
   res.status(200).json({
@@ -61,7 +61,7 @@ export const findAll = <U extends mongoose.Document, T extends mongoose.Model<U>
 
   let query = queryHelper.getQuery();
   if (!_.isEmpty(populateOptions)) {
-    query = query.populate({ populateOptions });
+    query = query.populate(populateOptions);
   }
   const documents = await query;
   res.status(200).json({

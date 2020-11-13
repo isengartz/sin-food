@@ -12,13 +12,16 @@ import {
   updateRestaurant,
   signinRestaurant,
   deleteRestaurant,
+  filterRestaurants,
 } from '../controllers/restaurantController';
+import { seedRestaurants } from '../utils/seeder';
 
 const router = express.Router();
 
 router.post('/signin', signinRestaurant);
 router.route('/').get(findAllRestaurants).post(createRestaurant);
-
+router.get('/filter', filterRestaurants);
+router.get('/seed', seedRestaurants);
 router
   .route('/:id')
   .put(

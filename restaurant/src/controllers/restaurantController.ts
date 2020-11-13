@@ -5,11 +5,91 @@ import {
   NotFoundError,
   Password,
   AuthHelper,
+  QueryModelHelper,
+  DateHelper,
 } from '@sin-nombre/sinfood-common';
 import { Restaurant } from '../models/restaurant';
 
+
+/**
+ * Returns all the restaurants that delivers to specific endpoint
+ * And their working hours match the current time + 10 minutes
+ * @todo: Think if its possible to do it with a middleware
+ * @todo: Probably move this to Query Service when is created
+ * @param req
+ * @param res
+ * @param next
+ */
+export const filterRestaurants = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { longitude, latitude } = req.query;
+
+  // Check if lat & long are defined
+  if (!longitude || !latitude) {
+    throw new BadRequestError('Latitude and Longitude are required');
+  }
+  // Remove them from query string so the rest filters will be parsed by QueryModelHelper
+  delete req.query.longitude;
+  delete req.query.latitude;
+
+  // convert current time and day in minutes / int
+  const now = DateHelper.DayNowToHours();
+  const today = DateHelper.TodayAsInt();
+
+  // Create the base query without resolving the Promise
+  const restaurantQuery = Restaurant.find({
+    working_hours: {
+      $elemMatch: {
+        day: today,
+        open: { $lte: now },
+        close: { $gte: now + 10 },
+      }, // have at least 10 min span
+    },
+    delivers_to: {
+      $geoIntersects: {
+        $geometry: {
+          type: 'Point',
+          coordinates: [longitude, latitude],
+        },
+      },
+    },
+  });
+
+  // Filter the Query
+  const queryHelper = new QueryModelHelper(restaurantQuery, req.query);
+  queryHelper.filter();
+  queryHelper.limitFields();
+  // @todo: Dunno if I should add limit here. Need to figure out based on frontend design later
+  const totalCount = await Restaurant.countDocuments(
+    // @ts-ignore
+    queryHelper.getTotalCount(),
+  );
+  const restaurants = await queryHelper.getQuery();
+
+  res.status(200).json({
+    status: 'success',
+    results: restaurants.length,
+    totalCount,
+    data: {
+      restaurants,
+    },
+  });
+};
+
+/**
+ * Return all Restaurants
+ */
 export const findAllRestaurants = findAll(Restaurant, {});
 
+/**
+ * Signup a Restaurant
+ * @param req
+ * @param res
+ * @param next
+ */
 export const createRestaurant = async (
   req: Request,
   res: Response,
@@ -27,6 +107,8 @@ export const createRestaurant = async (
     password_confirm,
     categories,
     role,
+    working_hours,
+    holidays,
   } = req.body;
 
   if (
@@ -38,7 +120,7 @@ export const createRestaurant = async (
   // Check for Password Confirmation
   if (!password_confirm || password_confirm !== password) {
     throw new BadRequestError(
-      `Password & Password Confirmation must be identical`,
+      'Password & Password Confirmation must be identical',
     );
   }
 
@@ -53,6 +135,8 @@ export const createRestaurant = async (
     delivers_to,
     categories,
     role,
+    working_hours,
+    holidays,
   });
 
   await restaurant.save();
@@ -68,6 +152,12 @@ export const createRestaurant = async (
   AuthHelper.createSendToken(restaurant, 201, res);
 };
 
+/**
+ * Signin A Restaurant
+ * @param req
+ * @param res
+ * @param next
+ */
 export const signinRestaurant = async (
   req: Request,
   res: Response,
@@ -75,7 +165,7 @@ export const signinRestaurant = async (
 ) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    throw new BadRequestError(`Email and Password are required`);
+    throw new BadRequestError('Email and Password are required');
   }
   const restaurant = await Restaurant.findOne({ email }).select('+password');
   if (!restaurant) {
@@ -85,7 +175,7 @@ export const signinRestaurant = async (
   // Check if password is correct
   if (!(await Password.compare(restaurant.password!, password))) {
     throw new NotFoundError(
-      `Incorrect Email / Password or email doesnt exists`,
+      'Incorrect Email / Password or email doesnt exists',
     ); // Dont expose that the user exist
   }
   req.session = AuthHelper.serializeToken(
@@ -99,6 +189,12 @@ export const signinRestaurant = async (
   AuthHelper.createSendToken(restaurant, 200, res);
 };
 
+/**
+ * Updates a Restaurant
+ * @param req
+ * @param res
+ * @param next
+ */
 export const updateRestaurant = async (
   req: Request,
   res: Response,
@@ -112,6 +208,8 @@ export const updateRestaurant = async (
     delivers_to,
     location,
     categories,
+    working_hours,
+    holidays,
   } = req.body;
 
   const restaurant = await Restaurant.findByIdAndUpdate(
@@ -124,6 +222,8 @@ export const updateRestaurant = async (
       location,
       delivers_to,
       categories,
+      working_hours,
+      holidays,
     },
     {
       new: true,
@@ -145,13 +245,19 @@ export const updateRestaurant = async (
   AuthHelper.createSendToken(restaurant, 200, res);
 };
 
+/**
+ * Deletes a Restaurant
+ * @param req
+ * @param res
+ * @param next
+ */
 export const deleteRestaurant = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   if (!req.params.id) {
-    throw new BadRequestError(`Id must be defined`);
+    throw new BadRequestError('Id must be defined');
   }
   const restaurant = await Restaurant.findById(req.params.id);
   if (!restaurant) {
