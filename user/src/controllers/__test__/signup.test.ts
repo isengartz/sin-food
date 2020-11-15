@@ -6,7 +6,7 @@ import {
   USER_CREATE_VALID_PAYLOAD,
 } from '../../utils/constants';
 
-it('should return 400 when a bad email provided', () => {
+it('should return 400 when a bad email provided', async () => {
   const faultyUserPayload = {
     email: 'test',
     first_name: 'Jon',
@@ -16,7 +16,7 @@ it('should return 400 when a bad email provided', () => {
     phone: '+306980000000',
   };
 
-  return request(app)
+  await request(app)
     .post(`${API_ROOT_ENDPOINT}/users/signup`)
     .send(faultyUserPayload)
     .expect(400);
@@ -31,7 +31,7 @@ it('should return 400 when a bad phone is provided', async () => {
     phone: '12345678',
   };
 
-  return request(app)
+  await request(app)
     .post(`${API_ROOT_ENDPOINT}/users/signup`)
     .send(faultyUserPayload)
     .expect(400);
