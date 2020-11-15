@@ -6,7 +6,9 @@ import {
 } from '../../utils/constants';
 
 it("should return 401 when user isn't logged in", async () => {
-  request(app).patch(`${API_ROOT_ENDPOINT}/users/updatePassword`).expect(401);
+  await request(app)
+    .patch(`${API_ROOT_ENDPOINT}/users/updatePassword`)
+    .expect(401);
 });
 
 it("should return 400 when password or new_password aren't provided", async () => {

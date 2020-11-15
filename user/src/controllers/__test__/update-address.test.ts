@@ -16,7 +16,7 @@ it('should return 401 when user not logged in', async () => {
 it('should return 400 on wrong address_id', async () => {
   const { cookie } = await global.signin();
 
-  const response = await request(app)
+   await request(app)
     .post(`${API_ROOT_ENDPOINT}/users/address/random_address_id`)
     .set('Cookie', cookie)
     .send({})

@@ -35,7 +35,7 @@ it('should return 404 when the token expired (10 mins)', async () => {
   // Update user password_reset_expires to be 11 mins ago
   const user = await User.findOne({ email: USER_CREATE_VALID_PAYLOAD.email });
   user!.password_reset_expires = Date.now() - 11 * 60 * 1000;
-  user!.save();
+  await user!.save();
 
   await request(app)
     .patch(`${API_ROOT_ENDPOINT}/users/resetPassword/${token}`)
