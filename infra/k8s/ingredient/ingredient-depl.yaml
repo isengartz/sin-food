@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ingredient-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ingredient
+  template:
+    metadata:
+      labels:
+        app: ingredient
+    spec:
+      containers:
+        - name: ingredient
+          image: isengart/food-ingredient #docker image
+          env:
+            - name: NATS_CLIENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name # we add the same name as the POD generated from Kubernetes
+            - name: NATS_URL
+              value: "http://nats-srv:4222"
+            - name: NATS_CLUSTER_ID
+              value: sinfood
+            - name: MONGO_URI
+              value: "mongodb://ingredient-mongo-srv:27017/ingredient"
+            - name: JWT_COOKIE_EXPIRES_IN
+              value: "30"
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingredient-srv
+spec:
+  selector:
+    app: ingredient
+  ports:
+    - name: ingredient
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

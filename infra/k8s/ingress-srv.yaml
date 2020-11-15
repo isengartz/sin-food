@@ -18,6 +18,14 @@ spec:
             backend:
               serviceName: restaurant-srv # Name of the pod
               servicePort: 3000
+          - path: /api/v1/menu/?(.*)
+            backend:
+              serviceName: menu-srv # Name of the pod
+              servicePort: 3000
+          - path: /api/v1/ingredients/?(.*)
+            backend:
+              serviceName: ingredient-srv # Name of the pod
+              servicePort: 3000
           - path: /api/v1/notification/?(.*)
             backend:
               serviceName: notification-srv # Name of the pod
