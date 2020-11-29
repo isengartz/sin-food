@@ -41,7 +41,7 @@ export class RelationHelper<T extends mongoose.Document> {
         { _id: { $in: this.document[relation.parentIdentifier as keyof T] } },
         {
           $addToSet: {
-            restaurants: this.document._id,
+            [relation.childIdentifier]: this.document._id,
           },
         },
       );
@@ -57,7 +57,7 @@ export class RelationHelper<T extends mongoose.Document> {
         { _id: { $nin: this.document[relation.parentIdentifier as keyof T] } },
         {
           $pull: {
-            restaurants: this.document._id,
+            [relation.childIdentifier]: this.document._id,
           },
         },
       );

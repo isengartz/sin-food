@@ -16,9 +16,23 @@ export * from './middlewares/restrict-to';
 export * from './middlewares/is-admin-or-current-user';
 export * from './middlewares/is-admin';
 
-// Event Interfaces
+/**
+ * Event Interfaces
+ */
 export * from './events/event-interfaces/email-sending-event';
 export * from './events/event-interfaces/restaurant/restaurant-category-deleted-event';
+
+// Menu
+export * from './events/event-interfaces/menu/menu-item-created-event';
+export * from './events/event-interfaces/menu/menu-item-updated-event';
+export * from './events/event-interfaces/menu/menu-item-deleted-event';
+export * from './events/event-interfaces/menu/ingredient-created-event';
+export * from './events/event-interfaces/menu/ingredient-updated-event';
+export * from './events/event-interfaces/menu/ingredient-deleted-event';
+
+/**
+ * End of Event Interfaces
+ */
 
 // Listeners
 export * from './events/base-listener';

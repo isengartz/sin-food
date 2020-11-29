@@ -8,7 +8,10 @@ import hpp from 'hpp';
 import mongoSanitize from 'express-mongo-sanitize';
 import { errorHandler, RouteNotFoundError } from '@sin-nombre/sinfood-common';
 import { API_ROOT_ENDPOINT } from './utils/constants';
-
+import { menuItemCategoriesRoutes } from './routes/menuItemCategoryRoutes';
+import { menuItemRoutes } from './routes/menuItemRoutes';
+import { ingredientCategoriesRoutes } from './routes/ingredientCategoryRoutes';
+import { ingredientRoutes } from './routes/ingredientRoutes';
 
 const app = express();
 app.set('trust proxy', true); //used for ingress-nginx
@@ -35,13 +38,21 @@ app.use(hpp());
 /**
  * Routes
  */
-// Restaurant Category
-// app.use(
-//   `${API_ROOT_ENDPOINT}/restaurants/categories/`,
-//   restaurantCategoryRouter,
-// );
-// // Restaurant
-// app.use(`${API_ROOT_ENDPOINT}/restaurants/`, restaurantRoutes);
+// Menu Item Category
+app.use(
+  `${API_ROOT_ENDPOINT}/menu/categories/`,
+  menuItemCategoriesRoutes,
+);
+// Menu Item
+app.use(`${API_ROOT_ENDPOINT}/menu/`, menuItemRoutes);
+
+// Ingredient Category
+app.use(
+  `${API_ROOT_ENDPOINT}/ingredients/categories/`,
+  ingredientCategoriesRoutes,
+);
+// Ingredient
+app.use(`${API_ROOT_ENDPOINT}/ingredients/`, ingredientRoutes);
 
 // Not Found Route
 app.all('*', () => {
