@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { UserPayload } from '../interfaces/UserPayload';
+import { UserRole } from '../enums/user-roles';
 
 class AuthHelper {
   // Sign the User Token
@@ -34,5 +35,6 @@ class AuthHelper {
       },
     });
   }
+
 }
 export { AuthHelper };

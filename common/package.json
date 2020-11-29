@@ -1,6 +1,6 @@
 {
   "name": "@sin-nombre/sinfood-common",
-  "version": "1.0.43",
+  "version": "1.0.44",
   "description": "Common middleware and helper classes for sin-food",
   "main": "./build/index.js",
   "types": "./build/index.d.ts",

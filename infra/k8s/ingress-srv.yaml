@@ -24,7 +24,7 @@ spec:
               servicePort: 3000
           - path: /api/v1/ingredients/?(.*)
             backend:
-              serviceName: ingredient-srv # Name of the pod
+              serviceName: menu-srv # Name of the pod
               servicePort: 3000
           - path: /api/v1/notification/?(.*)
             backend:

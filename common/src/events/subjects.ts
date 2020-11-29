@@ -3,4 +3,10 @@ export enum Subjects {
   UserUpdated = 'user:updated',
   EmailSending = 'email:sending',
   RestaurantCategoryDeleted = 'restaurant_category:deleted',
+  IngredientCreated = 'ingredient:created',
+  IngredientUpdated = 'ingredient:updated',
+  IngredientDeleted = 'ingredient:deleted',
+  MenuItemCreated = 'menu:created',
+  MenuItemUpdated = 'menu:updated',
+  MenuItemDeleted = 'menu:deleted',
 }

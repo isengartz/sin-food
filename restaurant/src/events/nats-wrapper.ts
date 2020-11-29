@@ -5,7 +5,7 @@ class NatsWrapper {
 
   get client() {
     if (!this._client) {
-      throw new Error(`Cant access NATS Client before connecting`);
+      throw new Error('Cant access NATS Client before connecting');
     }
     return this._client;
   }
@@ -16,7 +16,7 @@ class NatsWrapper {
     return new Promise((resolve, reject) => {
       this.client.on('connect', () => {
         // eslint-disable-next-line no-console
-        console.log(`Connected to NATS`);
+        console.log('Connected to NATS');
         resolve();
       });
       this.client.on('error', (err) => {
