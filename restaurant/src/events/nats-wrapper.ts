@@ -13,7 +13,8 @@ class NatsWrapper {
   connect(clusterId: string, clientId: string, url: string) {
     this._client = nats.connect(clusterId, clientId, { url });
 
-    return new Promise((resolve, reject) => {
+
+    return new Promise<void>((resolve, reject) => {
       this.client.on('connect', () => {
         // eslint-disable-next-line no-console
         console.log('Connected to NATS');

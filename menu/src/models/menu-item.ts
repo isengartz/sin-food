@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 import { IngredientDoc } from './ingredient';
+import { natsWrapper } from '../events/nats-wrapper';
+import { MenuItemDeletedPublisher } from '../events/publishers/menu-item-deleted-publisher';
+import { MenuItemCreatedPublisher } from '../events/publishers/menu-item-created-publisher';
+import { MenuItemUpdatedPublisher } from '../events/publishers/menu-item-updated-publisher';
 
 export interface VariationInterface {
   name: string;
@@ -110,6 +114,55 @@ menuItemSchema.plugin(updateIfCurrentPlugin);
 menuItemSchema.statics.build = (attrs: MenuItemAttrs) => {
   return new MenuItem(attrs);
 };
+
+// Add wasNew flag so we can do the check inside post middleware
+menuItemSchema.pre<IngredientDoc>('save', function (next) {
+  // @ts-ignore
+  this.wasNew = this.isNew;
+  next();
+});
+
+// Publish an Event on create and update
+menuItemSchema.post<MenuItemDoc>('save', async function (doc, next) {
+  if (doc.wasNew) {
+    new MenuItemCreatedPublisher(natsWrapper.client).publish({
+      id: doc._id,
+      base_price: doc.base_price,
+      variations: doc.variations,
+    });
+  } else {
+    new MenuItemUpdatedPublisher(natsWrapper.client).publish({
+      id: doc._id,
+      base_price: doc.base_price,
+      variations: doc.variations,
+      version: doc.version,
+    });
+  }
+  // @ts-ignore
+  next();
+});
+
+// This is fired only when Ingredient is getting deleted
+menuItemSchema.post<MenuItemDoc>('updateMany', async function (doc, next) {
+  new MenuItemUpdatedPublisher(natsWrapper.client).publish({
+    id: doc._id,
+    base_price: doc.base_price,
+    variations: doc.variations,
+    version: doc.version,
+  });
+  // @ts-ignore
+  next();
+});
+
+// Publish an Event on delete
+menuItemSchema.post<MenuItemDoc>('remove', async function (doc, next) {
+  new MenuItemDeletedPublisher(natsWrapper.client).publish({
+    id: doc._id,
+    version: doc.version,
+  });
+  // @ts-ignore
+  next();
+});
 
 const MenuItem = mongoose.model<MenuItemDoc, MenuItemModel>(
   'Menu_Item',

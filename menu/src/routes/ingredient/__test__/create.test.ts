@@ -2,6 +2,7 @@ import request from 'supertest';
 import { app } from '../../../app';
 import { API_ROOT_ENDPOINT } from '../../../utils/constants';
 import { natsWrapper } from '../../../events/nats-wrapper';
+import { Subjects } from '@sin-nombre/sinfood-common';
 
 it('should return 401 if user is not logged in', async () => {
   await request(app)
@@ -112,4 +113,9 @@ it('should emit an event', async () => {
     .send({ name: 'bacon', userId: 'randomUserId' })
     .expect(201);
   expect(natsWrapper.client.publish).toHaveBeenCalled();
+  const eventsPublished = (natsWrapper.client.publish as jest.Mock).mock.calls;
+  // The last Event should be IngredientCreated
+  expect(eventsPublished[eventsPublished.length - 1][0]).toEqual(
+    Subjects.IngredientCreated,
+  );
 });

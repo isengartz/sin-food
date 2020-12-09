@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
+import { IngredientDoc } from './ingredient';
 
 export interface IngredientCategoryAttrs {
   userId: string;
@@ -47,13 +48,22 @@ ingredientCategorySchema.statics.build = (attrs: IngredientCategoryAttrs) => {
 };
 
 // If someone remove the category - Remove the ingredients too
-ingredientCategorySchema.pre<IngredientCategoryDoc>('remove', async function (
-  next,
-) {
-  const ingredientModel = mongoose.model('Ingredient');
-  await ingredientModel.deleteMany({ category: this._id });
-  next();
-});
+
+ingredientCategorySchema.post<IngredientCategoryDoc>(
+  'remove',
+  async function (doc, next) {
+    const ingredientModel = mongoose.model('Ingredient');
+    // @ts-ignore
+    const ingredients: IngredientDoc[] = await ingredientModel.find({
+      category: doc._id,
+    });
+    ingredients.forEach(async (ingredient) => {
+      await ingredient.remove();
+    });
+    // @ts-ignore
+    next();
+  },
+);
 
 const IngredientCategory = mongoose.model<
   IngredientCategoryDoc,

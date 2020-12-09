@@ -2,6 +2,8 @@ import request from 'supertest';
 import mongoose from 'mongoose';
 import { app } from '../../../app';
 import { API_ROOT_ENDPOINT } from '../../../utils/constants';
+import { natsWrapper } from '../../../events/nats-wrapper';
+import { Subjects } from '@sin-nombre/sinfood-common';
 
 it('should return 401 if user is not logged in', async () => {
   await request(app)
@@ -112,4 +114,16 @@ it('should delete all ingredients associated with the category', async () => {
     .send({})
     .expect(200);
   expect(findIngredient.body.data.ingredients.length).toEqual(0);
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
+  const eventsPublished = (natsWrapper.client.publish as jest.Mock).mock.calls;
+
+  // The 3rd before end Event should be IngredientDeleted
+  expect(eventsPublished[eventsPublished.length - 3][0]).toEqual(
+    Subjects.IngredientDeleted,
+  );
+  // The last 2 Event should be MenuItemUpdated
+  expect(eventsPublished[eventsPublished.length - 1][0]).toEqual(
+    Subjects.MenuItemUpdated,
+  );
 });

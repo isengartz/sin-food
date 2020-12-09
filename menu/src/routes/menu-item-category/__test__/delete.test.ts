@@ -1,7 +1,9 @@
 import request from 'supertest';
 import mongoose from 'mongoose';
+import { Subjects } from '@sin-nombre/sinfood-common';
 import { app } from '../../../app';
 import { API_ROOT_ENDPOINT } from '../../../utils/constants';
+import { natsWrapper } from '../../../events/nats-wrapper';
 
 it('should return 401 if user is not logged in', async () => {
   await request(app)
@@ -75,7 +77,7 @@ it('should return 204 when user own the Document ', async () => {
     .expect(204);
 });
 
-it('should delete all ingredients associated with the category', async () => {
+it('should delete all menu items associated with the category', async () => {
   const cookie = global.signin();
 
   const createCategoryResponse = await request(app)
@@ -84,13 +86,18 @@ it('should delete all ingredients associated with the category', async () => {
     .send({ name: 'Burgers', userId: 'randomUserId' })
     .expect(201);
 
-  const createMenuItemResponse = await request(app)
-    .post(`${API_ROOT_ENDPOINT}/ingredients`)
+  await request(app)
+    .post(`${API_ROOT_ENDPOINT}/menu/`)
     .set('Cookie', cookie)
     .send({
-      name: 'bacon',
-      userId: createCategoryResponse.body.data.menu_item_categories.userId,
-      category: createCategoryResponse.body.data.menu_item_categories.id,
+      name: 'Super Texas Burger',
+      description: 'Amazing Burger or not !',
+      userId: 'randomUserId',
+      menu_category: createCategoryResponse.body.data.menu_item_categories.id,
+      base_price: 5,
+      main_ingredients: [],
+      variations: [],
+      extra_ingredient_groups: [],
     })
     .expect(201);
 
@@ -107,5 +114,13 @@ it('should delete all ingredients associated with the category', async () => {
     .set('Cookie', cookie)
     .send({})
     .expect(200);
+
   expect(findIngredient.body.data.menu_items.length).toEqual(0);
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
+  const eventsPublished = (natsWrapper.client.publish as jest.Mock).mock.calls;
+  // The last Event should be MenuItemDeleted
+  expect(eventsPublished[eventsPublished.length - 1][0]).toEqual(
+    Subjects.MenuItemDeleted,
+  );
 });
