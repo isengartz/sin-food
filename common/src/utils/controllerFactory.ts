@@ -5,6 +5,7 @@ import { NotFoundError } from '../errors/not-found-error';
 import { QueryModelHelper } from './QueryModelHelper';
 import { NotAuthorizedError } from '../errors/not-authorized-error';
 import { UserRole } from '../enums/user-roles';
+import { GLOBAL_EXCLUDED_UPDATE_FIELDS } from './globalConsts';
 
 // Create a new document of given Model
 export const createOne = <
@@ -148,6 +149,7 @@ export const updateOne = <
 >(
   Model: T,
   authField?: string,
+  excludes: string[] = [],
 ) => async (req: Request, res: Response, next: NextFunction) => {
   const documentName = Model.collection.collectionName;
   const document = await Model.findById(req.params.id);
@@ -165,10 +167,18 @@ export const updateOne = <
       throw new NotAuthorizedError('You dont have access to this Document');
     }
   }
-  const updatedDocument = await document.updateOne(req.body, {
-    new: true,
-    runValidators: true,
+  // Update the document excluding any field inside excludes array or global excludes
+  Object.keys(req.body).forEach((param) => {
+    if (
+      !excludes.includes(param) &&
+      !GLOBAL_EXCLUDED_UPDATE_FIELDS.includes(param)
+    ) {
+      document.set({ [param]: req.body[param] });
+    }
   });
+
+  const updatedDocument = await document.save();
+
   res.status(200).json({
     status: 'success',
     data: {
