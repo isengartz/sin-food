@@ -1,5 +1,9 @@
 import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
+import { IngredientDeletedPublisher } from '../events/publishers/ingredient-deleted-publisher';
+import { natsWrapper } from '../events/nats-wrapper';
+import { IngredientUpdatedPublisher } from '../events/publishers/ingredient-updated-publisher';
+import { IngredientCreatedPublisher } from '../events/publishers/ingredient-created-publisher';
 
 export interface IngredientAttrs {
   userId: string;
@@ -60,6 +64,75 @@ ingredientSchema.plugin(updateIfCurrentPlugin);
 ingredientSchema.statics.build = (attrs: IngredientAttrs) => {
   return new Ingredient(attrs);
 };
+
+// Add wasNew flag so we can do the check inside post middleware
+ingredientSchema.pre<IngredientDoc>('save', function (next) {
+  // @ts-ignore
+  this.wasNew = this.isNew;
+  next();
+});
+
+// Publish an Event on Create and Update
+ingredientSchema.post<IngredientDoc>('save', async function (doc, next) {
+  if (doc.wasNew) {
+    new IngredientCreatedPublisher(natsWrapper.client).publish({
+      id: doc._id,
+      price: doc.defaultPrice,
+    });
+  } else {
+    new IngredientUpdatedPublisher(natsWrapper.client).publish({
+      id: doc._id,
+      price: doc.defaultPrice,
+      version: doc.version,
+    });
+  }
+
+  // @ts-ignore
+  next();
+});
+
+
+// Publish an Event on delete
+ingredientSchema.post<IngredientDoc>('remove', async function (doc, next) {
+  new IngredientDeletedPublisher(natsWrapper.client).publish({
+    id: doc._id,
+    version: doc.version,
+  });
+  // @ts-ignore
+  next();
+});
+
+// If someone remove the Ingredient . Detach relations from Menu Item
+
+// Remove the ingredient from main_ingredients
+ingredientSchema.post<IngredientDoc>('remove', async function (doc, next) {
+  const menuItemModel = mongoose.model('Menu_Item');
+  await menuItemModel.updateMany(
+    { main_ingredients: { $in: doc._id } },
+    {
+      $pull: {
+        main_ingredients: doc._id,
+      },
+    },
+  );
+  // @ts-ignore
+  next();
+});
+
+// Remove the ingredient from extra_ingredient_groups
+ingredientSchema.post<IngredientDoc>('remove', async function (doc, next) {
+  const menuItemModel = mongoose.model('Menu_Item');
+  await menuItemModel.updateMany(
+    { 'extra_ingredient_groups.ingredients': { $in: doc._id } },
+    {
+      $pull: {
+        'extra_ingredient_groups.$[].ingredients': doc._id,
+      },
+    },
+  );
+  // @ts-ignore
+  next();
+});
 
 const Ingredient = mongoose.model<IngredientDoc, IngredientModel>(
   'Ingredient',

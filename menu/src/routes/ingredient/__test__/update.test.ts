@@ -1,5 +1,6 @@
 import request from 'supertest';
 import mongoose from 'mongoose';
+import { Subjects } from '@sin-nombre/sinfood-common';
 import { app } from '../../../app';
 import { API_ROOT_ENDPOINT } from '../../../utils/constants';
 import { Ingredient } from '../../../models/ingredient';
@@ -84,6 +85,11 @@ it('should return 200 when the user owns the document', async () => {
   expect(updatedIngredient!.name).toEqual('cheese_edited');
 
   expect(natsWrapper.client.publish).toHaveBeenCalled();
+  const eventsPublished = (natsWrapper.client.publish as jest.Mock).mock.calls;
+  // The last Event should be IngredientUpdated
+  expect(eventsPublished[eventsPublished.length - 1][0]).toEqual(
+    Subjects.IngredientUpdated,
+  );
 });
 
 it('should return 404 when document does not exist', async () => {

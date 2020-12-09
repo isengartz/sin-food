@@ -1,9 +1,11 @@
 import request from 'supertest';
+import { Subjects } from '@sin-nombre/sinfood-common';
 import { app } from '../../../app';
 import {
   API_ROOT_ENDPOINT,
   MENU_ITEM_CREATE_VALID_PAYLOAD,
 } from '../../../utils/constants';
+import { natsWrapper } from '../../../events/nats-wrapper';
 
 it('should return 401 if user is not logged in', async () => {
   await request(app)
@@ -172,4 +174,11 @@ it('should return a full valid payload', async () => {
     ingredientBacon.body.data.ingredients.id,
   );
   expect(variations[0].name).toEqual('Small Size');
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
+  const eventsPublished = (natsWrapper.client.publish as jest.Mock).mock.calls;
+  // The last Event should be MenuItemCreated
+  expect(eventsPublished[eventsPublished.length - 1][0]).toEqual(
+    Subjects.MenuItemCreated,
+  );
 });

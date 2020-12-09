@@ -8,8 +8,11 @@ import {
   QueryModelHelper,
   DateHelper,
 } from '@sin-nombre/sinfood-common';
-import { Restaurant } from '../models/restaurant';
-
+import {
+  Restaurant,
+  RestaurantDoc,
+  RestaurantModel,
+} from '../models/restaurant';
 
 /**
  * Returns all the restaurants that delivers to specific endpoint
@@ -82,7 +85,10 @@ export const filterRestaurants = async (
 /**
  * Return all Restaurants
  */
-export const findAllRestaurants = findAll(Restaurant, {});
+export const findAllRestaurants = findAll<RestaurantDoc, RestaurantModel>(
+  Restaurant,
+  {},
+);
 
 /**
  * Signup a Restaurant

@@ -11,11 +11,7 @@ import {
 const Router = express.Router();
 
 Router.route('/:id')
-  .get(
-    currentUser,
-    restrictTo([UserRole.Restaurant, UserRole.Admin]),
-    findOneMenuItem,
-  )
+  .get(findOneMenuItem)
   .put(
     currentUser,
     restrictTo([UserRole.Restaurant, UserRole.Admin]),
@@ -33,10 +29,6 @@ Router.route('/')
     restrictTo([UserRole.Restaurant, UserRole.Admin]),
     createOneMenuItem,
   )
-  .get(
-    currentUser,
-    restrictTo([UserRole.Restaurant, UserRole.Admin]),
-    findAllMenuItems,
-  );
+  .get(findAllMenuItems);
 
 export { Router as menuItemRoutes };

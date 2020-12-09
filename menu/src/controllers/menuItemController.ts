@@ -14,20 +14,18 @@ import { MenuItem, MenuItemDoc, MenuItemModel } from '../models/menu-item';
 export const findAllMenuItems = findAll<MenuItemDoc, MenuItemModel>(
   MenuItem,
   {},
-  'userId',
 );
 
 /**
- * Returns an MenuItem
+ * Returns a MenuItem
  */
 export const findOneMenuItem = findOne<MenuItemDoc, MenuItemModel>(
   MenuItem,
   {},
-  'userId',
 );
 
 /**
- * Creates an MenuItem
+ * Creates a MenuItem
  */
 
 export const createOneMenuItem = createOne<MenuItemDoc, MenuItemModel>(
@@ -36,7 +34,7 @@ export const createOneMenuItem = createOne<MenuItemDoc, MenuItemModel>(
 );
 
 /**
- * Updates an MenuItem
+ * Updates a MenuItem
  */
 export const updateOneMenuItem = updateOne<MenuItemDoc, MenuItemModel>(
   MenuItem,
@@ -44,7 +42,7 @@ export const updateOneMenuItem = updateOne<MenuItemDoc, MenuItemModel>(
 );
 
 /**
- * Deletes an MenuItem
+ * Deletes a MenuItem
  */
 export const deleteOneMenuItem = deleteOne<MenuItemDoc, MenuItemModel>(
   MenuItem,

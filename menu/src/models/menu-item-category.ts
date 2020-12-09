@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { MenuItemDoc } from './menu-item';
 
 export interface MenuItemCategoryAttrs {
   name: string;
@@ -43,13 +44,20 @@ menuItemCategorySchema.statics.build = (attrs: MenuItemCategoryAttrs) => {
   return new MenuItemCategory(attrs);
 };
 // If someone remove the category - Remove the MenuItem too
-menuItemCategorySchema.pre<MenuItemCategoryDoc>('remove', async function (
-  next,
-) {
-  const menuItemModel = mongoose.model('Menu_Item');
-  await menuItemModel.deleteMany({ category: this._id });
-  next();
-});
+menuItemCategorySchema.post<MenuItemCategoryDoc>(
+  'remove',
+  async function (doc) {
+    const menuItemModel = mongoose.model('Menu_Item');
+
+    // @ts-ignore
+    const menuItems: MenuItemDoc[] = await menuItemModel.find({
+      menu_category: doc._id,
+    });
+    menuItems.forEach(async (item) => {
+      await item.remove();
+    });
+  },
+);
 
 const MenuItemCategory = mongoose.model<
   MenuItemCategoryDoc,

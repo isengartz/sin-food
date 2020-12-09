@@ -9,6 +9,7 @@ import {
   restaurantWorkingHoursSchema,
 } from './restaurant-working-hours';
 
+
 // Describes the attributes that we accept from Request
 export interface RestaurantAttrs {
   email: string;
@@ -31,6 +32,7 @@ export interface RestaurantAttrs {
   working_hours: RestaurantWorkingHours[];
   holidays: Date[];
 }
+
 // Describes the actual Document returned by Mongoose
 export interface RestaurantDoc extends mongoose.Document {
   id: string;
@@ -69,7 +71,7 @@ const restaurantSchema = new mongoose.Schema(
   {
     email: {
       type: String,
-      unique: [true, 'Email already in use. Use a different one.'],
+      unique: true,
       required: [true, 'Email is required'],
       lowercase: true,
       validate: {
@@ -85,7 +87,7 @@ const restaurantSchema = new mongoose.Schema(
     },
     name: {
       type: String,
-      unique: [true, 'Restaurant Name must be unique'],
+      unique: true,
       required: [true, 'Restaurant Name is required'],
     },
     description: {
@@ -261,4 +263,5 @@ const Restaurant = mongoose.model<RestaurantDoc, RestaurantModel>(
   'Restaurant',
   restaurantSchema,
 );
+
 export { Restaurant };
