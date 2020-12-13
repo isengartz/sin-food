@@ -1,16 +1,14 @@
 import mongoose from 'mongoose';
 import { app } from './app';
 import { natsWrapper } from './events/nats-wrapper';
+import { MenuItemCreatedListener } from './events/listeners/menu-item-created-listener';
+import { MenuItemUpdatedListener } from './events/listeners/menu-item-updated-listener';
+import { IngredientCreatedListener } from './events/listeners/ingredient-created-listener';
+import { IngredientUpdatedListener } from './events/listeners/ingredient-updated-listener';
 
 const start = async () => {
   // Check for ENV Vars so TS stfu and also throw an error if we forgot to define them in Kubernetes
-  if (!process.env.ADMIN_ALLOW_PASSWORD) {
-    throw new Error('ADMIN_ALLOW_PASSWORD must be defined');
-  }
 
-  if (!process.env.JWT_KEY) {
-    throw new Error('JWT_KEY must be defined');
-  }
   if (!process.env.MONGO_URI) {
     throw new Error('MONGO_URI must be defined');
   }
@@ -49,6 +47,12 @@ const start = async () => {
     });
     process.on('SIGINT', () => natsWrapper.client.close());
     process.on('SIGTERM', () => natsWrapper.client.close());
+
+    // Initialize Listeners
+    new MenuItemCreatedListener(natsWrapper.client).listen();
+    new MenuItemUpdatedListener(natsWrapper.client).listen();
+    new IngredientCreatedListener(natsWrapper.client).listen();
+    new IngredientUpdatedListener(natsWrapper.client).listen();
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);

@@ -127,18 +127,19 @@ menuItemSchema.post<MenuItemDoc>('save', async function (doc, next) {
   if (doc.wasNew) {
     new MenuItemCreatedPublisher(natsWrapper.client).publish({
       id: doc._id,
+      name: doc.name,
       base_price: doc.base_price,
       variations: doc.variations,
     });
   } else {
     new MenuItemUpdatedPublisher(natsWrapper.client).publish({
       id: doc._id,
+      name: doc.name,
       base_price: doc.base_price,
       variations: doc.variations,
       version: doc.version,
     });
   }
-  // @ts-ignore
   next();
 });
 
@@ -146,11 +147,12 @@ menuItemSchema.post<MenuItemDoc>('save', async function (doc, next) {
 menuItemSchema.post<MenuItemDoc>('updateMany', async function (doc, next) {
   new MenuItemUpdatedPublisher(natsWrapper.client).publish({
     id: doc._id,
+    name: doc.name,
     base_price: doc.base_price,
     variations: doc.variations,
     version: doc.version,
   });
-  // @ts-ignore
+  //@ts-ignore
   next();
 });
 
@@ -160,7 +162,6 @@ menuItemSchema.post<MenuItemDoc>('remove', async function (doc, next) {
     id: doc._id,
     version: doc.version,
   });
-  // @ts-ignore
   next();
 });
 

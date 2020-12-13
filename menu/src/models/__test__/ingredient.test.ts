@@ -11,7 +11,7 @@ it('should implements optimistic concurrency control', async (done) => {
     userId: 'uui12345',
     name: 'Bacon',
     defaultPrice: 5,
-    category: ingredientCategory.id,
+    category: ingredientCategory.id!,
   }).save();
 
   // Get 2 instances
@@ -43,7 +43,7 @@ it('should increments the version number on multiple saves', async () => {
     userId: 'uui12345',
     name: 'Bacon',
     defaultPrice: 5,
-    category: ingredientCategory.id,
+    category: ingredientCategory.id!,
   });
   await ingredient.save();
   expect(ingredient.version).toEqual(0);

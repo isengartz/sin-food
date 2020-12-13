@@ -33,6 +33,14 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
+    - image: isengart/food-order
+      context: order
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
     - image: isengart/food-notification
       context: notification
       docker:
