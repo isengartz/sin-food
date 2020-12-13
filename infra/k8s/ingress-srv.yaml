@@ -22,6 +22,10 @@ spec:
             backend:
               serviceName: menu-srv # Name of the pod
               servicePort: 3000
+          - path: /api/v1/orders/?(.*)
+            backend:
+              serviceName: order-srv # Name of the pod
+              servicePort: 3000
           - path: /api/v1/ingredients/?(.*)
             backend:
               serviceName: menu-srv # Name of the pod

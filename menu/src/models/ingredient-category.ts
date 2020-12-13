@@ -60,7 +60,6 @@ ingredientCategorySchema.post<IngredientCategoryDoc>(
     ingredients.forEach(async (ingredient) => {
       await ingredient.remove();
     });
-    // @ts-ignore
     next();
   },
 );

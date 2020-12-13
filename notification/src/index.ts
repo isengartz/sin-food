@@ -27,6 +27,13 @@ const start = async () => {
       process.env.NATS_URL,
     );
 
+    natsWrapper.client.on('close', () => {
+      console.log('NATS connection closed!');
+      process.exit();
+    });
+    process.on('SIGINT', () => natsWrapper.client.close());
+    process.on('SIGTERM', () => natsWrapper.client.close());
+
     // Listen for Events
     new EmailSendingListener(natsWrapper.client).listen();
   } catch (e) {

@@ -51,6 +51,7 @@ export * from './utils/DateHelper';
 // Enums
 export * from './enums/user-roles';
 export * from './enums/working-days';
+export * from './enums/order-status';
 
 // Interfaces
 export * from './interfaces/RelationInterface';

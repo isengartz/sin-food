@@ -78,16 +78,17 @@ ingredientSchema.post<IngredientDoc>('save', async function (doc, next) {
     new IngredientCreatedPublisher(natsWrapper.client).publish({
       id: doc._id,
       price: doc.defaultPrice,
+      name: doc.name,
     });
   } else {
     new IngredientUpdatedPublisher(natsWrapper.client).publish({
       id: doc._id,
       price: doc.defaultPrice,
       version: doc.version,
+      name: doc.name,
     });
   }
 
-  // @ts-ignore
   next();
 });
 
@@ -98,7 +99,6 @@ ingredientSchema.post<IngredientDoc>('remove', async function (doc, next) {
     id: doc._id,
     version: doc.version,
   });
-  // @ts-ignore
   next();
 });
 
@@ -115,7 +115,6 @@ ingredientSchema.post<IngredientDoc>('remove', async function (doc, next) {
       },
     },
   );
-  // @ts-ignore
   next();
 });
 
@@ -130,7 +129,6 @@ ingredientSchema.post<IngredientDoc>('remove', async function (doc, next) {
       },
     },
   );
-  // @ts-ignore
   next();
 });
 

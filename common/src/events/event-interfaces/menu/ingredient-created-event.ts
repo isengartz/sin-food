@@ -4,6 +4,7 @@ export interface IngredientCreatedEvent {
   subject: Subjects.IngredientCreated;
   data: {
     id: string;
+    name: string;
     price: number;
   };
 }
