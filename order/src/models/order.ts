@@ -1,12 +1,13 @@
 import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 import { OrderStatus } from '@sin-nombre/sinfood-common';
-import { MenuItemDoc } from './menu-item';
+import { calculateFinalOrderPrice } from '../utils/calculate-final-order-price';
 
 interface OrderedMenuItemsOptions {
   excluded_ingredients: string[];
   extra_ingredients: string[];
   quantity: number;
+  variation?: string;
 }
 
 export interface OrderAttrs {
@@ -15,7 +16,7 @@ export interface OrderAttrs {
   status: OrderStatus;
   price: number;
   menu_items: {
-    item: MenuItemDoc;
+    item: string;
     item_options: OrderedMenuItemsOptions;
   }[];
 }
@@ -26,7 +27,7 @@ export interface OrderDoc extends mongoose.Document {
   status: OrderStatus;
   price: number;
   menu_items: {
-    item: MenuItemDoc;
+    item: string;
     item_options: OrderedMenuItemsOptions;
   }[];
   version: number;
@@ -60,6 +61,7 @@ const orderSchema = new mongoose.Schema(
     },
     menu_items: [
       {
+        _id: false,
         item: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'Menu_Item',
@@ -78,6 +80,7 @@ const orderSchema = new mongoose.Schema(
             },
           ],
           quantity: Number,
+          variation: String,
         },
       },
     ],
@@ -97,15 +100,13 @@ orderSchema.set('versionKey', 'version');
 orderSchema.plugin(updateIfCurrentPlugin);
 
 orderSchema.statics.build = (attrs: OrderAttrs) => {
-  return new Order({
-    price: attrs.price,
-    userId: attrs.userId,
-    restaurantId: attrs.restaurantId,
-    status: attrs.status,
-    menu_items: attrs.menu_items,
-  });
+  return new Order(attrs);
 };
 
+orderSchema.pre<OrderDoc>('save', async function (next) {
+  this.price = await calculateFinalOrderPrice(this.menu_items);
+  next();
+});
 const Order = mongoose.model<OrderDoc, OrderModel>('Order', orderSchema);
 
 export { Order };
