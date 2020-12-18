@@ -26,7 +26,7 @@ it('should return 2 results', async () => {
     base_price: 5,
     main_ingredients: [],
     variations: [],
-    menu_category: menuItemCategory.id,
+    menu_category: menuItemCategory.id!,
     extra_ingredient_groups: [],
   }).save();
 
@@ -37,7 +37,7 @@ it('should return 2 results', async () => {
     base_price: 5,
     main_ingredients: [],
     variations: [],
-    menu_category: menuItemCategory.id,
+    menu_category: menuItemCategory.id!,
     extra_ingredient_groups: [],
   }).save();
 
