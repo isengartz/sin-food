@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/indent */
+// eslint-disable-next-line import/no-cycle
 import { OrderDoc } from '../models/order';
 import { MenuItem } from '../models/menu-item';
 import { Ingredient } from '../models/ingredient';
@@ -11,6 +12,7 @@ export const calculateFinalOrderPrice = async (
   const ids: Set<string> = new Set();
   const ingrs: Set<string> = new Set();
 
+  // Find all unique menu items / ingredients
   items.forEach((item) => {
     ids.add(item.item);
     item.item_options.extra_ingredients.forEach((ingredient) =>
@@ -22,6 +24,7 @@ export const calculateFinalOrderPrice = async (
   // Convert Set to array
   const ingredients = await Ingredient.find({ _id: { $in: [...ingrs] } });
   const menuItems = await MenuItem.find({ _id: { $in: [...ids] } });
+
 
   const price = items.reduce((acc, current) => {
     const foundItem = menuItems.find(

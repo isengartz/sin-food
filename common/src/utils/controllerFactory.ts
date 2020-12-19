@@ -47,6 +47,7 @@ export const findOne = <
 ) => async (req: Request, res: Response, next: NextFunction) => {
   const documentName = Model.collection.collectionName;
   // Populate extra data if needed
+
   let query = Model.findById(req.params.id);
   if (!_.isEmpty(populateOptions)) {
     query = query.populate(populateOptions);
@@ -61,10 +62,32 @@ export const findOne = <
       throw new NotAuthorizedError('You dont have access to this Document');
     }
   }
+
+  // This is a hack cause Im way too deep now !
+  // The right thing to do, should be, change findById method to find and pass _id as a req.query parameter
+  // Then call QueryModelHelper and let it do the job
+  // But I will have to refactor some of the events in various services
+  // So lets implement this shit and maybe do it correctly in the future ^.^
+
+  // The idea behind this is, that if someone pass req.query, instead of passing the filters into mongoose query
+  // check if there is a document returned and also check if the filters match the document values
+  // this will work only for non-array fields but I dont care as I will only use it to filter user/restaurant ids
+  // if the second check fails return null instead of document
+  let shouldShowDocument = true;
+  if (req.query && document) {
+    const filters = Object.entries(req.query);
+    filters.forEach((filter) => {
+      // filter[0] is filter name / filter[1] is filter value
+      // @ts-ignore
+      if (document[filter[0]] !== filter[1]) {
+        shouldShowDocument = false;
+      }
+    });
+  }
   res.status(200).json({
     status: 'success',
     data: {
-      [documentName]: document,
+      [documentName]: shouldShowDocument ? document : null,
     },
   });
 };

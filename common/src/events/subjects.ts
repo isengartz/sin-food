@@ -9,4 +9,6 @@ export enum Subjects {
   MenuItemCreated = 'menu:created',
   MenuItemUpdated = 'menu:updated',
   MenuItemDeleted = 'menu:deleted',
+  OrderCreated = 'order:created',
+  OrderUpdated = 'order:updated',
 }
