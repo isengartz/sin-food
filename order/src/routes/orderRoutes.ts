@@ -1,5 +1,11 @@
 import express from 'express';
-import { currentUser, requireAuth } from '@sin-nombre/sinfood-common';
+import {
+  currentUser,
+  requireAuth,
+  restrictTo,
+  restrictToOwnRecords,
+  UserRole,
+} from '@sin-nombre/sinfood-common';
 import {
   createOneOrder,
   findAllOrders,
@@ -10,12 +16,16 @@ import {
 const Router = express.Router();
 
 Router.route('/:id')
-  .get(currentUser, requireAuth, findOneOrder)
-  .put(currentUser, requireAuth, updateOneOrder);
+  .get(currentUser, requireAuth, restrictToOwnRecords, findOneOrder)
+  .put(currentUser, restrictTo([UserRole.Admin]), updateOneOrder);
 // .delete(currentUser, requireAuth, deleteOneOrder);
 
 Router.route('/')
-  .post(currentUser, requireAuth, createOneOrder)
-  .get(currentUser, requireAuth, findAllOrders);
+  .post(
+    currentUser,
+    restrictTo([UserRole.Admin, UserRole.User]),
+    createOneOrder,
+  )
+  .get(currentUser, requireAuth, restrictToOwnRecords, findAllOrders);
 
 export { Router as orderRoutes };

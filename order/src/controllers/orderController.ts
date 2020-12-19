@@ -20,15 +20,19 @@ import { Order, OrderDoc, OrderModel } from '../models/order';
 // How do I secure the update endpoint tho? Bingo! Exclude both authFields = problem solved!
 // Do I need to treat create endpoint in a special way too ? No mongoose validation will handle everything here.
 
+// Update 19/12
+// Only admin should be able to update an order.....
+// Im a fucking retard -.-
+
 /**
  * Returns all Orders
  */
-export const findAllOrders = findAll<OrderDoc, OrderModel>(Order, {}, 'userId');
+export const findAllOrders = findAll<OrderDoc, OrderModel>(Order, {});
 
 /**
  * Returns an Order
  */
-export const findOneOrder = findOne<OrderDoc, OrderModel>(Order, {}, 'userId');
+export const findOneOrder = findOne<OrderDoc, OrderModel>(Order, {});
 
 /**
  * Creates an Order
@@ -38,7 +42,7 @@ export const createOneOrder = createOne<OrderDoc, OrderModel>(Order, 'userId');
 /**
  * Updates an Order
  */
-export const updateOneOrder = updateOne<OrderDoc, OrderModel>(Order, 'userId');
+export const updateOneOrder = updateOne<OrderDoc, OrderModel>(Order);
 
 /**
  * Deletes an Order

@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import { MenuItem } from '../menu-item';
 import { Ingredient } from '../ingredient';
 import { Order } from '../order';
-import { calculateFinalOrderPrice } from '../../utils/calculate-final-order-price';
 
 it('should implements OOC', async (done) => {
   const ingredient = await Ingredient.build({
@@ -136,7 +135,6 @@ it('should correctly calculate the order price', async () => {
     ],
   }).save();
 
-  //@ts-ignore
   const order = await Order.build({
     userId: new mongoose.Types.ObjectId().toHexString(),
     restaurantId: new mongoose.Types.ObjectId().toHexString(),

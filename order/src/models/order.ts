@@ -1,7 +1,11 @@
 import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 import { OrderStatus } from '@sin-nombre/sinfood-common';
+// eslint-disable-next-line import/no-cycle
 import { calculateFinalOrderPrice } from '../utils/calculate-final-order-price';
+import { OrderCreatedPublisher } from '../events/publishers/order-created-publisher';
+import { natsWrapper } from '../events/nats-wrapper';
+import { OrderUpdatedPublisher } from '../events/publishers/order-updated-publisher';
 
 interface OrderedMenuItemsOptions {
   excluded_ingredients: string[];
@@ -13,8 +17,8 @@ interface OrderedMenuItemsOptions {
 export interface OrderAttrs {
   userId: string;
   restaurantId: string;
-  status: OrderStatus;
-  price: number;
+  status?: OrderStatus;
+  price?: number;
   menu_items: {
     item: string;
     item_options: OrderedMenuItemsOptions;
@@ -31,8 +35,8 @@ export interface OrderDoc extends mongoose.Document {
     item_options: OrderedMenuItemsOptions;
   }[];
   version: number;
-  created_at: Date;
-  updated_at: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface OrderModel extends mongoose.Model<OrderDoc> {
@@ -61,7 +65,7 @@ const orderSchema = new mongoose.Schema(
     },
     menu_items: [
       {
-        _id: false,
+        _id: false, // dont need that nasty _id thing here
         item: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'Menu_Item',
@@ -103,8 +107,40 @@ orderSchema.statics.build = (attrs: OrderAttrs) => {
   return new Order(attrs);
 };
 
+// we shouldn't trust Frontend for the final price of the order
+// so we need to calculate it manually before each save
 orderSchema.pre<OrderDoc>('save', async function (next) {
   this.price = await calculateFinalOrderPrice(this.menu_items);
+  next();
+});
+
+// Add wasNew flag so we can do the check inside post middleware
+orderSchema.pre<OrderDoc>('save', function (next) {
+  // @ts-ignore
+  this.wasNew = this.isNew;
+  next();
+});
+
+// emit Events on Create / Update
+orderSchema.post<OrderDoc>('save', async function (doc, next) {
+  if (doc.wasNew) {
+    new OrderCreatedPublisher(natsWrapper.client).publish({
+      id: doc._id,
+      price: doc.price,
+      status: doc.status,
+      userId: doc.userId,
+      restaurantId: doc.restaurantId,
+    });
+  } else {
+    new OrderUpdatedPublisher(natsWrapper.client).publish({
+      id: doc._id,
+      price: doc.price,
+      status: doc.status,
+      userId: doc.userId,
+      restaurantId: doc.restaurantId,
+      version: doc.version,
+    });
+  }
   next();
 });
 const Order = mongoose.model<OrderDoc, OrderModel>('Order', orderSchema);
