@@ -26,6 +26,7 @@ export const allUsers = async (
   res: Response,
   next: NextFunction,
 ) => {
+  // @ts-ignore
   const queryHelper = new QueryModelHelper(User.find(), req.query)
     .filter()
     .sort()

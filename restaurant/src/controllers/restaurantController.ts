@@ -62,6 +62,7 @@ export const filterRestaurants = async (
   });
 
   // Filter the Query
+  // @ts-ignore
   const queryHelper = new QueryModelHelper(restaurantQuery, req.query);
   queryHelper.filter();
   queryHelper.limitFields();

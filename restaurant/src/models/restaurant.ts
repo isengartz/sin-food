@@ -9,7 +9,6 @@ import {
   restaurantWorkingHoursSchema,
 } from './restaurant-working-hours';
 
-
 // Describes the attributes that we accept from Request
 export interface RestaurantAttrs {
   email: string;
@@ -56,9 +55,9 @@ export interface RestaurantDoc extends mongoose.Document {
   role: UserRole;
   working_hours: RestaurantWorkingHours[];
   holidays: Date[];
-  password_reset_token?: string;
-  password_reset_expires?: number;
-  password_changed_at?: number;
+  password_reset_token: string;
+  password_reset_expires: number;
+  password_changed_at: number;
   createPasswordResetToken(): string;
   changedPasswordAfter(JWTTimestamp: number): boolean;
 }
@@ -189,6 +188,7 @@ restaurantSchema.pre<RestaurantDoc>('save', async function (next) {
   next();
 });
 
+//@ts-ignore
 restaurantSchema.post<RestaurantDoc>('findOneAndUpdate', async function (doc) {
   if (doc) {
     const relationshipHelper = new RelationHelper<RestaurantDoc>(doc);
@@ -208,7 +208,7 @@ restaurantSchema.pre<RestaurantDoc>('remove', async function (next) {
 });
 
 // Hash password before Save
-restaurantSchema.pre('save', async function (next) {
+restaurantSchema.pre<RestaurantDoc>('save', async function (next) {
   if (this.isModified('password')) {
     const hashed = await Password.toHash(this.get('password'));
     this.set('password', hashed);
@@ -217,7 +217,7 @@ restaurantSchema.pre('save', async function (next) {
 });
 
 // If updated password add the passwordChangedAt field too
-restaurantSchema.pre('save', function (next) {
+restaurantSchema.pre<RestaurantDoc>('save', function (next) {
   if (!this.isModified('password') || this.isNew) {
     return next();
   }
@@ -227,7 +227,10 @@ restaurantSchema.pre('save', function (next) {
 });
 
 // Checks if a password was changed after a given timestamp
+//@todo:check why the fuck it breaks
+//@ts-ignore
 restaurantSchema.methods.changedPasswordAfter = function (
+  this:RestaurantDoc,
   JWTTimestamp: number,
 ) {
   if (this.password_changed_at) {
@@ -243,9 +246,13 @@ restaurantSchema.methods.changedPasswordAfter = function (
 };
 
 // Creates and persist the password_reset_token and password_reset_expires
-restaurantSchema.methods.createPasswordResetToken = function () {
+//@todo:check why the fuck it breaks
+//@ts-ignore
+restaurantSchema.methods.createPasswordResetToken = function (
+  this : RestaurantDoc,
+) : string {
   const resetToken = randomBytes(32).toString('hex');
-
+  const test = this;
   this.password_reset_token = createHash('sha256')
     .update(resetToken)
     .digest('hex');

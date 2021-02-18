@@ -136,7 +136,8 @@ userSchema.pre('save', function (next) {
 });
 
 // Checks if a password was changed after a given timestamp
-userSchema.methods.changedPasswordAfter = function (JWTTimestamp: number) {
+//@ts-ignore
+userSchema.methods.changedPasswordAfter = function (this:UserDoc, JWTTimestamp: number) {
   if (this.password_changed_at) {
     const changedTimestamp = parseInt(
       // @ts-ignore
@@ -150,7 +151,8 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp: number) {
 };
 
 // Creates and persist the password_reset_token and password_reset_expires
-userSchema.methods.createPasswordResetToken = function () {
+//@ts-ignore
+userSchema.methods.createPasswordResetToken = function (this: UserDoc) {
   const resetToken = randomBytes(32).toString('hex');
 
   this.password_reset_token = createHash('sha256')
@@ -161,7 +163,7 @@ userSchema.methods.createPasswordResetToken = function () {
   return resetToken;
 };
 
-userSchema.pre('remove', async function (next) {
+userSchema.pre<UserDoc>('remove', async function (next) {
   const UserAddress = mongoose.model('UserAddress');
 
   await UserAddress.remove({

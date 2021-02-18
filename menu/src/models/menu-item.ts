@@ -144,6 +144,7 @@ menuItemSchema.post<MenuItemDoc>('save', async function (doc, next) {
 });
 
 // This is fired only when Ingredient is getting deleted
+// @ts-ignore
 menuItemSchema.post<MenuItemDoc>('updateMany', async function (doc, next) {
   new MenuItemUpdatedPublisher(natsWrapper.client).publish({
     id: doc._id,
@@ -152,7 +153,6 @@ menuItemSchema.post<MenuItemDoc>('updateMany', async function (doc, next) {
     variations: doc.variations,
     version: doc.version,
   });
-  //@ts-ignore
   next();
 });
 

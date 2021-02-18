@@ -48,6 +48,7 @@ restaurantCategorySchema.statics.build = (attrs: RestaurantCategoryAttrs) => {
 
 // Remove references From relations on delete
 restaurantCategorySchema.post<RestaurantCategoryDoc>(
+  // @ts-ignore
   'findOneAndDelete',
   async function (doc) {
     if (doc) {
