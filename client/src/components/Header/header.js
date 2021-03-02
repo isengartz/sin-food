@@ -1,9 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
-import { showLoginModal } from "../../actions/modalActions";
-import { signout } from "../../actions/userActions";
-import { Menu, Avatar, Button, Row, Col, Modal } from "antd";
+import { showLoginModal } from "../../redux/actions/modalActions";
+import { signout } from "../../redux/actions/userActions";
+import { Menu, Avatar, Row, Col, } from "antd";
 import { UserOutlined, UserAddOutlined } from "@ant-design/icons";
 
 const { SubMenu, Item } = Menu;
@@ -24,15 +24,15 @@ const Header = ({ user, signout, showLoginModal }) => {
               icon={<UserAddOutlined />}
               className="float-right"
             >
-              <a href="#" type="primary">Register</a>
+              <Link to="/register">Register</Link>
             </Item>
           )}
 
           {!user && (
-            <Item key="login" icon={<UserOutlined />} className="float-right">
-              <a href="#" onClick={() => showLoginModal()} type="primary">
+            <Item onClick={() => showLoginModal()} key="login" icon={<UserOutlined />} className="float-right">
+              <span >
                 Login
-              </a>
+              </span>
             </Item>
           )}
           {user ? (
@@ -47,9 +47,9 @@ const Header = ({ user, signout, showLoginModal }) => {
             >
               <Item key="profile">Profile</Item>
               <Item key="logout">
-                <a href="#" onClick={() => signout()}>
+                <span onClick={() => signout()}>
                   Logout
-                </a>
+                </span>
               </Item>
             </SubMenu>
           ) : null}

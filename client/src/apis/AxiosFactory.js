@@ -1,6 +1,6 @@
 import axios from "axios";
-import { setError } from "../actions/utilActions";
-import store from "../store";
+import { setError } from "../redux/actions/utilActions";
+import store from "../redux/store";
 
 class AxiosFactory {
   constructor(baseURL) {

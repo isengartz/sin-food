@@ -1,0 +1,47 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-service
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+spec:
+  rules:
+    - host: restaurants.sinfood.dev
+      http:
+        paths:
+          - path: /?(.*)
+            backend:
+              serviceName: client-restaurant-srv # Name of the pod
+              servicePort: 3000
+    - host: sinfood.dev
+      http:
+        paths:
+          - path: /api/v1/users/?(.*)
+            backend:
+              serviceName: user-srv # Name of the pod
+              servicePort: 3000
+          - path: /api/v1/restaurants/?(.*)
+            backend:
+              serviceName: restaurant-srv # Name of the pod
+              servicePort: 3000
+          - path: /api/v1/menu/?(.*)
+            backend:
+              serviceName: menu-srv # Name of the pod
+              servicePort: 3000
+          - path: /api/v1/orders/?(.*)
+            backend:
+              serviceName: order-srv # Name of the pod
+              servicePort: 3000
+          - path: /api/v1/ingredients/?(.*)
+            backend:
+              serviceName: menu-srv # Name of the pod
+              servicePort: 3000
+          - path: /api/v1/notification/?(.*)
+            backend:
+              serviceName: notification-srv # Name of the pod
+              servicePort: 3000
+          - path: /?(.*)
+            backend:
+              serviceName: client-srv # Name of the pod
+              servicePort: 3000

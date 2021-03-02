@@ -34,6 +34,7 @@ const start = async () => {
       useUnifiedTopology: true,
       useCreateIndex: true,
       useFindAndModify: false,
+      autoIndex: true, // Should make sure this shit doesnt break anything
     });
 
     // Initialize NATS

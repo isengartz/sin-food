@@ -25,7 +25,6 @@ export const calculateFinalOrderPrice = async (
   const ingredients = await Ingredient.find({ _id: { $in: [...ingrs] } });
   const menuItems = await MenuItem.find({ _id: { $in: [...ids] } });
 
-
   const price = items.reduce((acc, current) => {
     const foundItem = menuItems.find(
       (menuItem) => menuItem._id.toString() === current.item.toString(),

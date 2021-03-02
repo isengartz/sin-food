@@ -230,7 +230,7 @@ restaurantSchema.pre<RestaurantDoc>('save', function (next) {
 //@todo:check why the fuck it breaks
 //@ts-ignore
 restaurantSchema.methods.changedPasswordAfter = function (
-  this:RestaurantDoc,
+  this: RestaurantDoc,
   JWTTimestamp: number,
 ) {
   if (this.password_changed_at) {
@@ -249,10 +249,9 @@ restaurantSchema.methods.changedPasswordAfter = function (
 //@todo:check why the fuck it breaks
 //@ts-ignore
 restaurantSchema.methods.createPasswordResetToken = function (
-  this : RestaurantDoc,
-) : string {
+  this: RestaurantDoc,
+): string {
   const resetToken = randomBytes(32).toString('hex');
-  const test = this;
   this.password_reset_token = createHash('sha256')
     .update(resetToken)
     .digest('hex');

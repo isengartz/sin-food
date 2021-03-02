@@ -12,9 +12,16 @@ spec:
       labels:
         app: restaurant-mongo
     spec:
+      volumes: # Adding a PVC
+        - name: restaurant-mongo-storage
+          persistentVolumeClaim:
+            claimName: database-persistent-volume-claim
       containers:
         - name: restaurant-mongo
           image: mongo
+          volumeMounts:
+            - name: restaurant-mongo-storage
+              mountPath: /data/db
 ---
 apiVersion: v1
 kind: Service
