@@ -40,13 +40,13 @@ const userSchema = new mongoose.Schema(
   {
     email: {
       type: String,
+      unique: true,
+      required: [true, 'Email is required'],
+      lowercase: true,
       validate: {
         validator: validator.isEmail,
         message: 'Provide a valid Email',
       },
-      unique: true,
-      required: [true, 'Email is required'],
-      lowercase: true,
     },
     password: {
       type: String,
@@ -137,7 +137,10 @@ userSchema.pre('save', function (next) {
 
 // Checks if a password was changed after a given timestamp
 //@ts-ignore
-userSchema.methods.changedPasswordAfter = function (this:UserDoc, JWTTimestamp: number) {
+userSchema.methods.changedPasswordAfter = function (
+  this: UserDoc,
+  JWTTimestamp: number,
+) {
   if (this.password_changed_at) {
     const changedTimestamp = parseInt(
       // @ts-ignore

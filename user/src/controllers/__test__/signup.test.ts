@@ -131,3 +131,15 @@ it("should return a user with role 'admin' when admin secret is supplied", async
     .expect(201);
   expect(response.body.data.user.role).toEqual(UserRole.Admin);
 });
+
+it('should not allow duplicate emails ', async () => {
+  await request(app)
+    .post(`${API_ROOT_ENDPOINT}/users/signup`)
+    .send(USER_CREATE_VALID_PAYLOAD)
+    .expect(201);
+
+  await request(app)
+    .post(`${API_ROOT_ENDPOINT}/users/signup`)
+    .send(USER_CREATE_VALID_PAYLOAD)
+    .expect(400);
+});
