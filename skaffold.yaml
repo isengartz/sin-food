@@ -4,7 +4,7 @@ deploy:
   kubectl:
     manifests: # shouldn't add the persistent Volumes and dbs to skaffold
       - ./infra/k8s/nats-depl.yaml
-      - ./infra/k8s/client/*
+      - ./infra/k8s/client/client-depl.yaml
       - ./infra/k8s/menu/menu-depl.yaml
       - ./infra/k8s/notification/notification-depl.yaml
       - ./infra/k8s/order/order-depl.yaml
@@ -61,13 +61,13 @@ build:
         dockerfile: Dockerfile
       sync:
         manual:
-          - src: 'src/**/*.js'
+          - src: 'src/**/*.ts'
             dest: .
-    - image: isengart/food-client-restaurant
-      context: client-restaurant
-      docker:
-        dockerfile: Dockerfile
-      sync:
-        manual:
-          - src: 'src/**/*.js'
-            dest: .
+#    - image: isengart/food-client-restaurant
+#      context: client-restaurant
+#      docker:
+#        dockerfile: Dockerfile
+#      sync:
+#        manual:
+#          - src: 'src/**/*.js'
+#            dest: .

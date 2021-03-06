@@ -11,9 +11,8 @@ COPY package.json .
 # It kept me insane for some hours
 ENV CI=true
 
-# Install dependencies / Exclude dev dependencies / Use the legacy-peer-deps for now until the craco is fixed
-# RUN npm install --only=prod
-RUN npm install --only=prod --legacy-peer-deps
+# Install dependencies / Exclude dev dependencies
+RUN npm install --only=prod
 RUN npm install react-scripts -g
 # Copy the rest of the files
 COPY . .
