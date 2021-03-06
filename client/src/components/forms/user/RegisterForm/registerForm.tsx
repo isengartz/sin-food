@@ -1,33 +1,31 @@
 import React, { useEffect } from 'react';
 import { useActions } from '../../../../hooks/useActions';
+import { useErrorMessage } from '../../../../hooks/useErrorMessage';
 import { useTypedSelector } from '../../../../hooks/useTypedSelector';
-import { message } from 'antd';
 import { Button, Checkbox, Form, Input, Select, Typography } from 'antd';
-import BuildErrorMessage from '../../../layout/BuildErrorMessage';
-import {
-  COUNTRY_CODES,
-  DEFAULT_POP_UP_MESSAGE_DURATION_SECONDS,
-} from '../../../../util/constants';
+import { COUNTRY_CODES } from '../../../../util/constants';
 import { selectUser } from '../../../../redux/selectors';
-import { RegisterUserForm } from '../../../../util/interfaces/forms/RegisterUserForm'
+import { RegisterUserForm } from '../../../../util/interfaces/forms/RegisterUserForm';
+import { useHistory } from 'react-router';
 
 const { Option } = Select;
 
 const RegisterForm = () => {
-  const { errors } = useTypedSelector(selectUser);
-  const { registerUser } = useActions();
-  //@todo: create a custom hook for this
+  const { errors, currentUser } = useTypedSelector(selectUser);
+  const { registerUser, clearUserErrors } = useActions();
+  let history = useHistory();
+  // Attach Error Handling for User Errors
+  useErrorMessage(errors, clearUserErrors);
+
+  // Redirect on Successful register if user is logged in
   useEffect(() => {
-    if (errors.length > 0) {
-      message.error(
-        <BuildErrorMessage errors={errors} />,
-        DEFAULT_POP_UP_MESSAGE_DURATION_SECONDS,
-      );
+    if (currentUser) {
+      history.push('/');
     }
-  }, [errors]);
+  }, [currentUser, history]);
 
   // On Submit
-  const onSubmit = (values:RegisterUserForm) => {
+  const onSubmit = (values: RegisterUserForm) => {
     const formattedValues = { ...values, phone: values.prefix + values.phone };
     // @ts-ignore
     delete formattedValues.prefix;

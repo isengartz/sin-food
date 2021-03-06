@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react';
-import { useActions } from './hooks/useActions';
-import { useTypedSelector } from './hooks/useTypedSelector';
-import { selectCurrentUser } from './redux';
+import { useActions } from '../hooks/useActions';
+import { useTypedSelector } from '../hooks/useTypedSelector';
+import { selectCurrentUser } from '../redux';
 import { BrowserRouter } from 'react-router-dom';
-import LayoutHeader from './components/layout/Header';
-import LoginForm from './components/forms/user/LoginForm/loginForm';
+import LayoutHeader from './layout/Header';
+import LoginForm from './forms/user/LoginForm/loginForm';
 import { Layout } from 'antd';
-import Routes from './components/Routes/Routes';
-import './assets/less/imports.less';
+import Routes from './Routes/Routes';
+import '../assets/less/imports.less';
+import DisplayGlobalMessage from './DisplayGlobalMessage/DisplayGlobalMessage';
 
 const { Header, Footer } = Layout;
 
@@ -18,7 +19,7 @@ const App: React.FC = () => {
   // Check for currentUser
   useEffect(() => {
     getCurrentUser();
-  }, [getCurrentUser]);
+  }, []);
 
   return (
     <BrowserRouter>
@@ -31,10 +32,9 @@ const App: React.FC = () => {
 
         {!user && <LoginForm />}
       </Layout>
-      {/*<DisplayGlobalMessage />*/}
+      <DisplayGlobalMessage />
     </BrowserRouter>
   );
 };
 
 export default App;
-
