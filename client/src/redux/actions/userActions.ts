@@ -14,7 +14,8 @@ export type UserAction =
   | SignOutUserErrorAction
   | RegisterUserStartAction
   | RegisterUserSuccessAction
-  | RegisterUserErrorAction;
+  | RegisterUserErrorAction
+  | ClearUserErrorsAction;
 
 /**
  * Get Current User Actions
@@ -73,4 +74,11 @@ interface SignOutUserSuccessAction {
 interface SignOutUserErrorAction {
   type: UserTypes.SIGN_OUT_USER_ERROR;
   payload: ErrorType;
+}
+
+/**
+ * Clear User Error
+ */
+interface ClearUserErrorsAction {
+  type: UserTypes.CLEAR_USER_ERRORS;
 }

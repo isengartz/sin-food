@@ -11,4 +11,5 @@ export enum UserTypes {
   REGISTER_USER_START = 'user/register_user_start',
   REGISTER_USER_SUCCESS = 'user/register_user_success',
   REGISTER_USER_ERROR = 'user/register_user_error',
+  CLEAR_USER_ERRORS = 'user/clear_user_errors'
 }

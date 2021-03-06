@@ -60,9 +60,10 @@ build:
       docker:
         dockerfile: Dockerfile
       sync:
-        manual:
-          - src: 'src/**/*.ts'
-            dest: .
+        infer:
+          - '**/*.ts'
+          - '**/*.tsx'
+          - '**/*.less'
 #    - image: isengart/food-client-restaurant
 #      context: client-restaurant
 #      docker:

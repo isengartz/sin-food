@@ -1,6 +1,6 @@
-import { ModalTypes, UserTypes } from '../action-types';
+import { ModalTypes, UserTypes, UtilTypes } from '../action-types'
 import { Dispatch } from 'redux';
-import { ModalAction, UserAction } from '../actions';
+import { ModalAction, UserAction, UtilActions } from '../actions'
 import axios from 'axios';
 import { SignInUserForm } from '../../util/interfaces/forms/SignInUserForm';
 import { RegisterUserForm } from '../../util/interfaces/forms/RegisterUserForm';
@@ -30,7 +30,7 @@ export const getCurrentUser = () => {
 };
 
 export const signInUser = (data: SignInUserForm) => {
-  return async (dispatch: Dispatch<UserAction | ModalAction>) => {
+  return async (dispatch: Dispatch<UserAction | ModalAction | UtilActions>) => {
     dispatch({ type: UserTypes.SIGN_IN_USER_START });
     try {
       const {
@@ -45,10 +45,10 @@ export const signInUser = (data: SignInUserForm) => {
       dispatch({
         type: ModalTypes.CLOSE_USER_LOGIN_MODAL,
       });
-
     } catch (e) {
+      // Push the error at the global Error Stack
       dispatch({
-        type: UserTypes.SIGN_IN_USER_ERROR,
+        type: UtilTypes.SET_GLOBAL_ERROR_MESSAGE,
         payload: handleAxiosErrorMessage(e),
       });
     }
@@ -93,5 +93,11 @@ export const signOutUser = () => {
         payload: handleAxiosErrorMessage(e),
       });
     }
+  };
+};
+
+export const clearUserErrors = () => {
+  return async (dispatch: Dispatch<UserAction>) => {
+    dispatch({ type: UserTypes.CLEAR_USER_ERRORS });
   };
 };

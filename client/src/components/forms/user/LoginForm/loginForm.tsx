@@ -1,16 +1,15 @@
-import React,{useEffect} from 'react';
+import React from 'react';
 import { Link, Redirect, useHistory } from 'react-router-dom';
-import { Form, Input, Button, Modal, Space, message } from 'antd'
+import { Form, Input, Button, Modal, Space } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useActions } from '../../../../hooks/useActions';
 import { SignInUserForm } from '../../../../util/interfaces/forms/SignInUserForm';
 import { useTypedSelector } from '../../../../hooks/useTypedSelector';
 import {
-  selectCurrentUser, selectUserErrors,
+  selectCurrentUser,
   selectUserLoginModal,
 } from '../../../../redux/selectors'
-import BuildErrorMessage from '../../../layout/BuildErrorMessage'
-import { DEFAULT_POP_UP_MESSAGE_DURATION_SECONDS } from '../../../../util/constants'
+
 
 const LoginForm = () => {
   const [formRef] = Form.useForm();
@@ -18,21 +17,11 @@ const LoginForm = () => {
 
   const isVisible = useTypedSelector(selectUserLoginModal);
   const user = useTypedSelector(selectCurrentUser);
-  const userErrors = useTypedSelector(selectUserErrors);
-
   const { closeLoginModal, signInUser } = useActions();
+
   const closeModal = () => {
     closeLoginModal();
   };
-
-  useEffect(() => {
-    if(isVisible && userErrors.length >0){
-      message.error(
-        <BuildErrorMessage errors={userErrors} />,
-        DEFAULT_POP_UP_MESSAGE_DURATION_SECONDS,
-      );
-    }
-  },[userErrors,isVisible])
 
   const onSubmit = (values: SignInUserForm) => {
     signInUser(values);
