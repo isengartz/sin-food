@@ -1,5 +1,5 @@
 import React from 'react';
-import { selectCurrentUser } from '../../redux';
+import { selectCurrentUser } from '../../state';
 import { useActions } from '../../hooks/useActions';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
 import { Link } from 'react-router-dom';

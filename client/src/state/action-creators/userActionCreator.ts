@@ -1,6 +1,6 @@
-import { ModalTypes, UserTypes, UtilTypes } from '../action-types'
+import { ModalTypes, UserTypes, UtilTypes } from '../action-types';
 import { Dispatch } from 'redux';
-import { ModalAction, UserAction, UtilActions } from '../actions'
+import { Action, ClearUserErrorsAction, UserAction } from '../actions';
 import axios from 'axios';
 import { SignInUserForm } from '../../util/interfaces/forms/SignInUserForm';
 import { RegisterUserForm } from '../../util/interfaces/forms/RegisterUserForm';
@@ -30,7 +30,7 @@ export const getCurrentUser = () => {
 };
 
 export const signInUser = (data: SignInUserForm) => {
-  return async (dispatch: Dispatch<UserAction | ModalAction | UtilActions>) => {
+  return async (dispatch: Dispatch<Action>) => {
     dispatch({ type: UserTypes.SIGN_IN_USER_START });
     try {
       const {
@@ -96,8 +96,8 @@ export const signOutUser = () => {
   };
 };
 
-export const clearUserErrors = () => {
-  return async (dispatch: Dispatch<UserAction>) => {
-    dispatch({ type: UserTypes.CLEAR_USER_ERRORS });
+export const clearUserErrors = (): ClearUserErrorsAction => {
+  return {
+    type: UserTypes.CLEAR_USER_ERRORS,
   };
 };

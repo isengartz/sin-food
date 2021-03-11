@@ -2,23 +2,23 @@ import { UtilTypes } from '../action-types';
 import { ErrorType } from '../../util/types/ErrorType';
 
 export type UtilActions =
-  | SetGlobalErrorMessage
-  | ClearGlobalErrorMessage
-  | SetGlobalNotificationMessage
-  | ClearGlobalNotificationMessage;
+  | SetGlobalErrorMessageAction
+  | ClearGlobalErrorMessageAction
+  | SetGlobalNotificationMessageAction
+  | ClearGlobalNotificationMessageAction;
 
-interface SetGlobalErrorMessage {
+export interface SetGlobalErrorMessageAction {
   type: UtilTypes.SET_GLOBAL_ERROR_MESSAGE;
   payload: ErrorType;
 }
-interface ClearGlobalErrorMessage {
+export interface ClearGlobalErrorMessageAction {
   type: UtilTypes.CLEAR_GLOBAL_ERROR_MESSAGE;
 }
 
-interface SetGlobalNotificationMessage {
+export interface SetGlobalNotificationMessageAction {
   type: UtilTypes.SET_GLOBAL_NOTIFICATION_MESSAGE;
   payload: string;
 }
-interface ClearGlobalNotificationMessage {
+export interface ClearGlobalNotificationMessageAction {
   type: UtilTypes.CLEAR_GLOBAL_NOTIFICATION_MESSAGE;
 }

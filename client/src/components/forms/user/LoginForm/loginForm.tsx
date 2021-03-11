@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, Redirect, useHistory } from 'react-router-dom';
-import { Form, Input, Button, Modal, Space } from 'antd'
+import { Form, Input, Button, Modal, Space } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useActions } from '../../../../hooks/useActions';
 import { SignInUserForm } from '../../../../util/interfaces/forms/SignInUserForm';
@@ -8,8 +8,7 @@ import { useTypedSelector } from '../../../../hooks/useTypedSelector';
 import {
   selectCurrentUser,
   selectUserLoginModal,
-} from '../../../../redux/selectors'
-
+} from '../../../../state/selectors';
 
 const LoginForm = () => {
   const [formRef] = Form.useForm();

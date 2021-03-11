@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useActions } from '../hooks/useActions';
 import { useTypedSelector } from '../hooks/useTypedSelector';
-import { selectCurrentUser } from '../redux';
+import { selectCurrentUser } from '../state';
 import { BrowserRouter } from 'react-router-dom';
 import LayoutHeader from './layout/Header';
 import LoginForm from './forms/user/LoginForm/loginForm';

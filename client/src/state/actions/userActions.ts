@@ -79,6 +79,6 @@ interface SignOutUserErrorAction {
 /**
  * Clear User Error
  */
-interface ClearUserErrorsAction {
+export interface ClearUserErrorsAction {
   type: UserTypes.CLEAR_USER_ERRORS;
 }
