@@ -19,7 +19,7 @@ const App: React.FC = () => {
   // Check for currentUser
   useEffect(() => {
     getCurrentUser();
-  }, []);
+  }, [getCurrentUser]);
 
   return (
     <BrowserRouter>

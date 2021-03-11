@@ -5,10 +5,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useActions } from '../../../../hooks/useActions';
 import { SignInUserForm } from '../../../../util/interfaces/forms/SignInUserForm';
 import { useTypedSelector } from '../../../../hooks/useTypedSelector';
-import {
-  selectCurrentUser,
-  selectUserLoginModal,
-} from '../../../../state/selectors';
+import { selectCurrentUser, selectUserLoginModal } from '../../../../state';
 
 const LoginForm = () => {
   const [formRef] = Form.useForm();
