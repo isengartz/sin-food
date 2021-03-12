@@ -57,7 +57,7 @@
     ],
     "suppressImplicitAnyIndexErrors": 0,
     "prefer-object-spread/prefer-object-spread": 2,
-    "prettier/prettier": "warn",
+    "prettier/prettier": "off", // this is breaking my balls so shut it off for now
     "spaced-comment": "off",
     "no-console": "warn",
     "consistent-return": "off",
