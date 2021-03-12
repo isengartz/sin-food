@@ -4,7 +4,7 @@ import { useErrorMessage } from '../../../../hooks/useErrorMessage';
 import { useTypedSelector } from '../../../../hooks/useTypedSelector';
 import { Button, Checkbox, Form, Input, Select, Typography } from 'antd';
 import { COUNTRY_CODES } from '../../../../util/constants';
-import { selectUser } from '../../../../redux/selectors';
+import { selectUser } from '../../../../state';
 import { RegisterUserForm } from '../../../../util/interfaces/forms/RegisterUserForm';
 import { useHistory } from 'react-router';
 

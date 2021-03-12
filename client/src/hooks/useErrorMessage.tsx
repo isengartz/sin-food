@@ -5,6 +5,11 @@ import BuildErrorMessage from '../components/layout/BuildErrorMessage';
 import { DEFAULT_POP_UP_MESSAGE_DURATION_SECONDS } from '../util/constants';
 import { ErrorClearFunc } from '../util/types/ErrorClearFunc';
 
+/**
+ * Shows an error message and dispatch an action to clear the error state after
+ * @param errors
+ * @param clearErrors
+ */
 export const useErrorMessage = (
   errors: ErrorType,
   clearErrors: ErrorClearFunc,
