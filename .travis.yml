@@ -8,5 +8,5 @@ before_install:
   - docker build -t isengart/food-order-test -f ./order/Dockerfile.dev ./order
 
 script:
-  - docker run -e CI=true isengart/react-test npm test
+  - docker run -e CI=true isengart/food-client-test npm test
   - docker run isengart/food-order-test npm run test:ci
