@@ -1,0 +1,12 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker build -t isengart/food-client-test -f ./client/Dockerfile.dev ./client
+  - docker build -t isengart/food-order-test -f ./order/Dockerfile.dev ./order
+
+script:
+  - docker run -e CI=true isengart/react-test npm test
+  - docker run isengart/food-order-test npm run test:ci
