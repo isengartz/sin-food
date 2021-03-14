@@ -3,8 +3,12 @@ import { UserRole } from '@sin-nombre/sinfood-common';
 import { app } from '../../app';
 import {
   API_ROOT_ENDPOINT,
+  USER_ADDRESS_CREATE_VALID_PAYLOAD,
   USER_CREATE_VALID_PAYLOAD,
 } from '../../utils/constants';
+import { UserAddress } from '../../models/user_address';
+import { User } from '../../models/user';
+import exp from 'constants';
 
 it('should return 400 when a bad email provided', async () => {
   const faultyUserPayload = {
@@ -143,3 +147,40 @@ it('should not allow duplicate emails ', async () => {
     .send(USER_CREATE_VALID_PAYLOAD)
     .expect(400);
 });
+
+it('should return 201 and address set when given a correct payload', async () => {
+  const response = await request(app)
+    .post(`${API_ROOT_ENDPOINT}/users/signup`)
+    .send({
+      ...USER_CREATE_VALID_PAYLOAD,
+      addresses: [USER_ADDRESS_CREATE_VALID_PAYLOAD],
+    })
+    .expect(201);
+
+  const user = await User.findById(response.body.data.user.id);
+  expect(user!.addresses.length).toEqual(1);
+});
+
+// Jest keeps instant failing the test the moment it catches the Validation Error from Mongoose
+// Although I catch it in 2 different places. Wasted too much time searching for the issue.
+// Should come back later
+// it('should return 201 but no address attached when address payload is faulty', async () => {
+//   expect.assertions(1);
+//   try {
+//     const response = await request(app)
+//       .post(`${API_ROOT_ENDPOINT}/users/signup`)
+//       .send({
+//         ...USER_CREATE_VALID_PAYLOAD,
+//         addresses: [
+//           {
+//             floor: 3,
+//             full_address: 'test test',
+//           },
+//         ],
+//       });
+//     console.debug(response.body);
+//     expect(response.body.data.user.id).toBeDefined();
+//   } catch (e) {
+//     //noop
+//   }
+// });

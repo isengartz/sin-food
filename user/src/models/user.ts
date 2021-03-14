@@ -171,7 +171,6 @@ userSchema.pre<UserDoc>('remove', async function (next) {
 
   await UserAddress.remove({
     _id: {
-      // @ts-ignore
       $in: this.addresses,
     },
   });

@@ -14,6 +14,7 @@ import { User } from '../models/user';
 import { API_ROOT_ENDPOINT } from '../utils/constants';
 import { EmailSendingPublisher } from '../events/publishers/email-sending-publisher';
 import { natsWrapper } from '../events/nats-wrapper';
+import { UserAddress, UserAddressAttrs } from '../models/user_address';
 
 /**
  * Return all users with addresses populated
@@ -73,6 +74,7 @@ export const signup = async (
     phone,
     password_confirm,
     role,
+    addresses,
   } = req.body;
 
   // Check for Password Confirmation
@@ -91,6 +93,25 @@ export const signup = async (
     role,
   });
   await user.save();
+
+  // If the user send any address alongside with the initial registration save them too
+  // Although we dont want to return an error response if the UserAddress Validation Fails
+  try {
+    if (user && addresses) {
+      user.addresses =
+        addresses.map(async (address: UserAddressAttrs) => {
+          const addr = await UserAddress.build({
+            ...address,
+            user_id: user.id,
+          }).save();
+          return addr;
+        }) || [];
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.debug(e);
+  }
+
   // Add JWT to express session
   req.session = AuthHelper.serializeToken(
     AuthHelper.signToken({
