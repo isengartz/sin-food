@@ -3,7 +3,6 @@ import { app } from '../../app';
 import {
   API_ROOT_ENDPOINT,
   USER_ADDRESS_CREATE_VALID_PAYLOAD,
-  USER_CREATE_VALID_PAYLOAD,
 } from '../../utils/constants';
 import { User } from '../../models/user';
 

@@ -1,9 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import {
-  NotAuthorizedError,
-  NotFoundError,
-  UserRole,
-} from '@sin-nombre/sinfood-common';
+import { NotFoundError } from '@sin-nombre/sinfood-common';
 import { UserAddress } from '../models/user_address';
 
 export const createAddress = async (
@@ -84,5 +80,22 @@ export const deleteAddress = async (
   res.status(204).json({
     status: 'success',
     data: null,
+  });
+};
+
+export const getUsersAddresses = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const addresses = await UserAddress.find({
+    user_id: req.params.userId,
+  });
+
+  res.status(200).send({
+    status: 'success',
+    data: {
+      addresses,
+    },
   });
 };
