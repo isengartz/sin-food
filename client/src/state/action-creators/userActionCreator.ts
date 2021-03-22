@@ -5,6 +5,7 @@ import { SignInUserForm } from '../../util/interfaces/forms/SignInUserForm';
 import { RegisterUserForm } from '../../util/interfaces/forms/RegisterUserForm';
 import { handleAxiosErrorMessage } from '../../util/handleAxiosErrorMessage';
 import axios from '../../apis/instances/user';
+import { AppThunk } from '../../util/types/AppThunk';
 
 // How using the HandleApiMiddleware action would look like if I wired it
 // export const getCurrentUser = () => ({
@@ -19,7 +20,11 @@ import axios from '../../apis/instances/user';
 //   },
 // });
 
-export const getCurrentUser = () => {
+/**
+ * Get Current User JWT Data
+ * Used to see if user is logged in
+ */
+export const getCurrentUser = (): AppThunk => {
   return async (dispatch: Dispatch<UserAction>) => {
     dispatch({ type: UserTypes.GET_CURRENT_USER_START });
     try {
@@ -41,7 +46,11 @@ export const getCurrentUser = () => {
   };
 };
 
-export const signInUser = (data: SignInUserForm) => {
+/**
+ * Sign in current user
+ * @param data
+ */
+export const signInUser = (data: SignInUserForm): AppThunk => {
   return async (dispatch: Dispatch<Action>) => {
     dispatch({ type: UserTypes.SIGN_IN_USER_START });
     try {
@@ -68,7 +77,11 @@ export const signInUser = (data: SignInUserForm) => {
   };
 };
 
-export const registerUser = (data: RegisterUserForm) => {
+/**
+ * Registers Current User
+ * @param data
+ */
+export const registerUser = (data: RegisterUserForm): AppThunk => {
   return async (dispatch: Dispatch<UserAction>) => {
     dispatch({ type: UserTypes.REGISTER_USER_START });
 
@@ -78,8 +91,6 @@ export const registerUser = (data: RegisterUserForm) => {
           data: { user },
         },
       } = await axios.post('/signup', data);
-      console.debug(user);
-      // @ts-ignore
       dispatch({
         type: UserTypes.REGISTER_USER_SUCCESS,
         payload: user,
@@ -93,7 +104,10 @@ export const registerUser = (data: RegisterUserForm) => {
   };
 };
 
-export const signOutUser = () => {
+/**
+ * Signout the current signed in user
+ */
+export const signOutUser = (): AppThunk => {
   return async (dispatch: Dispatch<UserAction>) => {
     dispatch({ type: UserTypes.SIGN_OUT_USER_START });
     try {
@@ -110,6 +124,34 @@ export const signOutUser = () => {
   };
 };
 
+export const getCurrentUserAddresses = (userId: string): AppThunk => {
+  return async (dispatch: Dispatch<UserAction>) => {
+    dispatch({
+      type: UserTypes.GET_CURRENT_USER_ADDRESSES_START,
+    });
+
+    try {
+      const {
+        data: {
+          data: { addresses },
+        },
+      } = await axios.get(`${userId}/address`);
+      dispatch({
+        type: UserTypes.GET_CURRENT_USER_ADDRESSES_SUCCESS,
+        payload: addresses,
+      });
+    } catch (e) {
+      dispatch({
+        type: UserTypes.GET_CURRENT_USER_ADDRESSES_ERROR,
+        payload: handleAxiosErrorMessage(e),
+      });
+    }
+  };
+};
+
+/**
+ * Clear the user error from Reducer
+ */
 export const clearUserErrors = (): ClearUserErrorsAction => {
   return {
     type: UserTypes.CLEAR_USER_ERRORS,

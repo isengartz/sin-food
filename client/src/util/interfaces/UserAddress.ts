@@ -4,4 +4,5 @@ export interface UserAddress {
   full_address: string;
   latitude: number;
   longitude: number;
+  id?: string;
 }

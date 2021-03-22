@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
+import { UserDoc } from './user';
 
 const PointSchema = new mongoose.Schema({
   type: { type: String, enum: ['Point'], default: 'Point' },
@@ -86,10 +87,9 @@ userAddressSchema.statics.build = (attrs: UserAddressAttrs) => {
   return new UserAddress(attrs);
 };
 
-// Add address tp user Document
-userAddressSchema.pre('save', async function (next) {
-  const User = mongoose.model('User');
-  // @ts-ignore
+// Add address to user Document
+userAddressSchema.pre<UserAddressDoc>('save', async function (next) {
+  const User = mongoose.model<UserDoc>('User');
   await User.findByIdAndUpdate(this.user_id, {
     $push: {
       addresses: this._id,
@@ -100,9 +100,9 @@ userAddressSchema.pre('save', async function (next) {
 });
 
 // Remove address from user Document
-userAddressSchema.pre('remove', async function (next) {
-  const User = mongoose.model('User');
-  // @ts-ignore
+userAddressSchema.pre<UserAddressDoc>('remove', async function (next) {
+  const User = mongoose.model<UserDoc>('User');
+
   await User.findByIdAndUpdate(this.user_id, {
     $pull: {
       addresses: this._id,

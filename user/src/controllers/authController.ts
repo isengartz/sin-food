@@ -117,6 +117,7 @@ export const signup = async (
     AuthHelper.signToken({
       id: user.id,
       email: user.email,
+      first_name: user.first_name,
       role: user.role,
     }),
   );
@@ -157,6 +158,7 @@ export const login = async (
     AuthHelper.signToken({
       id: user.id,
       email: user.email,
+      first_name: user.first_name,
       role: user.role,
     }),
   );
@@ -275,6 +277,7 @@ export const resetPassword = async (
     AuthHelper.signToken({
       id: user.id,
       email: user.email,
+      first_name: user.first_name,
       role: user.role,
     }),
   );
@@ -318,6 +321,7 @@ export const updatePassword = async (
   req.session = AuthHelper.serializeToken(
     AuthHelper.signToken({
       id: user.id,
+      first_name: user.first_name,
       email: user.email,
       role: user.role,
     }),

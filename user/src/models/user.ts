@@ -126,7 +126,7 @@ userSchema.pre('save', async function (next) {
 });
 
 // If updated password add the passwordChangedAt field too
-userSchema.pre('save', function (next) {
+userSchema.pre<UserDoc>('save', function (next) {
   if (!this.isModified('password') || this.isNew) {
     return next();
   }

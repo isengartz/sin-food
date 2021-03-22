@@ -8,6 +8,20 @@ export const selectCurrentUser = createSelector(
   (user) => user.currentUser,
 );
 
+export const selectCurrentUserAddresses = createSelector(
+  selectUser,
+  (user) => user.currentUser?.addresses || [],
+);
+
+export const selectCurrentUserAddressesFormatted = createSelector(
+  selectUser,
+  (user) =>
+    user.currentUser?.addresses?.map((address) => ({
+      value: address.id!,
+      text: address.full_address,
+    })) || [],
+);
+
 export const selectUserErrors = createSelector(
   selectUser,
   (user) => user.errors,
