@@ -67,7 +67,11 @@ const LoginForm = () => {
               Log in
             </Button>
             <span>
-              Or <Link to="/register">register</Link> now!{' '}
+              Or
+              <Link onClick={closeLoginModal} to="/register">
+                register
+              </Link>
+              now!
             </span>
           </Space>
         </Form.Item>

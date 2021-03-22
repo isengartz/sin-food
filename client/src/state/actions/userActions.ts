@@ -1,6 +1,7 @@
 import { UserTypes } from '../action-types';
 import { UserInterface } from '../../util/interfaces/UserInterface';
 import { ErrorType } from '../../util/types/ErrorType';
+import { UserAddress } from '../../util/interfaces/UserAddress';
 
 export type UserAction =
   | GetCurrentUserAction
@@ -15,7 +16,10 @@ export type UserAction =
   | RegisterUserStartAction
   | RegisterUserSuccessAction
   | RegisterUserErrorAction
-  | ClearUserErrorsAction;
+  | ClearUserErrorsAction
+  | GetCurrentUserAddressesErrorAction
+  | GetCurrentUserAddressesStartAction
+  | GetCurrentUserAddressesSuccessAction;
 
 /**
  * Get Current User Actions
@@ -81,4 +85,21 @@ interface SignOutUserErrorAction {
  */
 export interface ClearUserErrorsAction {
   type: UserTypes.CLEAR_USER_ERRORS;
+}
+
+/**
+ * Get User Addresses
+ */
+export interface GetCurrentUserAddressesStartAction {
+  type: UserTypes.GET_CURRENT_USER_ADDRESSES_START;
+}
+
+export interface GetCurrentUserAddressesSuccessAction {
+  type: UserTypes.GET_CURRENT_USER_ADDRESSES_SUCCESS;
+  payload: UserAddress[];
+}
+
+export interface GetCurrentUserAddressesErrorAction {
+  type: UserTypes.GET_CURRENT_USER_ADDRESSES_ERROR;
+  payload: ErrorType;
 }

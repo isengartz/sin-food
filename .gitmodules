@@ -1,0 +1,3 @@
+[submodule "sin-food-common"]
+	path = common
+	url = https://github.com/isengartz/sin-food-common.git

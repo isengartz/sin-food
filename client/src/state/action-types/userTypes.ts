@@ -11,5 +11,8 @@ export enum UserTypes {
   REGISTER_USER_START = 'user/register_user_start',
   REGISTER_USER_SUCCESS = 'user/register_user_success',
   REGISTER_USER_ERROR = 'user/register_user_error',
-  CLEAR_USER_ERRORS = 'user/clear_user_errors'
+  CLEAR_USER_ERRORS = 'user/clear_user_errors',
+  GET_CURRENT_USER_ADDRESSES_START = 'user/get_current_user_addresses_start',
+  GET_CURRENT_USER_ADDRESSES_SUCCESS = 'user/get_current_user_addresses_success',
+  GET_CURRENT_USER_ADDRESSES_ERROR = 'user/get_current_user_addresses_error',
 }
