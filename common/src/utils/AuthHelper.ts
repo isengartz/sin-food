@@ -25,6 +25,7 @@ class AuthHelper {
       id: user.id,
       email: user.email,
       role: user.role,
+      first_name: user.first_name,
     });
 
     res.status(statusCode).json({
@@ -35,6 +36,5 @@ class AuthHelper {
       },
     });
   }
-
 }
 export { AuthHelper };
