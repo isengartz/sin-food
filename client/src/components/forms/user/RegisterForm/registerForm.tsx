@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { useActions } from '../../../../hooks/useActions';
 import { useErrorMessage } from '../../../../hooks/useErrorMessage';
 import { useTypedSelector } from '../../../../hooks/useTypedSelector';
@@ -9,29 +9,22 @@ import {
   RegisterUserAddressForm,
   RegisterUserForm,
 } from '../../../../util/interfaces/forms/RegisterUserForm';
-import { useHistory } from 'react-router';
 import { FrownOutlined } from '@ant-design/icons';
-import { UserAddress } from '../../../../util/interfaces/UserAddress';
+import { UserAddressForm } from '../../../../util/interfaces/UserAddress';
 import UserAddressModal from './userAddressModal';
 
 const { Option } = Select;
 
 const RegisterForm = () => {
   const [visible, setVisible] = useState(false);
-  const { errors, currentUser } = useTypedSelector(selectUser);
+  const { errors } = useTypedSelector(selectUser);
   const { registerUser, clearUserErrors } = useActions();
   const mainFormRef = useRef<any>();
-  let history = useHistory();
 
   // Attach Error Handling for User Errors
   useErrorMessage(errors, clearUserErrors);
 
   // Redirect on Successful register /  if user is logged in
-  useEffect(() => {
-    if (currentUser) {
-      history.push('/');
-    }
-  }, [currentUser, history]);
 
   const showUserAddressModal = () => {
     setVisible(true);
@@ -229,7 +222,8 @@ const RegisterForm = () => {
           }
         >
           {({ getFieldValue }) => {
-            const addresses: UserAddress[] = getFieldValue('addresses') || [];
+            const addresses: UserAddressForm[] =
+              getFieldValue('addresses') || [];
             return addresses.length ? (
               <ul className="user-address-list">
                 {addresses.map((address, index) => (

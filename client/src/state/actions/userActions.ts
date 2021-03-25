@@ -2,6 +2,7 @@ import { UserTypes } from '../action-types';
 import { UserInterface } from '../../util/interfaces/UserInterface';
 import { ErrorType } from '../../util/types/ErrorType';
 import { UserAddress } from '../../util/interfaces/UserAddress';
+import { UserPayload } from '@sin-nombre/sinfood-common';
 
 export type UserAction =
   | GetCurrentUserAction
@@ -29,7 +30,7 @@ interface GetCurrentUserAction {
 }
 interface GetCurrentUserSuccessAction {
   type: UserTypes.GET_CURRENT_USER_SUCCESS;
-  payload: UserInterface;
+  payload: UserPayload;
 }
 interface GetCurrentUserErrorAction {
   type: UserTypes.GET_CURRENT_USER_ERROR;
@@ -44,7 +45,7 @@ interface SignInUserStartAction {
 }
 interface SignInUserSuccessAction {
   type: UserTypes.SIGN_IN_USER_SUCCESS;
-  payload: UserInterface;
+  payload: UserPayload;
 }
 interface SignInUserErrorAction {
   type: UserTypes.SIGN_IN_USER_ERROR;
@@ -59,7 +60,7 @@ interface RegisterUserStartAction {
 }
 interface RegisterUserSuccessAction {
   type: UserTypes.REGISTER_USER_SUCCESS;
-  payload: UserInterface;
+  payload: UserPayload;
 }
 interface RegisterUserErrorAction {
   type: UserTypes.REGISTER_USER_ERROR;

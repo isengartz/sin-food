@@ -37,6 +37,8 @@ export const getCurrentUser = (): AppThunk => {
         type: UserTypes.GET_CURRENT_USER_SUCCESS,
         payload: currentUser,
       });
+      console.log(currentUser, JSON.stringify(currentUser));
+      localStorage.setItem('user', JSON.stringify(currentUser));
     } catch (e) {
       dispatch({
         type: UserTypes.GET_CURRENT_USER_ERROR,
@@ -67,6 +69,8 @@ export const signInUser = (data: SignInUserForm): AppThunk => {
       dispatch({
         type: ModalTypes.CLOSE_USER_LOGIN_MODAL,
       });
+
+      localStorage.setItem('user', JSON.stringify(user));
     } catch (e) {
       // Push the error at the global Error Stack
       dispatch({
@@ -95,6 +99,7 @@ export const registerUser = (data: RegisterUserForm): AppThunk => {
         type: UserTypes.REGISTER_USER_SUCCESS,
         payload: user,
       });
+      localStorage.setItem('user', JSON.stringify(user));
     } catch (e) {
       dispatch({
         type: UserTypes.REGISTER_USER_ERROR,
@@ -115,6 +120,7 @@ export const signOutUser = (): AppThunk => {
       dispatch({
         type: UserTypes.SIGN_OUT_USER_SUCCESS,
       });
+      localStorage.removeItem('user');
     } catch (e) {
       dispatch({
         type: UserTypes.SIGN_OUT_USER_ERROR,

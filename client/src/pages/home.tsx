@@ -23,22 +23,14 @@ const HomePage: React.FC = () => {
 
   // If user is logged in and we have not fetch the addresses yet
   // Get all addresses from API
-  useEffect(() => {
-    currentUser &&
-      !currentUser.addresses &&
-      getCurrentUserAddresses(currentUser.id);
-  }, [currentUser, getCurrentUserAddresses]);
+  // We use JSON stringify so we wont cause a rerender when the user Authentication check run
 
-  // const testOptions = [
-  //   {
-  //     value: 'lenodou-21',
-  //     text: 'Leonidou 21, Larissa 41222, Greece',
-  //   },
-  //   {
-  //     value: 'xenofontos-7',
-  //     text: 'Xenofontos 7, Thessaloniki 546 46, Greece',
-  //   },
-  // ];
+  useEffect(() => {
+    currentUser && getCurrentUserAddresses(currentUser.id);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(currentUser), getCurrentUserAddresses]);
+
   const onBtnClick = (val: string | undefined) => {
     console.debug(val);
   };
@@ -59,7 +51,6 @@ const HomePage: React.FC = () => {
                     options={userAddressesFormatted}
                     onBtnClick={onBtnClick}
                     buttonText="Order Now"
-                    defaultSelectedOption="xenofontos-7"
                   />
                 )}
               </>
