@@ -3,10 +3,12 @@ import { ModalTypes } from '../action-types';
 
 interface ModalState {
   userLoginModal: boolean;
+  userAddressModal: boolean;
 }
 
 const initialState: ModalState = {
   userLoginModal: false,
+  userAddressModal: false,
 };
 
 const reducer = (
@@ -18,6 +20,10 @@ const reducer = (
       return { ...state, userLoginModal: true };
     case ModalTypes.CLOSE_USER_LOGIN_MODAL:
       return { ...state, userLoginModal: false };
+    case ModalTypes.OPEN_USER_ADDRESS_MODAL:
+      return { ...state, userAddressModal: true };
+    case ModalTypes.CLOSE_USER_ADDRESS_MODAL:
+      return { ...state, userAddressModal: false };
     default:
       return state;
   }

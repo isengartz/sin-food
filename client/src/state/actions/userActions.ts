@@ -20,7 +20,10 @@ export type UserAction =
   | ClearUserErrorsAction
   | GetCurrentUserAddressesErrorAction
   | GetCurrentUserAddressesStartAction
-  | GetCurrentUserAddressesSuccessAction;
+  | GetCurrentUserAddressesSuccessAction
+  | AddUserAddressStartAction
+  | AddUserAddressSuccessAction
+  | AddUserAddressErrorAction;
 
 /**
  * Get Current User Actions
@@ -102,5 +105,22 @@ export interface GetCurrentUserAddressesSuccessAction {
 
 export interface GetCurrentUserAddressesErrorAction {
   type: UserTypes.GET_CURRENT_USER_ADDRESSES_ERROR;
+  payload: ErrorType;
+}
+
+/**
+ * Add New User Address
+ */
+export interface AddUserAddressStartAction {
+  type: UserTypes.ADD_USER_ADDRESS_START;
+}
+
+export interface AddUserAddressSuccessAction {
+  type: UserTypes.ADD_USER_ADDRESS_SUCCESS;
+  payload: UserAddress;
+}
+
+export interface AddUserAddressErrorAction {
+  type: UserTypes.ADD_USER_ADDRESS_ERROR;
   payload: ErrorType;
 }

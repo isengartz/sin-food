@@ -98,6 +98,18 @@ const reducer = compose(
         state.loading = false;
         state.errors = [];
         return state;
+      case UserTypes.ADD_USER_ADDRESS_START:
+        state.loading = true;
+        state.errors = [];
+        return state;
+      case UserTypes.ADD_USER_ADDRESS_SUCCESS:
+        state.loading = false;
+        state.addresses = [...state.addresses, action.payload];
+        return state;
+      case UserTypes.ADD_USER_ADDRESS_ERROR:
+        state.loading = false;
+        state.errors = action.payload;
+        return state;
       default:
         return state;
     }

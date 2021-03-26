@@ -6,6 +6,7 @@ import { RegisterUserForm } from '../../util/interfaces/forms/RegisterUserForm';
 import { handleAxiosErrorMessage } from '../../util/handleAxiosErrorMessage';
 import axios from '../../apis/instances/user';
 import { AppThunk } from '../../util/types/AppThunk';
+import { UserAddress } from '../../util/interfaces/UserAddress';
 
 // How using the HandleApiMiddleware action would look like if I wired it
 // export const getCurrentUser = () => ({
@@ -37,7 +38,6 @@ export const getCurrentUser = (): AppThunk => {
         type: UserTypes.GET_CURRENT_USER_SUCCESS,
         payload: currentUser,
       });
-      console.log(currentUser, JSON.stringify(currentUser));
       localStorage.setItem('user', JSON.stringify(currentUser));
     } catch (e) {
       dispatch({
@@ -161,5 +161,33 @@ export const getCurrentUserAddresses = (userId: string): AppThunk => {
 export const clearUserErrors = (): ClearUserErrorsAction => {
   return {
     type: UserTypes.CLEAR_USER_ERRORS,
+  };
+};
+
+/**
+ * Adds a new address
+ * @param data
+ */
+export const addUserAddress = (data: UserAddress): AppThunk => {
+  return async (dispatch: Dispatch<UserAction>) => {
+    dispatch({ type: UserTypes.ADD_USER_ADDRESS_START });
+
+    try {
+      const {
+        data: {
+          data: { address },
+        },
+      } = await axios.post('/address', data);
+      dispatch({
+        type: UserTypes.ADD_USER_ADDRESS_SUCCESS,
+        payload: address,
+      });
+      // localStorage.setItem('addresses', JSON.stringify(addresses));
+    } catch (e) {
+      dispatch({
+        type: UserTypes.ADD_USER_ADDRESS_ERROR,
+        payload: handleAxiosErrorMessage(e),
+      });
+    }
   };
 };
