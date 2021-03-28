@@ -11,6 +11,11 @@ deploy:
       - ./infra/k8s/restaurant/restaurant-depl.yaml
       - ./infra/k8s/user/user-depl.yaml
       - ./infra/k8s-dev/*
+      - ./infra/k8s/database-pvc.yaml #added it to refresh schemas
+      - ./infra/k8s/menu/menu-mongo-depl.yaml #added it to refresh schemas
+      - ./infra/k8s/restaurant/restaurant-mongo-depl.yaml #added it to refresh schemas
+      - ./infra/k8s/order/order-mongo-depl.yaml #added it to refresh schemas
+      - ./infra/k8s/user/user-mongo-depl.yaml #added it to refresh schemas
 build:
   local:
     push: false

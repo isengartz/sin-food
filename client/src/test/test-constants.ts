@@ -58,3 +58,10 @@ export const mockedUserRegisterRequest = {
   role: UserRole.User,
   phone: '+301234567890',
 };
+
+export const mockedCreateAddressRequest = {
+  location: { coordinates: [22.9584529, 40.6135547] },
+  full_address: 'Xenofontos 17, Thessaloniki 546 41, Greece',
+  floor: '3',
+  description: 'House',
+};

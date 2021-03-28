@@ -1,11 +1,21 @@
-/* eslint-disable no-await-in-loop,no-plusplus */
+import axios from 'axios';
 import faker from 'faker';
-import { Restaurant } from '../models/restaurant';
+import { BASE_API_URL } from '../utils/const';
 
 const NUMBER_OF_RECORDS = 10;
 
-export const seedRestaurants = async () => {
+export const seedRestaurants = async (
+  categories: { id: string; name: string }[],
+) => {
+  const result = [];
+  // eslint-disable-next-line no-plusplus
   for (let i = 0; i < NUMBER_OF_RECORDS; i++) {
+    const categoryOneIndex = Math.floor(Math.random() * categories.length);
+    let categoryTwoIndex;
+    do {
+      categoryTwoIndex = Math.floor(Math.random() * categories.length);
+    } while (categoryOneIndex === categoryTwoIndex);
+
     const payload = {
       email: faker.internet.email(),
       password: 'testpass',
@@ -49,13 +59,23 @@ export const seedRestaurants = async () => {
         },
       ],
       holidays: [faker.date.soon(), faker.date.soon()],
+      categories: [
+        categories[categoryOneIndex].id,
+        categories[categoryTwoIndex].id,
+      ],
     };
 
-    await Restaurant.build(payload).save();
-  }
-  console.log(`Inserted ${NUMBER_OF_RECORDS}`);
-  return 'completed';
-};
+    const {
+      // @ts-ignore
+      data: {
+        data: { user },
+      },
+      // eslint-disable-next-line no-await-in-loop
+    } = await axios
+      .post(`${BASE_API_URL}/restaurants`, payload)
+      .catch((err) => console.log(err.response.data || err.message));
 
-// @ts-ignore
-// seedRestaurants();
+    result.push(user);
+  }
+  return result;
+};

@@ -4,7 +4,6 @@ import UserAddressModal from '../../forms/user/RegisterForm/userAddressModal';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import { selectUserAddressModal } from '../../../state';
 import { useActions } from '../../../hooks/useActions';
-import { RegisterUserAddressForm } from '../../../util/interfaces/forms/RegisterUserForm';
 import { UserAddress } from '../../../util/interfaces/UserAddress';
 
 const AddNewAddress = () => {

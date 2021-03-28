@@ -26,7 +26,6 @@ const ingredientCategorySchema = new mongoose.Schema(
     name: {
       type: String,
       required: [true, 'Ingredient Category name is required'],
-      unique: [true, 'Ingredient Category name must be unique'],
     },
   },
   {
@@ -39,7 +38,7 @@ const ingredientCategorySchema = new mongoose.Schema(
     },
   },
 );
-
+ingredientCategorySchema.index({ name: 1, userId: 1 }, { unique: true });
 ingredientCategorySchema.set('versionKey', 'version');
 ingredientCategorySchema.plugin(updateIfCurrentPlugin);
 

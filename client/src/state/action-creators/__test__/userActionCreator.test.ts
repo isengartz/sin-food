@@ -8,8 +8,10 @@ import {
   registerUser,
   signInUser,
   signOutUser,
+  addUserAddress,
 } from '../userActionCreator';
 import {
+  mockedCreateAddressRequest,
   mockedUserGetAddressesResponse,
   mockedUserRegisterRequest,
   mockedUserRegisterResponse,
@@ -24,6 +26,7 @@ const store = mockStore();
 
 describe('Tests the userActionCreator', () => {
   beforeEach(() => {
+    localStorage.clear();
     store.clearActions();
   });
 
@@ -50,7 +53,7 @@ describe('Tests the userActionCreator', () => {
 
     // @ts-ignore
     await store.dispatch(signInUser(mockedUserSignInRequest));
-
+    expect(localStorage.getItem('user')).toBeTruthy();
     expect(store.getActions()).toEqual(expectedActions);
   });
 
@@ -74,7 +77,7 @@ describe('Tests the userActionCreator', () => {
 
     // @ts-ignore
     await store.dispatch(registerUser(mockedUserRegisterRequest));
-
+    expect(localStorage.getItem('user')).toBeTruthy();
     expect(store.getActions()).toEqual(expectedActions);
   });
 
@@ -96,7 +99,7 @@ describe('Tests the userActionCreator', () => {
 
     // @ts-ignore
     await store.dispatch(signOutUser());
-
+    expect(localStorage.getItem('user')).not.toBeTruthy();
     expect(store.getActions()).toEqual(expectedActions);
   });
 
@@ -119,6 +122,29 @@ describe('Tests the userActionCreator', () => {
 
     // @ts-ignore
     await store.dispatch(getCurrentUserAddresses('testUserId'));
+
+    expect(store.getActions()).toEqual(expectedActions);
+  });
+
+  it('should return create a new address', async () => {
+    mock.onPost('/address', mockedCreateAddressRequest).reply(200, {
+      data: {
+        address: mockedUserGetAddressesResponse[0],
+      },
+    });
+
+    const expectedActions = [
+      {
+        type: UserTypes.ADD_USER_ADDRESS_START,
+      },
+      {
+        type: UserTypes.ADD_USER_ADDRESS_SUCCESS,
+        payload: mockedUserGetAddressesResponse[0],
+      },
+    ];
+
+    // @ts-ignore
+    await store.dispatch(addUserAddress(mockedCreateAddressRequest));
 
     expect(store.getActions()).toEqual(expectedActions);
   });
