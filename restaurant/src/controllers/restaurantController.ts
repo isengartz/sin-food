@@ -7,6 +7,7 @@ import {
   AuthHelper,
   QueryModelHelper,
   DateHelper,
+  UserRestaurantPayload,
 } from '@sin-nombre/sinfood-common';
 import {
   Restaurant,
@@ -153,10 +154,11 @@ export const createRestaurant = async (
       id: restaurant.id,
       email: restaurant.email,
       role: restaurant.role,
-    }),
+      name: restaurant.name,
+    } as UserRestaurantPayload),
   );
   // Send Data + JWT Back
-  AuthHelper.createSendToken(restaurant, 201, res);
+  AuthHelper.createSendToken(restaurant as UserRestaurantPayload, 201, res);
 };
 
 /**
@@ -190,10 +192,11 @@ export const signinRestaurant = async (
       id: restaurant.id,
       email: restaurant.email,
       role: restaurant.role,
-    }),
+      name: restaurant.name,
+    } as UserRestaurantPayload),
   );
   // Send Data + JWT Back
-  AuthHelper.createSendToken(restaurant, 200, res);
+  AuthHelper.createSendToken(restaurant as UserRestaurantPayload, 200, res);
 };
 
 /**
@@ -246,10 +249,11 @@ export const updateRestaurant = async (
       id: restaurant.id,
       email: restaurant.email,
       role: restaurant.role,
-    }),
+      name: restaurant.name,
+    } as UserRestaurantPayload),
   );
   // Send Data + JWT Back
-  AuthHelper.createSendToken(restaurant, 200, res);
+  AuthHelper.createSendToken(restaurant as UserRestaurantPayload, 200, res);
 };
 
 /**

@@ -27,7 +27,11 @@ const App: React.FC = () => {
         <Header>
           <LayoutHeader />
         </Header>
+        {/*<Suspense fallback={<div>Loading...</div>}>*/}
+        {/*  {isCurrentlyAuthenticating ? <Loader /> : <Routes />}*/}
+        {/*</Suspense>*/}
         <Routes />
+
         <Footer style={{ position: 'sticky', bottom: '0' }}>Footer</Footer>
 
         {!user && <LoginForm />}

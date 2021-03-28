@@ -6,6 +6,7 @@ import { RegisterUserForm } from '../../util/interfaces/forms/RegisterUserForm';
 import { handleAxiosErrorMessage } from '../../util/handleAxiosErrorMessage';
 import axios from '../../apis/instances/user';
 import { AppThunk } from '../../util/types/AppThunk';
+import { UserAddress } from '../../util/interfaces/UserAddress';
 
 // How using the HandleApiMiddleware action would look like if I wired it
 // export const getCurrentUser = () => ({
@@ -37,6 +38,7 @@ export const getCurrentUser = (): AppThunk => {
         type: UserTypes.GET_CURRENT_USER_SUCCESS,
         payload: currentUser,
       });
+      localStorage.setItem('user', JSON.stringify(currentUser));
     } catch (e) {
       dispatch({
         type: UserTypes.GET_CURRENT_USER_ERROR,
@@ -67,6 +69,8 @@ export const signInUser = (data: SignInUserForm): AppThunk => {
       dispatch({
         type: ModalTypes.CLOSE_USER_LOGIN_MODAL,
       });
+
+      localStorage.setItem('user', JSON.stringify(user));
     } catch (e) {
       // Push the error at the global Error Stack
       dispatch({
@@ -95,6 +99,7 @@ export const registerUser = (data: RegisterUserForm): AppThunk => {
         type: UserTypes.REGISTER_USER_SUCCESS,
         payload: user,
       });
+      localStorage.setItem('user', JSON.stringify(user));
     } catch (e) {
       dispatch({
         type: UserTypes.REGISTER_USER_ERROR,
@@ -115,6 +120,7 @@ export const signOutUser = (): AppThunk => {
       dispatch({
         type: UserTypes.SIGN_OUT_USER_SUCCESS,
       });
+      localStorage.removeItem('user');
     } catch (e) {
       dispatch({
         type: UserTypes.SIGN_OUT_USER_ERROR,
@@ -155,5 +161,33 @@ export const getCurrentUserAddresses = (userId: string): AppThunk => {
 export const clearUserErrors = (): ClearUserErrorsAction => {
   return {
     type: UserTypes.CLEAR_USER_ERRORS,
+  };
+};
+
+/**
+ * Adds a new address
+ * @param data
+ */
+export const addUserAddress = (data: UserAddress): AppThunk => {
+  return async (dispatch: Dispatch<UserAction>) => {
+    dispatch({ type: UserTypes.ADD_USER_ADDRESS_START });
+
+    try {
+      const {
+        data: {
+          data: { address },
+        },
+      } = await axios.post('/address', data);
+      dispatch({
+        type: UserTypes.ADD_USER_ADDRESS_SUCCESS,
+        payload: address,
+      });
+      // localStorage.setItem('addresses', JSON.stringify(addresses));
+    } catch (e) {
+      dispatch({
+        type: UserTypes.ADD_USER_ADDRESS_ERROR,
+        payload: handleAxiosErrorMessage(e),
+      });
+    }
   };
 };

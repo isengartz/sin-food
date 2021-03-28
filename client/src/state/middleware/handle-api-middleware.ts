@@ -76,6 +76,7 @@ const handleErrors = (
   onErrorType: UtilTypes | UserTypes | ModalTypes,
 ): Action => {
   console.error(error);
+  // @ts-ignore
   return {
     ...action,
     type: onErrorType || UtilTypes.SET_GLOBAL_ERROR_MESSAGE,

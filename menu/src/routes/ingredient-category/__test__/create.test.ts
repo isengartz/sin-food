@@ -62,3 +62,20 @@ it('should return 400 when name already exist', async () => {
     .send({ name: 'meat', userId: 'randomUserId' })
     .expect(400);
 });
+
+it('should allow same name for different users', async () => {
+  const cookie = global.signin();
+  const cookieTwo = global.signin();
+
+  await request(app)
+    .post(`${API_ROOT_ENDPOINT}/ingredients/categories`)
+    .set('Cookie', cookie)
+    .send({ name: 'meat', userId: 'randomUserId' })
+    .expect(201);
+
+  await request(app)
+    .post(`${API_ROOT_ENDPOINT}/ingredients/categories`)
+    .set('Cookie', cookieTwo)
+    .send({ name: 'meat', userId: 'randomUserId' })
+    .expect(201);
+});

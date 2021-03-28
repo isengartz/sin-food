@@ -1,59 +1,49 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import { useActions } from '../../../../hooks/useActions';
 import { useErrorMessage } from '../../../../hooks/useErrorMessage';
 import { useTypedSelector } from '../../../../hooks/useTypedSelector';
 import { Button, Checkbox, Form, Input, Select, Typography } from 'antd';
 import { COUNTRY_CODES } from '../../../../util/constants';
-import { selectUser } from '../../../../state';
+import { selectUser, selectUserAddressModal } from '../../../../state';
 import {
   RegisterUserAddressForm,
   RegisterUserForm,
 } from '../../../../util/interfaces/forms/RegisterUserForm';
-import { useHistory } from 'react-router';
 import { FrownOutlined } from '@ant-design/icons';
-import { UserAddress } from '../../../../util/interfaces/UserAddress';
+import { UserAddressForm } from '../../../../util/interfaces/UserAddress';
 import UserAddressModal from './userAddressModal';
 
 const { Option } = Select;
 
 const RegisterForm = () => {
-  const [visible, setVisible] = useState(false);
-  const { errors, currentUser } = useTypedSelector(selectUser);
-  const { registerUser, clearUserErrors } = useActions();
+  const visible = useTypedSelector(selectUserAddressModal);
+  const { errors } = useTypedSelector(selectUser);
+  const {
+    registerUser,
+    clearUserErrors,
+    showUserAddressModal,
+    closeUserAddressModal,
+  } = useActions();
   const mainFormRef = useRef<any>();
-  let history = useHistory();
 
   // Attach Error Handling for User Errors
   useErrorMessage(errors, clearUserErrors);
 
   // Redirect on Successful register /  if user is logged in
-  useEffect(() => {
-    if (currentUser) {
-      history.push('/');
-    }
-  }, [currentUser, history]);
-
-  const showUserAddressModal = () => {
-    setVisible(true);
-  };
-
-  const hideUserAddressModal = () => {
-    setVisible(false);
-  };
 
   // On Submit
   const onSubmit = (values: RegisterUserForm) => {
     // Format address payload in the appropriate payload
-    const addresses = mainFormRef.current
-      .getFieldValue('addresses')
-      .map((address: RegisterUserAddressForm) => {
-        return {
-          ...address,
-          location: {
-            coordinates: [address.longitude, address.latitude],
-          },
-        };
-      });
+    const addressObj = mainFormRef.current.getFieldValue('addresses') || [];
+
+    const addresses = addressObj.map((address: RegisterUserAddressForm) => {
+      return {
+        ...address,
+        location: {
+          coordinates: [address.longitude, address.latitude],
+        },
+      };
+    });
 
     // Format the rest of values
     const formattedValues = {
@@ -119,7 +109,7 @@ const RegisterForm = () => {
           registerUserForm.setFieldsValue({
             addresses: updatedAddresses,
           });
-          setVisible(false);
+          closeUserAddressModal();
         }
       }}
     >
@@ -229,7 +219,8 @@ const RegisterForm = () => {
           }
         >
           {({ getFieldValue }) => {
-            const addresses: UserAddress[] = getFieldValue('addresses') || [];
+            const addresses: UserAddressForm[] =
+              getFieldValue('addresses') || [];
             return addresses.length ? (
               <ul className="user-address-list">
                 {addresses.map((address, index) => (
@@ -281,7 +272,7 @@ const RegisterForm = () => {
           </Button>
         </Form.Item>
       </Form>
-      <UserAddressModal visible={visible} onCancel={hideUserAddressModal} />
+      <UserAddressModal visible={visible} onCancel={closeUserAddressModal} />
     </Form.Provider>
   );
 };

@@ -15,4 +15,7 @@ export enum UserTypes {
   GET_CURRENT_USER_ADDRESSES_START = 'user/get_current_user_addresses_start',
   GET_CURRENT_USER_ADDRESSES_SUCCESS = 'user/get_current_user_addresses_success',
   GET_CURRENT_USER_ADDRESSES_ERROR = 'user/get_current_user_addresses_error',
+  ADD_USER_ADDRESS_START = 'user/add_user_address_start',
+  ADD_USER_ADDRESS_SUCCESS = 'user/add_user_address_success',
+  ADD_USER_ADDRESS_ERROR = 'user/add_user_address_error',
 }

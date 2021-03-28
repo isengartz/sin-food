@@ -2,6 +2,7 @@ import { UserTypes } from '../action-types';
 import { UserInterface } from '../../util/interfaces/UserInterface';
 import { ErrorType } from '../../util/types/ErrorType';
 import { UserAddress } from '../../util/interfaces/UserAddress';
+import { UserPayload } from '@sin-nombre/sinfood-common';
 
 export type UserAction =
   | GetCurrentUserAction
@@ -19,7 +20,10 @@ export type UserAction =
   | ClearUserErrorsAction
   | GetCurrentUserAddressesErrorAction
   | GetCurrentUserAddressesStartAction
-  | GetCurrentUserAddressesSuccessAction;
+  | GetCurrentUserAddressesSuccessAction
+  | AddUserAddressStartAction
+  | AddUserAddressSuccessAction
+  | AddUserAddressErrorAction;
 
 /**
  * Get Current User Actions
@@ -29,7 +33,7 @@ interface GetCurrentUserAction {
 }
 interface GetCurrentUserSuccessAction {
   type: UserTypes.GET_CURRENT_USER_SUCCESS;
-  payload: UserInterface;
+  payload: UserPayload;
 }
 interface GetCurrentUserErrorAction {
   type: UserTypes.GET_CURRENT_USER_ERROR;
@@ -44,7 +48,7 @@ interface SignInUserStartAction {
 }
 interface SignInUserSuccessAction {
   type: UserTypes.SIGN_IN_USER_SUCCESS;
-  payload: UserInterface;
+  payload: UserPayload;
 }
 interface SignInUserErrorAction {
   type: UserTypes.SIGN_IN_USER_ERROR;
@@ -59,7 +63,7 @@ interface RegisterUserStartAction {
 }
 interface RegisterUserSuccessAction {
   type: UserTypes.REGISTER_USER_SUCCESS;
-  payload: UserInterface;
+  payload: UserPayload;
 }
 interface RegisterUserErrorAction {
   type: UserTypes.REGISTER_USER_ERROR;
@@ -101,5 +105,22 @@ export interface GetCurrentUserAddressesSuccessAction {
 
 export interface GetCurrentUserAddressesErrorAction {
   type: UserTypes.GET_CURRENT_USER_ADDRESSES_ERROR;
+  payload: ErrorType;
+}
+
+/**
+ * Add New User Address
+ */
+export interface AddUserAddressStartAction {
+  type: UserTypes.ADD_USER_ADDRESS_START;
+}
+
+export interface AddUserAddressSuccessAction {
+  type: UserTypes.ADD_USER_ADDRESS_SUCCESS;
+  payload: UserAddress;
+}
+
+export interface AddUserAddressErrorAction {
+  type: UserTypes.ADD_USER_ADDRESS_ERROR;
   payload: ErrorType;
 }

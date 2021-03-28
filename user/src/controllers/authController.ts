@@ -42,7 +42,7 @@ export const allUsers = async (
     status: 'success',
     results: users.length,
     totalCount,
-    data: users,
+    data: { users },
   });
 };
 

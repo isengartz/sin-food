@@ -27,7 +27,10 @@ const DropDownWithButton: React.FC<DropDownWithButtonProps> = ({
       foundItem && setOptionSelected(foundItem.value);
     } else {
       // else set as selected the first option
-      !optionSelected && options && setOptionSelected(options[0].value);
+      !optionSelected &&
+        options &&
+        options?.length > 0 &&
+        setOptionSelected(options[0].value);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultSelectedOption]);

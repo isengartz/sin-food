@@ -4,19 +4,24 @@ import HomePage from '../../pages/home';
 import SearchStores from '../../pages/search-stores';
 import NotFoundPage from '../../pages/404';
 import RegisterUserPage from '../../pages/register-user';
+import UnAuthRoute from './UnAuthRoute/UnAuthRoute';
+import { useTypedSelector } from '../../hooks/useTypedSelector';
+import { selectCurrentUser } from '../../state';
+import AuthRoute from './AuthRoute/AuthRoute';
 
 const Routes: React.FC = () => {
+  const user = useTypedSelector(selectCurrentUser);
   return (
     <Switch>
       <Route exact path="/">
         <HomePage />
       </Route>
-      <Route exact path="/search-stores">
+      <AuthRoute redirectTo="/" isLogged={!!user} exact path="/search-stores">
         <SearchStores />
-      </Route>
-      <Route exact path="/register">
+      </AuthRoute>
+      <UnAuthRoute redirectTo="/" isLogged={!!user} exact path="/register">
         <RegisterUserPage />
-      </Route>
+      </UnAuthRoute>
       <Route path="*">
         <NotFoundPage />
       </Route>

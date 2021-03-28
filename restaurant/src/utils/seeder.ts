@@ -1,5 +1,4 @@
 /* eslint-disable no-await-in-loop,no-plusplus */
-// @ts-ignore
 import faker from 'faker';
 import { Restaurant } from '../models/restaurant';
 
@@ -52,7 +51,6 @@ export const seedRestaurants = async () => {
       holidays: [faker.date.soon(), faker.date.soon()],
     };
 
-    //@ts-ignore
     await Restaurant.build(payload).save();
   }
   console.log(`Inserted ${NUMBER_OF_RECORDS}`);

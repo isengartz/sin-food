@@ -17,18 +17,33 @@ interface ModalFormProps {
   onCancel: () => void;
   onSubmit?: () => void;
 }
+const libraries: (
+  | 'drawing'
+  | 'geometry'
+  | 'localContext'
+  | 'places'
+  | 'visualization'
+)[] = ['places'];
 
+/**
+ * Adds a form for a user to add a new address
+ * @param visible
+ * @param onCancel
+ * @constructor
+ */
 const UserAddressModal: React.FC<ModalFormProps> = ({ visible, onCancel }) => {
   const [form] = Form.useForm();
   const [markers, setMarkers] = useState<GoogleMapMarker[]>([]);
   const [mapCenter, setMapCenter] = useState<GoogleMapMarker['location']>();
   const [mapZoom, setMapZoom] = useState<number>();
 
+  // Loads the GMAPS API alongside with any given libraries
   useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
-    libraries: ['places'],
+    libraries,
   });
 
+  // Reset all form fields on modal close
   useResetFormOnCloseModal({
     form,
     visible,
