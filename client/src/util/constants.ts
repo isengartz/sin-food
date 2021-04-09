@@ -1,4 +1,7 @@
 export const API_USER_SERVICE_BASE_URL = '/api/v1/users';
+export const API_RESTAURANT_SERVICE_BASE_URL = '/api/v1/restaurants';
+
+export const ALL_CATEGORIES_CHECKBOX_VALUE = 'All';
 
 export const GOOGLE_MAP_ZOOM_VALUE_ON_PIN = 17;
 

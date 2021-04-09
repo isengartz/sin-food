@@ -5,6 +5,7 @@ import {
   selectCurrentUserAddressesFormatted,
 } from '../../../state';
 import { useActions } from '../../../hooks/useActions';
+import { useHistory } from 'react-router-dom';
 import DropDownWithButton from '../../layout/DropDownWithButton/dropDownWithButton';
 import { Typography } from 'antd';
 import AddNewAddress from './AddNewAddress';
@@ -17,11 +18,12 @@ const { Title, Paragraph } = Typography;
  * @constructor
  */
 const HomeUserAddressSection: React.FC = () => {
+  const history = useHistory();
   const currentUser = useTypedSelector(selectCurrentUser);
   const userAddressesFormatted = useTypedSelector(
     selectCurrentUserAddressesFormatted,
   );
-  const { getCurrentUserAddresses } = useActions();
+  const { getCurrentUserAddresses, selectUserAddress } = useActions();
 
   // If user is logged in and we have not fetch the addresses yet
   // Get all addresses from API
@@ -34,7 +36,10 @@ const HomeUserAddressSection: React.FC = () => {
   }, [JSON.stringify(currentUser), getCurrentUserAddresses]);
 
   const onBtnClick = (val: string | undefined) => {
-    console.debug(val);
+    if (val) {
+      selectUserAddress(val);
+      history.push(`/search-stores?address=${val}`);
+    }
   };
   return (
     <>

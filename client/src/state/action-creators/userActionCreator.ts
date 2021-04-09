@@ -1,6 +1,11 @@
 import { ModalTypes, UserTypes, UtilTypes } from '../action-types';
 import { Dispatch } from 'redux';
-import { Action, ClearUserErrorsAction, UserAction } from '../actions';
+import {
+  Action,
+  ClearUserErrorsAction,
+  SelectUserAddress,
+  UserAction,
+} from '../actions';
 import { SignInUserForm } from '../../util/interfaces/forms/SignInUserForm';
 import { RegisterUserForm } from '../../util/interfaces/forms/RegisterUserForm';
 import { handleAxiosErrorMessage } from '../../util/handleAxiosErrorMessage';
@@ -189,5 +194,17 @@ export const addUserAddress = (data: UserAddress): AppThunk => {
         payload: handleAxiosErrorMessage(e),
       });
     }
+  };
+};
+
+/**
+ * Select a user's address
+ * @param address
+ */
+export const selectUserAddress = (address: string): SelectUserAddress => {
+  localStorage.setItem('selectedAddress', address);
+  return {
+    type: UserTypes.SELECT_USER_ADDRESS,
+    payload: address,
   };
 };

@@ -9,6 +9,10 @@ import { useTypedSelector } from '../../hooks/useTypedSelector';
 import { selectCurrentUser } from '../../state';
 import AuthRoute from './AuthRoute/AuthRoute';
 
+/**
+ * Application Routes
+ * @constructor
+ */
 const Routes: React.FC = () => {
   const user = useTypedSelector(selectCurrentUser);
   return (

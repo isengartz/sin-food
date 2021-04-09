@@ -11,6 +11,7 @@ export interface UserState {
   errors: ErrorType;
   currentUser: UserPayload | null;
   addresses: UserAddress[];
+  selectedAddress: string;
 }
 // We persist no sensitive data in localStorage
 // So there is no issue initialize the currentUser state with the data from LS
@@ -22,6 +23,9 @@ const initialState: UserState = {
     ? JSON.parse(localStorage.getItem('user') as string)
     : null,
   addresses: [],
+  selectedAddress: localStorage.getItem('selectedAddress')
+    ? (localStorage.getItem('selectedAddress') as string)
+    : '',
 };
 
 const reducer = compose(
@@ -109,6 +113,9 @@ const reducer = compose(
       case UserTypes.ADD_USER_ADDRESS_ERROR:
         state.loading = false;
         state.errors = action.payload;
+        return state;
+      case UserTypes.SELECT_USER_ADDRESS:
+        state.selectedAddress = action.payload;
         return state;
       default:
         return state;

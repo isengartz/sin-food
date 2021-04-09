@@ -23,7 +23,8 @@ export type UserAction =
   | GetCurrentUserAddressesSuccessAction
   | AddUserAddressStartAction
   | AddUserAddressSuccessAction
-  | AddUserAddressErrorAction;
+  | AddUserAddressErrorAction
+  | SelectUserAddress;
 
 /**
  * Get Current User Actions
@@ -123,4 +124,12 @@ export interface AddUserAddressSuccessAction {
 export interface AddUserAddressErrorAction {
   type: UserTypes.ADD_USER_ADDRESS_ERROR;
   payload: ErrorType;
+}
+
+/**
+ * Select User Address
+ */
+export interface SelectUserAddress {
+  type: UserTypes.SELECT_USER_ADDRESS;
+  payload: string;
 }

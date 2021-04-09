@@ -37,6 +37,19 @@ $ kubectl create secret generic transporter-email-username --from-literal TRANSP
 $ kubectl create secret generic transporter-email-password --from-literal TRANSPORTER_EMAIL_PASSWORD=KEY
 ```
 
+
+Seeder
+
+`cd seeder/`
+
+`mv .env.example .env`
+
+Put the same value to `ADMIN_ALLOW_PASSWORD` as defined in the Kubernetes secrets
+
+`npm install`
+
+`node-ts index.ts`
+
 Run Skaffold
 
 ```sh
