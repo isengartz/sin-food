@@ -18,4 +18,5 @@ export enum UserTypes {
   ADD_USER_ADDRESS_START = 'user/add_user_address_start',
   ADD_USER_ADDRESS_SUCCESS = 'user/add_user_address_success',
   ADD_USER_ADDRESS_ERROR = 'user/add_user_address_error',
+  SELECT_USER_ADDRESS = 'user/select_user_address',
 }

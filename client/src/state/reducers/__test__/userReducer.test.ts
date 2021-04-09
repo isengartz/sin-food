@@ -12,6 +12,7 @@ const initialState: UserState = {
   errors: [],
   currentUser: null,
   addresses: [],
+  selectedAddress: '',
 };
 
 describe('Tests the User Reducer', () => {
