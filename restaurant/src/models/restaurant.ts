@@ -8,6 +8,10 @@ import {
   RestaurantWorkingHours,
   restaurantWorkingHoursSchema,
 } from './restaurant-working-hours';
+import { natsWrapper } from '../events/nats-wrapper';
+import { RestaurantUpdatedPublisher } from '../events/publishers/restaurant-updated-publisher';
+import { RestaurantCreatedPublisher } from '../events/publishers/restaurant-created-publisher';
+import { RestaurantDeletedPublisher } from '../events/publishers/restaurant-deleted-publisher';
 
 // Describes the attributes that we accept from Request
 export interface RestaurantAttrs {
@@ -35,6 +39,7 @@ export interface RestaurantAttrs {
 // Describes the actual Document returned by Mongoose
 export interface RestaurantDoc extends mongoose.Document {
   id: string;
+  version: number;
   email: string;
   password?: string;
   name: string;
@@ -178,6 +183,9 @@ restaurantSchema.plugin(updateIfCurrentPlugin);
 
 // Insert the reference from the Restaurant Category
 restaurantSchema.pre<RestaurantDoc>('save', async function (next) {
+  // @ts-ignore
+  this.wasNew = this.isNew;
+
   if (this.categories.length === 0) {
     return next();
   }
@@ -188,6 +196,21 @@ restaurantSchema.pre<RestaurantDoc>('save', async function (next) {
   next();
 });
 
+// Publish an Event on new records
+restaurantSchema.post<RestaurantDoc>('save', async function (doc, next) {
+  if (doc.wasNew) {
+    new RestaurantCreatedPublisher(natsWrapper.client).publish({
+      id: doc._id,
+      version: doc.version,
+      delivers_to: doc.delivers_to,
+      working_hours: doc.working_hours,
+      holidays: doc.holidays,
+      categories: doc.categories,
+    });
+  }
+  next();
+});
+
 //@ts-ignore
 restaurantSchema.post<RestaurantDoc>('findOneAndUpdate', async function (doc) {
   if (doc) {
@@ -195,6 +218,16 @@ restaurantSchema.post<RestaurantDoc>('findOneAndUpdate', async function (doc) {
     relationshipHelper.addRelations(restaurantRelationships);
     relationshipHelper.insertReferencesBasedOnId();
     relationshipHelper.removeUpdatedReferencesBasedOnId();
+
+    // Publish an Event
+    new RestaurantUpdatedPublisher(natsWrapper.client).publish({
+      id: doc._id,
+      version: doc.version,
+      delivers_to: doc.delivers_to,
+      working_hours: doc.working_hours,
+      holidays: doc.holidays,
+      categories: doc.categories,
+    });
   }
 });
 
@@ -204,6 +237,15 @@ restaurantSchema.pre<RestaurantDoc>('remove', async function (next) {
   relationshipHelper.addRelations(restaurantRelationships);
   relationshipHelper.removeReferencesBasedOnId();
 
+  next();
+});
+
+// Publish an event on delete
+restaurantSchema.post<RestaurantDoc>('remove', async function (doc, next) {
+  new RestaurantDeletedPublisher(natsWrapper.client).publish({
+    id: doc._id,
+    version: doc.version,
+  });
   next();
 });
 

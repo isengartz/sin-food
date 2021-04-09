@@ -7,6 +7,7 @@ import {
 } from '../../../utils/constants';
 import { Restaurant } from '../../../models/restaurant';
 import { natsWrapper } from '../../../events/nats-wrapper';
+import { Subjects } from '@sin-nombre/sinfood-common';
 
 it('should return 401 when no logged in', async () => {
   await request(app)
@@ -98,6 +99,50 @@ it('should remove reference from restaurant', async () => {
   expect(updatedUser!.categories.length).toEqual(0);
 });
 
+it('should emit RestaurantUpdate events when deleting a category attached to a restaurant', async () => {
+  const { cookie } = await global.signinAdmin();
+
+  // create category
+  const {
+    body: {
+      data: { restaurant_categories },
+    },
+  } = await request(app)
+    .post(`${API_ROOT_ENDPOINT}/restaurants/categories/`)
+    .set('Cookie', cookie)
+    .send({ name: 'Pizza' })
+    .expect(201);
+
+  // create user with category
+  const {
+    body: {
+      data: { user },
+    },
+  } = await request(app)
+    .post(`${API_ROOT_ENDPOINT}/restaurants`)
+    .send({
+      ...RESTAURANT_CREATE_VALID_PAYLOAD,
+      categories: [restaurant_categories.id],
+    })
+    .expect(201);
+
+  // Delete category
+  await request(app)
+    .delete(
+      `${API_ROOT_ENDPOINT}/restaurants/categories/${restaurant_categories.id}`,
+    )
+    .set('Cookie', cookie)
+    .send({})
+    .expect(204);
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
+  const eventsPublished = (natsWrapper.client.publish as jest.Mock).mock.calls;
+
+  expect(eventsPublished[eventsPublished.length - 1][0]).toEqual(
+    Subjects.RestaurantUpdated,
+  );
+});
+
 it('should emit a RestaurantCategoryDeleted event', async () => {
   const { cookie } = await global.signinAdmin();
 
@@ -120,4 +165,8 @@ it('should emit a RestaurantCategoryDeleted event', async () => {
     .expect(204);
 
   expect(natsWrapper.client.publish).toHaveBeenCalled();
+  const eventsPublished = (natsWrapper.client.publish as jest.Mock).mock.calls;
+  expect(eventsPublished[eventsPublished.length - 1][0]).toEqual(
+    Subjects.RestaurantCategoryDeleted,
+  );
 });

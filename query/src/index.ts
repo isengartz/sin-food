@@ -5,12 +5,7 @@ import { natsWrapper } from './events/nats-wrapper';
 const start = async () => {
   // Check for ENV Vars so TS stfu and also throw an error if we forgot to define them in Kubernetes
 
-  if (!process.env.JWT_KEY) {
-    throw new Error('JWT_KEY must be defined');
-  }
-  if (!process.env.ADMIN_ALLOW_PASSWORD) {
-    throw new Error('ADMIN_ALLOW_PASSWORD must be defined');
-  }
+
   if (!process.env.MONGO_URI) {
     throw new Error('MONGO_URI must be defined');
   }
@@ -49,6 +44,7 @@ const start = async () => {
     });
     process.on('SIGINT', () => natsWrapper.client.close());
     process.on('SIGTERM', () => natsWrapper.client.close());
+
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);

@@ -1,4 +1,5 @@
 import request from 'supertest';
+import { Subjects } from '@sin-nombre/sinfood-common';
 import { app } from '../../app';
 
 import {
@@ -6,6 +7,7 @@ import {
   USER_ADDRESS_CREATE_VALID_PAYLOAD,
 } from '../../utils/constants';
 import { User } from '../../models/user';
+import { natsWrapper } from '../../events/nats-wrapper';
 
 it('should return 401 when user not logged in', async () => {
   await request(app)
@@ -16,7 +18,7 @@ it('should return 401 when user not logged in', async () => {
 it('should return 400 on wrong address_id', async () => {
   const { cookie } = await global.signin();
 
-   await request(app)
+  await request(app)
     .post(`${API_ROOT_ENDPOINT}/users/address/random_address_id`)
     .set('Cookie', cookie)
     .send({})
@@ -78,4 +80,11 @@ it('should update the userAddress on success ', async () => {
   const updatedUser = await User.findById(user.id).populate('addresses');
 
   expect(updatedUser!.addresses[0].description).toEqual('description changed');
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
+  const eventsPublished = (natsWrapper.client.publish as jest.Mock).mock.calls;
+  // The last Event should be UserAddressCreated
+  expect(eventsPublished[eventsPublished.length - 1][0]).toEqual(
+    Subjects.UserAddressUpdated,
+  );
 });

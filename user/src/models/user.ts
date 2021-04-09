@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { randomBytes, createHash } from 'crypto';
 import validator from 'validator';
 import { Password, UserRole } from '@sin-nombre/sinfood-common';
+// eslint-disable-next-line import/no-cycle
 import { UserAddressDoc } from './user_address';
 
 // Describes the attributes that we accept from Request

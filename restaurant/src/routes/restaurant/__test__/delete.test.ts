@@ -7,6 +7,8 @@ import {
   RESTAURANT_CREATE_VALID_PAYLOAD,
 } from '../../../utils/constants';
 import { RestaurantCategory } from '../../../models/restaurant-category';
+import { natsWrapper } from '../../../events/nats-wrapper';
+import { Subjects } from '@sin-nombre/sinfood-common';
 
 it('should return 401 when not logged in', async () => {
   await request(app)
@@ -94,4 +96,25 @@ it('should remove the reference to restaurant from categories', async () => {
     restaurant_categories.id,
   );
   expect(categoryAfterDelete!.restaurants.length).toEqual(0);
+});
+
+it('should emit an event', async () => {
+  // Create new Restaurant
+  const { user } = await global.signin();
+  // Create new admin
+  const { cookie } = await global.signinAdmin();
+
+  // Send the request as Admin
+  await request(app)
+    .delete(`${API_ROOT_ENDPOINT}/restaurants/${user.id}`)
+    .set('Cookie', cookie)
+    .send({})
+    .expect(204);
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
+  const eventsPublished = (natsWrapper.client.publish as jest.Mock).mock.calls;
+  // The last Event should be RestaurantUpdated
+  expect(eventsPublished[eventsPublished.length - 1][0]).toEqual(
+    Subjects.RestaurantDeleted,
+  );
 });
