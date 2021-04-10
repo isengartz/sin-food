@@ -1,10 +1,15 @@
 import mongoose from 'mongoose';
 import { app } from './app';
 import { natsWrapper } from './events/nats-wrapper';
+import { UserAddressCreatedListener } from './events/listeners/user-address-created-listener';
+import { UserAddressUpdatedListener } from './events/listeners/user-address-updated-listener';
+import { UserAddressDeletedListener } from './events/listeners/user-address-deleted-listener';
+import { RestaurantCreatedListener } from './events/listeners/restaurant-created-listener';
+import { RestaurantUpdatedListener } from './events/listeners/restaurant-updated-listener';
+import { RestaurantDeletedListener } from './events/listeners/restaurant-deleted-listener';
 
 const start = async () => {
   // Check for ENV Vars so TS stfu and also throw an error if we forgot to define them in Kubernetes
-
 
   if (!process.env.MONGO_URI) {
     throw new Error('MONGO_URI must be defined');
@@ -45,6 +50,13 @@ const start = async () => {
     process.on('SIGINT', () => natsWrapper.client.close());
     process.on('SIGTERM', () => natsWrapper.client.close());
 
+    // Initialize Listeners
+    new UserAddressCreatedListener(natsWrapper.client).listen();
+    new UserAddressUpdatedListener(natsWrapper.client).listen();
+    new UserAddressDeletedListener(natsWrapper.client).listen();
+    new RestaurantCreatedListener(natsWrapper.client).listen();
+    new RestaurantUpdatedListener(natsWrapper.client).listen();
+    new RestaurantDeletedListener(natsWrapper.client).listen();
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
