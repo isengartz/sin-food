@@ -15,6 +15,7 @@ import { API_ROOT_ENDPOINT } from '../utils/constants';
 import { EmailSendingPublisher } from '../events/publishers/email-sending-publisher';
 import { natsWrapper } from '../events/nats-wrapper';
 import { UserAddress, UserAddressAttrs } from '../models/user_address';
+import { UserAddressCreatedPublisher } from '../events/publishers/user-address-created-publisher';
 
 /**
  * Return all users with addresses populated
@@ -96,6 +97,7 @@ export const signup = async (
 
   // If the user send any address alongside with the initial registration save them too
   // Although we dont want to return an error response if the UserAddress Validation Fails
+  // noinspection ES6MissingAwait
   try {
     if (user && addresses) {
       user.addresses =
@@ -104,6 +106,11 @@ export const signup = async (
             ...address,
             user_id: user.id,
           }).save();
+          new UserAddressCreatedPublisher(natsWrapper.client).publish({
+            id: addr.id,
+            version: addr.version,
+            location: addr.location,
+          });
           return addr;
         }) || [];
     }

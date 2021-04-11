@@ -52,7 +52,6 @@ const start = async () => {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
-    console.log('WTF??');
   }
   app.listen(3000, () => {
     // eslint-disable-next-line no-console

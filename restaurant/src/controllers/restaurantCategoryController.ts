@@ -37,13 +37,16 @@ export const deleteOneCategory = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const category = await RestaurantCategory.findByIdAndDelete(req.params.id);
+  const category = await RestaurantCategory.findById(req.params.id);
   if (!category) {
     throw new NotFoundError('No Category found with that ID');
   }
   await new RestaurantCategoryDeletedPublisher(natsWrapper.client).publish({
-    id: req.params.id,
+    id: category.id,
+    version: category.version,
   });
+
+  await category.remove();
 
   res.status(204).json({
     status: 'success',

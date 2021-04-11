@@ -1,10 +1,12 @@
 import request from 'supertest';
+import { Subjects } from '@sin-nombre/sinfood-common';
 import { app } from '../../app';
 import {
   API_ROOT_ENDPOINT,
   USER_ADDRESS_CREATE_VALID_PAYLOAD,
 } from '../../utils/constants';
 import { User } from '../../models/user';
+import { natsWrapper } from '../../events/nats-wrapper';
 
 // it('should return 404 when different user tries to delete not owned address', async () => {
 //   const userOne = await global.signin();
@@ -47,4 +49,11 @@ it('should return 204 on success and user has 0 addresses', async () => {
   const updatedUser = await User.findById(user.id);
 
   expect(updatedUser!.addresses.length).toEqual(0);
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
+  const eventsPublished = (natsWrapper.client.publish as jest.Mock).mock.calls;
+  // The last Event should be UserAddressCreated
+  expect(eventsPublished[eventsPublished.length - 1][0]).toEqual(
+    Subjects.UserAddressDeleted,
+  );
 });

@@ -49,6 +49,7 @@ export const seedRestaurants = async () => {
         },
       ],
       holidays: [faker.date.soon(), faker.date.soon()],
+      minimum_order: 5,
     };
 
     await Restaurant.build(payload).save();

@@ -5,9 +5,9 @@ import {
   NotFoundError,
   Password,
   AuthHelper,
-  QueryModelHelper,
   DateHelper,
   UserRestaurantPayload,
+  QueryModelHelper,
 } from '@sin-nombre/sinfood-common';
 import {
   Restaurant,
@@ -63,7 +63,7 @@ export const filterRestaurants = async (
   });
 
   // Filter the Query
-  // @ts-ignore
+  //@ts-ignore
   const queryHelper = new QueryModelHelper(restaurantQuery, req.query);
   queryHelper.filter();
   queryHelper.limitFields();
@@ -117,6 +117,7 @@ export const createRestaurant = async (
     role,
     working_hours,
     holidays,
+    minimum_order,
   } = req.body;
 
   if (
@@ -145,6 +146,7 @@ export const createRestaurant = async (
     role,
     working_hours,
     holidays,
+    minimum_order,
   });
 
   await restaurant.save();

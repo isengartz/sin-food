@@ -33,9 +33,9 @@ spec:
             backend:
               serviceName: order-srv # Name of the pod
               servicePort: 3000
-          - path: /api/v1/ingredients/?(.*)
+          - path: /api/v1/query/?(.*)
             backend:
-              serviceName: menu-srv # Name of the pod
+              serviceName: query-srv # Name of the pod
               servicePort: 3000
           - path: /api/v1/notification/?(.*)
             backend:

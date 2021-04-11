@@ -1,5 +1,6 @@
 import request from 'supertest';
 import * as faker from 'faker';
+import { Subjects } from '@sin-nombre/sinfood-common';
 import { app } from '../../../app';
 import {
   API_ROOT_ENDPOINT,
@@ -7,6 +8,7 @@ import {
 } from '../../../utils/constants';
 import { Restaurant } from '../../../models/restaurant';
 import { RestaurantCategory } from '../../../models/restaurant-category';
+import { natsWrapper } from '../../../events/nats-wrapper';
 
 it('should return 401 when user isnt logged in', async () => {
   await request(app)
@@ -137,4 +139,41 @@ it('should remove the reference to category on update', async () => {
   expect(updatedPasta!.restaurants.length).toEqual(0);
   // Pizza should be unchanged
   expect(updatedPizza!.restaurants[0].toString()).toEqual(user.id.toString());
+});
+
+it('should publish an event', async () => {
+  const { cookie } = await global.signinAdmin();
+  const restaurant = await global.signin();
+
+  // Create 2 categories
+  const pizza = await request(app)
+    .post(`${API_ROOT_ENDPOINT}/restaurants/categories`)
+    .set('Cookie', cookie)
+    .send({ name: 'Pizza' })
+    .expect(201);
+  const pasta = await request(app)
+    .post(`${API_ROOT_ENDPOINT}/restaurants/categories`)
+    .set('Cookie', cookie)
+    .send({ name: 'Pasta' })
+    .expect(201);
+
+  // Update the restaurant and add categories
+  await request(app)
+    .put(`${API_ROOT_ENDPOINT}/restaurants/${restaurant.user.id}`)
+    .set('Cookie', cookie)
+    .send({
+      ...RESTAURANT_CREATE_VALID_PAYLOAD,
+      name: faker.company.companyName(),
+      categories: [
+        pasta.body.data.restaurant_categories.id,
+        pizza.body.data.restaurant_categories.id,
+      ],
+    })
+    .expect(200);
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
+  const eventsPublished = (natsWrapper.client.publish as jest.Mock).mock.calls;
+  // The last Event should be RestaurantUpdated
+  expect(eventsPublished[eventsPublished.length - 1][0]).toEqual(
+    Subjects.RestaurantUpdated,
+  );
 });

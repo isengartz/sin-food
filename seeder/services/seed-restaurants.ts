@@ -2,7 +2,7 @@ import axios from 'axios';
 import faker from 'faker';
 import { BASE_API_URL } from '../utils/const';
 
-const NUMBER_OF_RECORDS = 10;
+const NUMBER_OF_RECORDS = 20;
 
 export const seedRestaurants = async (
   categories: { id: string; name: string }[],
@@ -54,11 +54,34 @@ export const seedRestaurants = async (
         },
         {
           day: 3,
-          open: 800,
+          open: 0,
+          close: Math.floor(Math.random() * 1440),
+        },
+        {
+          day: 4,
+          open: 0,
+          close: Math.floor(Math.random() * 1440),
+        },
+        {
+          day: 5,
+          open: 0,
+          close: Math.floor(Math.random() * 1440),
+        },
+        {
+          day: 6,
+          open: 0,
+          close: Math.floor(Math.random() * 1440),
+        },
+        {
+          day: 0,
+          open: 0,
           close: Math.floor(Math.random() * 1440),
         },
       ],
-      holidays: [faker.date.soon(), faker.date.soon()],
+      holidays: [
+        new Date(faker.date.soon().setUTCHours(0, 0, 0, 0)),
+        new Date(faker.date.soon().setUTCHours(0, 0, 0, 0)),
+      ],
       categories: [
         categories[categoryOneIndex].id,
         categories[categoryTwoIndex].id,

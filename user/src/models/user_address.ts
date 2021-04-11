@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
+// eslint-disable-next-line import/no-cycle
 import { UserDoc } from './user';
 
 const PointSchema = new mongoose.Schema({

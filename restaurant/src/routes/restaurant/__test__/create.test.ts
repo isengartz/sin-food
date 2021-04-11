@@ -1,12 +1,13 @@
 import request from 'supertest';
 import faker from 'faker';
-import { UserRole } from '@sin-nombre/sinfood-common';
+import { Subjects, UserRole } from '@sin-nombre/sinfood-common';
 import { app } from '../../../app';
 import {
   API_ROOT_ENDPOINT,
   RESTAURANT_CREATE_VALID_PAYLOAD,
 } from '../../../utils/constants';
 import { RestaurantCategory } from '../../../models/restaurant-category';
+import { natsWrapper } from '../../../events/nats-wrapper';
 
 it('should return 400 when no required fields are set', async () => {
   await request(app)
@@ -114,10 +115,25 @@ it('should successfully save working_hours', async () => {
     .expect(201);
   expect(response.body.data.user.working_hours.length).toBeGreaterThan(0);
 });
+
 it('should successfully save holidays', async () => {
   const response = await request(app)
     .post(`${API_ROOT_ENDPOINT}/restaurants`)
     .send(RESTAURANT_CREATE_VALID_PAYLOAD)
     .expect(201);
   expect(response.body.data.user.holidays.length).toBeGreaterThan(0);
+});
+
+it('should emit an event', async () => {
+  await request(app)
+    .post(`${API_ROOT_ENDPOINT}/restaurants/`)
+    .send(RESTAURANT_CREATE_VALID_PAYLOAD)
+    .expect(201);
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
+  const eventsPublished = (natsWrapper.client.publish as jest.Mock).mock.calls;
+  // The last Event should be RestaurantUpdated
+  expect(eventsPublished[eventsPublished.length - 1][0]).toEqual(
+    Subjects.RestaurantCreated,
+  );
 });
