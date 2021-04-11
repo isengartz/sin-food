@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import {
   BadRequestError,
-  QueryModelHelper,
+  convertObjectKeyToArray,
   DateHelper,
 } from '@sin-nombre/sinfood-common';
 import { Restaurant } from '../models/restaurant';
@@ -22,8 +22,9 @@ export const filterRestaurants = async (
 
   // Check if lat & long are defined
   if (!longitude || !latitude) {
-    throw new BadRequestError('Latitude and Longitude are required');
+    throw new BadRequestError('Latitude / Longitude are required');
   }
+
   // Remove them from query string so the rest filters will be parsed by QueryModelHelper
   delete req.query.longitude;
   delete req.query.latitude;
@@ -32,41 +33,101 @@ export const filterRestaurants = async (
   const now = DateHelper.DayNowToHours();
   const today = DateHelper.TodayAsInt();
 
-  // Create the base query without resolving the Promise
-  const restaurantQuery = Restaurant.find({
-    working_hours: {
-      $elemMatch: {
-        day: today,
-        open: { $lte: now },
-        close: { $gte: now + 10 },
-      }, // have at least 10 min span
-    },
+  const baseMatchingQuery = {
     delivers_to: {
       $geoIntersects: {
         $geometry: {
           type: 'Point',
-          coordinates: [longitude, latitude],
+          // @ts-ignore
+          coordinates: [parseFloat(longitude), parseFloat(latitude)],
         },
       },
     },
-  });
+  };
 
-  // Filter the Query
-  // @ts-ignore
-  const queryHelper = new QueryModelHelper(restaurantQuery, req.query);
-  queryHelper.filter();
-  queryHelper.limitFields();
+  const queryObj = convertObjectKeyToArray(req.query, ['in', 'nin']);
 
-  const totalCount = await Restaurant.countDocuments(
-    // @ts-ignore
-    queryHelper.getTotalCount(),
+  const queryString = JSON.stringify(queryObj).replace(
+    /\b(gte|gt|lte|lt|in|nin)\b/g,
+    (match) => {
+      return `$${match}`;
+    },
   );
-  const restaurants = await queryHelper.getQuery();
+  const extraFilterQueries = JSON.parse(queryString);
+
+  // @todo: refactor this so it will support Timezone
+  const todayAsDate = new Date(new Date().setUTCHours(0, 0, 0, 0));
+
+  const restaurants = await Restaurant.aggregate([
+    {
+      $match: { ...baseMatchingQuery, ...extraFilterQueries },
+    },
+    {
+      $facet: {
+        open: [
+          {
+            $match: {
+              working_hours: {
+                $elemMatch: {
+                  day: today,
+                  open: { $lte: now },
+                  close: { $gte: now + 10 },
+                }, // have at least 10 min span
+              },
+              holidays: {
+                $nin: [todayAsDate],
+              },
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              minimum_order: 1,
+              logo: 1,
+            },
+          },
+        ],
+        closed: [
+          {
+            $match: {
+              $or: [
+                {
+                  working_hours: {
+                    $not: {
+                      $elemMatch: {
+                        day: today,
+                        open: { $lte: now },
+                        close: { $gte: now + 10 },
+                      }, // have at least 10 min span
+                    },
+                  },
+                },
+                {
+                  holidays: {
+                    $in: [todayAsDate],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              minimum_order: 1,
+              logo: 1,
+            },
+          },
+        ],
+      },
+    },
+  ]);
 
   res.status(200).json({
     status: 'success',
-    results: restaurants.length,
-    totalCount,
+    results: restaurants[0].open.length,
+    totalCount: restaurants[0].open.length + restaurants[0].closed.length,
     data: {
       restaurants,
     },

@@ -20,6 +20,10 @@ export class RestaurantUpdatedListener extends Listener<RestaurantUpdatedEvent> 
       holidays,
       delivers_to,
       version,
+      enabled,
+      minimum_order,
+      logo,
+      name,
     } = data;
 
     const restaurant = await Restaurant.findByEvent({
@@ -30,7 +34,16 @@ export class RestaurantUpdatedListener extends Listener<RestaurantUpdatedEvent> 
     if (!restaurant) {
       throw new Error('Restaurant Not found');
     }
-    restaurant.set({ working_hours, categories, holidays, delivers_to });
+    restaurant.set({
+      working_hours,
+      categories,
+      holidays,
+      delivers_to,
+      enabled,
+      minimum_order,
+      logo,
+      name,
+    });
     await restaurant.save();
 
     msg.ack();

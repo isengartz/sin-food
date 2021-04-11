@@ -13,13 +13,27 @@ export class RestaurantCreatedListener extends Listener<RestaurantCreatedEvent> 
   queueGroupName = queueGroupName;
 
   async onMessage(data: RestaurantCreatedEvent['data'], msg: Message) {
-    const { id, working_hours, categories, holidays, delivers_to } = data;
+    const {
+      id,
+      working_hours,
+      categories,
+      holidays,
+      delivers_to,
+      enabled,
+      minimum_order,
+      logo,
+      name,
+    } = data;
     const restaurant = Restaurant.build({
       id,
       working_hours,
       categories,
       holidays,
       delivers_to,
+      enabled,
+      minimum_order,
+      logo,
+      name,
     });
     await restaurant.save();
 

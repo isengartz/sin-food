@@ -5,6 +5,6 @@ import { filterRestaurants } from '../controllers/queryController';
 
 const Router = express.Router();
 
-Router.route('/restaurants').get(currentUser, requireAuth, filterRestaurants);
+Router.route('/restaurants').get(filterRestaurants);
 
 export { Router as routes };

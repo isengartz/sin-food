@@ -20,6 +20,7 @@ export interface RestaurantAttrs {
   name: string;
   description: string;
   full_address: string;
+  minimum_order: number;
   logo?: string;
   categories?: string[];
   location: {
@@ -45,6 +46,7 @@ export interface RestaurantDoc extends mongoose.Document {
   name: string;
   description: string;
   full_address: string;
+  minimum_order: number;
   logo: string | null;
   location: {
     type: string;
@@ -83,6 +85,11 @@ const restaurantSchema = new mongoose.Schema(
         message: 'Provide a valid Email',
       },
     },
+    minimum_order: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
     password: {
       type: String,
       required: [true, 'Password is required'],
@@ -105,7 +112,7 @@ const restaurantSchema = new mongoose.Schema(
     },
     enabled: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     location: {
       type: { type: String, enum: ['Point'], default: 'Point' },
@@ -206,6 +213,10 @@ restaurantSchema.post<RestaurantDoc>('save', async function (doc, next) {
       working_hours: doc.working_hours,
       holidays: doc.holidays,
       categories: doc.categories,
+      logo: doc.logo,
+      minimum_order: doc.minimum_order,
+      name: doc.name,
+      enabled: doc.enabled,
     });
   }
   next();
@@ -227,6 +238,10 @@ restaurantSchema.post<RestaurantDoc>('findOneAndUpdate', async function (doc) {
       working_hours: doc.working_hours,
       holidays: doc.holidays,
       categories: doc.categories,
+      logo: doc.logo,
+      minimum_order: doc.minimum_order,
+      name: doc.name,
+      enabled: doc.enabled,
     });
   }
 });

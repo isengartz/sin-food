@@ -7,18 +7,26 @@ import {
 
 interface RestaurantAttrs {
   id: string;
+  enabled: boolean;
   categories: string[];
   delivers_to: {
     type?: string;
     coordinates: number[][][];
   };
+  minimum_order: number;
+  logo: string | null;
+  name: string;
   working_hours: RestaurantWorkingHours[];
   holidays: Date[];
 }
 
 interface RestaurantDoc extends mongoose.Document {
   version: number;
+  enabled: boolean;
   categories: string[];
+  minimum_order: number;
+  logo: string | null;
+  name: string;
   delivers_to: {
     type?: string;
     coordinates: number[][][];
@@ -37,6 +45,20 @@ interface RestaurantModel extends mongoose.Model<RestaurantDoc> {
 
 const RestaurantSchema = new mongoose.Schema(
   {
+    name: {
+      type: String,
+    },
+    enabled: {
+      type: Boolean,
+    },
+    minimum_order: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
+    logo: {
+      type: String,
+    },
     delivers_to: {
       type: { type: String, enum: ['Polygon'], default: 'Polygon' },
       coordinates: {
@@ -78,8 +100,14 @@ RestaurantSchema.statics.build = (attrs: RestaurantAttrs) => {
   // We will get a record with both id and _id
   return new Restaurant({
     _id: attrs.id,
+    enabled: attrs.enabled,
     categories: attrs.categories,
     working_hours: attrs.working_hours,
+    delivers_to: attrs.delivers_to,
+    holidays: attrs.holidays,
+    logo: attrs.logo,
+    minimum_order: attrs.minimum_order,
+    name: attrs.name,
   });
 };
 const Restaurant = mongoose.model<RestaurantDoc, RestaurantModel>(

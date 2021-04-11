@@ -1,8 +1,6 @@
-import { RelationHelper } from '@sin-nombre/sinfood-common';
 import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
-import { restaurantCategoryRelationships } from '../utils/RestaurantCategoryRelations';
 import { Restaurant, RestaurantDoc } from './restaurant';
 import { RestaurantUpdatedPublisher } from '../events/publishers/restaurant-updated-publisher';
 import { natsWrapper } from '../events/nats-wrapper';
@@ -77,6 +75,10 @@ restaurantCategorySchema.post<RestaurantCategoryDoc>(
           working_hours: restaurant.working_hours,
           holidays: restaurant.holidays,
           categories: restaurant.categories,
+          logo: restaurant.logo,
+          minimum_order: restaurant.minimum_order,
+          name: restaurant.name,
+          enabled: restaurant.enabled,
         });
       });
     }
