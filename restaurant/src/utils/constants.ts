@@ -8,6 +8,7 @@ export const RESTAURANT_CREATE_VALID_PAYLOAD = {
   password: 'test12345',
   password_confirm: 'test12345',
   phone: '+306981234567',
+  minimum_order: 5,
   location: {
     coordinates: [22.9522107, 40.6095628],
   },

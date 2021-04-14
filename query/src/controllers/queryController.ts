@@ -54,13 +54,16 @@ export const filterRestaurants = async (
     },
   );
   const extraFilterQueries = JSON.parse(queryString);
+  console.log({ ...baseMatchingQuery, ...extraFilterQueries });
 
   // @todo: refactor this so it will support Timezone
   const todayAsDate = new Date(new Date().setUTCHours(0, 0, 0, 0));
 
   const restaurants = await Restaurant.aggregate([
     {
-      $match: { ...baseMatchingQuery, ...extraFilterQueries },
+      $match: {
+        $and: [{ ...baseMatchingQuery, ...extraFilterQueries }],
+      },
     },
     {
       $facet: {
@@ -81,7 +84,8 @@ export const filterRestaurants = async (
           },
           {
             $project: {
-              _id: 1,
+              _id: 0,
+              id: '$_id',
               name: 1,
               minimum_order: 1,
               logo: 1,
@@ -113,7 +117,8 @@ export const filterRestaurants = async (
           },
           {
             $project: {
-              _id: 1,
+              _id: 0,
+              id: '$_id',
               name: 1,
               minimum_order: 1,
               logo: 1,
@@ -129,7 +134,7 @@ export const filterRestaurants = async (
     results: restaurants[0].open.length,
     totalCount: restaurants[0].open.length + restaurants[0].closed.length,
     data: {
-      restaurants,
+      restaurants: restaurants[0],
     },
   });
 };

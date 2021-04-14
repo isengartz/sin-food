@@ -1,11 +1,16 @@
 import { RestaurantTypes } from '../action-types';
 import { ErrorType } from '../../util/types/ErrorType';
+import { RestaurantListItemInterface } from '../../util/interfaces/RestaurantListItemInterface';
 
 export type RestaurantAction =
   | GetRestaurantCategoriesStart
   | GetRestaurantCategoriesSuccess
   | GetRestaurantCategoriesError
-  | SetRestaurantSearchFilters;
+  | SetRestaurantSearchFilters
+  | SearchRestaurantsStart
+  | SearchRestaurantsSuccess
+  | SearchRestaurantsError
+  | ClearRestaurantErrors;
 
 interface GetRestaurantCategoriesStart {
   type: RestaurantTypes.GET_RESTAURANT_CATEGORIES_START;
@@ -29,4 +34,24 @@ export interface SetRestaurantSearchFilters {
     address: string;
     categories: string[];
   };
+}
+
+export interface SearchRestaurantsStart {
+  type: RestaurantTypes.SEARCH_RESTAURANTS_START;
+}
+
+export interface SearchRestaurantsSuccess {
+  type: RestaurantTypes.SEARCH_RESTAURANTS_SUCCESS;
+  payload: {
+    open: RestaurantListItemInterface[];
+    closed: RestaurantListItemInterface[];
+  };
+}
+export interface SearchRestaurantsError {
+  type: RestaurantTypes.SEARCH_RESTAURANTS_ERROR;
+  payload: ErrorType;
+}
+
+export interface ClearRestaurantErrors {
+  type: RestaurantTypes.CLEAR_RESTAURANT_ERROR;
 }

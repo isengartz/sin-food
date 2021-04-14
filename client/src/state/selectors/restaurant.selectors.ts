@@ -17,3 +17,13 @@ export const selectRestaurantSearchIsLoading = createSelector(
   selectRestaurants,
   (restaurants) => restaurants.loading,
 );
+
+export const selectRestaurantErrors = createSelector(
+  selectRestaurants,
+  (restaurants) => restaurants.errors,
+);
+
+export const selectOpenRestaurants = createSelector(
+  selectRestaurants,
+  (restaurants) => restaurants.restaurants.open,
+);
