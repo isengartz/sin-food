@@ -22,7 +22,9 @@ const initialState: UserState = {
   currentUser: localStorage.getItem('user')
     ? JSON.parse(localStorage.getItem('user') as string)
     : null,
-  addresses: [],
+  addresses: localStorage.getItem('userAddresses')
+    ? JSON.parse(localStorage.getItem('userAddresses') as string)
+    : [],
   selectedAddress: localStorage.getItem('selectedAddress')
     ? (localStorage.getItem('selectedAddress') as string)
     : '',

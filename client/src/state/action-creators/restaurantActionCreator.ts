@@ -1,8 +1,13 @@
 import { AppThunk } from '../../util/types/AppThunk';
 import { Dispatch } from 'redux';
-import { RestaurantAction, SetRestaurantSearchFilters } from '../actions';
+import {
+  ClearRestaurantErrors,
+  RestaurantAction,
+  SetRestaurantSearchFilters,
+} from '../actions';
 import { RestaurantTypes } from '../action-types';
 import axios from '../../apis/instances/restaurant';
+import axiosQueryService from '../../apis/instances/query';
 import { handleAxiosErrorMessage } from '../../util/handleAxiosErrorMessage';
 import { RestaurantSearchFilters } from '../../util/interfaces/RestaurantSearchFilters';
 
@@ -41,3 +46,29 @@ export const setRestaurantSearchFilters = (
   type: RestaurantTypes.SET_RESTAURANT_SEARCH_FILTERS,
   payload: filters,
 });
+
+export const clearRestaurantErrors = (): ClearRestaurantErrors => ({
+  type: RestaurantTypes.CLEAR_RESTAURANT_ERROR,
+});
+
+export const searchRestaurants = (filterString: string): AppThunk => {
+  return async (dispatch: Dispatch<RestaurantAction>) => {
+    dispatch({ type: RestaurantTypes.SEARCH_RESTAURANTS_START });
+    try {
+      const {
+        data: {
+          data: { restaurants },
+        },
+      } = await axiosQueryService.get(`/restaurants?${filterString}`);
+      dispatch({
+        type: RestaurantTypes.SEARCH_RESTAURANTS_SUCCESS,
+        payload: restaurants,
+      });
+    } catch (e) {
+      dispatch({
+        type: RestaurantTypes.SEARCH_RESTAURANTS_ERROR,
+        payload: handleAxiosErrorMessage(e),
+      });
+    }
+  };
+};

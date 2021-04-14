@@ -125,7 +125,7 @@ export const signOutUser = (): AppThunk => {
       dispatch({
         type: UserTypes.SIGN_OUT_USER_SUCCESS,
       });
-      localStorage.removeItem('user');
+      localStorage.clear();
     } catch (e) {
       dispatch({
         type: UserTypes.SIGN_OUT_USER_ERROR,
@@ -151,6 +151,7 @@ export const getCurrentUserAddresses = (userId: string): AppThunk => {
         type: UserTypes.GET_CURRENT_USER_ADDRESSES_SUCCESS,
         payload: addresses,
       });
+      localStorage.setItem('userAddresses', JSON.stringify(addresses));
     } catch (e) {
       dispatch({
         type: UserTypes.GET_CURRENT_USER_ADDRESSES_ERROR,
@@ -187,6 +188,21 @@ export const addUserAddress = (data: UserAddress): AppThunk => {
         type: UserTypes.ADD_USER_ADDRESS_SUCCESS,
         payload: address,
       });
+
+      // If there are no addresses set it
+      if (!localStorage.getItem('userAddresses')) {
+        localStorage.setItem('addresses', JSON.stringify([address]));
+      } else {
+        // else push it in the current array
+        const addresses = JSON.parse(
+          localStorage.getItem('userAddresses') as string,
+        );
+        localStorage.setItem(
+          'userAddresses',
+          JSON.stringify([...addresses, address]),
+        );
+      }
+
       // localStorage.setItem('addresses', JSON.stringify(addresses));
     } catch (e) {
       dispatch({

@@ -6,7 +6,7 @@ import { ALL_CATEGORIES_CHECKBOX_VALUE } from '../../../util/constants';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import { selectRestaurantCategories } from '../../../state';
 import { useHistory } from 'react-router-dom';
-import restaurant from '../../../apis/instances/restaurant';
+import { useUpdateEffect } from '../../../hooks/useUpdateEffect';
 
 /**
  * Returns a list with all Categories
@@ -18,12 +18,12 @@ const RestaurantCategoryList: React.FC = () => {
   const [categoriesSelected, setCategoriesSelected] = useState([
     ALL_CATEGORIES_CHECKBOX_VALUE,
   ]);
+
   const { getRestaurantCategories, setRestaurantSearchFilters } = useActions();
   const restaurantCategories = useTypedSelector(selectRestaurantCategories);
 
   // Fetch Categories if they are not already set
   useEffect(() => {
-    console.log(restaurantCategories);
     if (!restaurantCategories || restaurantCategories.length === 0) {
       getRestaurantCategories();
     }
@@ -52,7 +52,8 @@ const RestaurantCategoryList: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
+  // Run this only on dependency array change
+  useUpdateEffect(() => {
     if (categoriesSelected.includes(ALL_CATEGORIES_CHECKBOX_VALUE)) {
       queryParams.delete('categories');
     } else {
@@ -73,7 +74,7 @@ const RestaurantCategoryList: React.FC = () => {
     event,
   ) => {
     const target = event.target as HTMLInputElement;
-    // If someone clicks the All Categories
+    // If someone clicks the All Categories choice
     if (target.value === ALL_CATEGORIES_CHECKBOX_VALUE) {
       // If All categories is already selected do nothing
       if (categoriesSelected.includes(ALL_CATEGORIES_CHECKBOX_VALUE)) {
@@ -81,7 +82,23 @@ const RestaurantCategoryList: React.FC = () => {
       }
       setCategoriesSelected([ALL_CATEGORIES_CHECKBOX_VALUE]);
     } else {
-      // Add the new category and remove the All Categories choice
+      // If choice is already checked, uncheck it
+      if (categoriesSelected.includes(target.value)) {
+        const newCategories = [...categoriesSelected, target.value].filter(
+          (val) => val !== target.value,
+        );
+
+        // If we removed all filters, check the All Categories
+        if (newCategories.length === 0) {
+          newCategories.push(ALL_CATEGORIES_CHECKBOX_VALUE);
+        }
+
+        setCategoriesSelected(newCategories);
+        return;
+      }
+
+      // If we are adding a new category
+      // Add the new category and remove the All Categories choice ( if exists )
       const newCategories = [...categoriesSelected, target.value].filter(
         (val) => val !== ALL_CATEGORIES_CHECKBOX_VALUE,
       );
