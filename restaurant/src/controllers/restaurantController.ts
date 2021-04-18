@@ -282,3 +282,29 @@ export const deleteRestaurant = async (
     data: null,
   });
 };
+
+/**
+ * Find a Restaurant
+ * @param req
+ * @param res
+ * @param next
+ */
+export const getRestaurant = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!req.params.id) {
+    throw new BadRequestError('Id must be defined');
+  }
+  const restaurant = await Restaurant.findById(req.params.id);
+
+  if (!restaurant) {
+    throw new NotFoundError(`Restaurant with id ${req.params.id} not found`);
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: { restaurant },
+  });
+};

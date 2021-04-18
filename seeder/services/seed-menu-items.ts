@@ -30,11 +30,11 @@ export const seedMenuItems = async (
         const variations = shouldAddVariation
           ? [
               {
-                title: 'Normal',
+                name: 'Normal',
                 price: basePrice,
               },
               {
-                title: 'Big',
+                name: 'Big',
                 price: basePrice + 2,
               },
             ]
@@ -49,7 +49,7 @@ export const seedMenuItems = async (
           randomIdGenerator(restaurantsIngredients),
         ]);
 
-        const extra_ingredients_group = [
+        const extra_ingredient_groups = [
           {
             title: faker.commerce.productMaterial(),
             ingredients: _.uniq([
@@ -80,7 +80,7 @@ export const seedMenuItems = async (
           base_price: basePrice,
           variations,
           main_ingredients,
-          extra_ingredients_group,
+          extra_ingredient_groups,
         };
 
         const {

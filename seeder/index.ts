@@ -32,7 +32,7 @@ const seeder = async () => {
     const restaurantCategories = await seedRestaurantCategories(instance);
     console.log('restaurant-categories', restaurantCategories.length);
 
-    const restaurants = await seedRestaurants(restaurantCategories);
+    const restaurants = await seedRestaurants(restaurantCategories, true);
     console.log('restaurants', restaurants.length);
 
     const ingredientCategories = await seedIngredientCategories(

@@ -1,5 +1,10 @@
 import express from 'express';
-import { currentUser, restrictTo, UserRole } from '@sin-nombre/sinfood-common';
+import {
+  currentUser,
+  filterByReqParam,
+  restrictTo,
+  UserRole,
+} from '@sin-nombre/sinfood-common';
 import {
   createOneMenuItem,
   deleteOneMenuItem,
@@ -31,4 +36,10 @@ Router.route('/')
   )
   .get(findAllMenuItems);
 
+Router.route('/filter/:userId').get(
+  currentUser,
+  restrictTo([UserRole.Admin, UserRole.User]),
+  filterByReqParam('userId'),
+  findAllMenuItems,
+);
 export { Router as menuItemRoutes };

@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
+// eslint-disable-next-line import/no-cycle
 import { IngredientDoc } from './ingredient';
 import { natsWrapper } from '../events/nats-wrapper';
 import { MenuItemDeletedPublisher } from '../events/publishers/menu-item-deleted-publisher';
@@ -69,8 +70,8 @@ const menuItemSchema = new mongoose.Schema(
     },
     variations: [
       {
-        name: String,
-        price: Number,
+        name: { type: String },
+        price: { type: Number },
       },
     ],
     main_ingredients: [
