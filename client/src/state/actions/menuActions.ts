@@ -9,7 +9,8 @@ export type MenuAction =
   | GetMenuCategoriesError
   | GetMenuItemsStart
   | GetMenuItemsSuccess
-  | GetMenuItemsError;
+  | GetMenuItemsError
+  | SetSelectedMenuItem;
 
 interface GetMenuCategoriesStart {
   type: MenuTypes.GET_MENU_CATEGORIES_START;
@@ -36,4 +37,9 @@ interface GetMenuItemsSuccess {
 interface GetMenuItemsError {
   type: MenuTypes.GET_MENU_ITEMS_ERROR;
   payload: ErrorType;
+}
+
+export interface SetSelectedMenuItem {
+  type: MenuTypes.SET_SELECTED_MENU_ITEM;
+  payload: MenuItemInterface;
 }

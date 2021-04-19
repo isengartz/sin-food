@@ -13,6 +13,7 @@ import { Layout, Row } from 'antd';
 import Loader from '../components/layout/Loader/Loader';
 import RestaurantMenuCategoryList from '../components/menu/RestaurantMenuCategoryList/RestaurantMenuCategoryList';
 import RestaurantMenuList from '../components/menu/RestaurantMenuList/RestaurantMenuList';
+import MenuItemModal from '../components/forms/menu/MenuItemModal/MenuItemModal';
 
 const { Content } = Layout;
 const RestaurantPage: React.FC = () => {
@@ -41,6 +42,7 @@ const RestaurantPage: React.FC = () => {
         </Row>
       </Content>
       {loading && <Loader />}
+      <MenuItemModal />
     </Layout>
   );
 };

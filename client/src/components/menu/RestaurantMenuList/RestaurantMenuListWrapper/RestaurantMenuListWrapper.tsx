@@ -9,7 +9,7 @@ interface RestaurantMenuListWrapperProps {
   name: string;
   items: MenuItemInterface[];
 }
-console.log('inside wrapper');
+
 const { Title } = Typography;
 const RestaurantMenuListWrapper: React.FC<RestaurantMenuListWrapperProps> = ({
   id,

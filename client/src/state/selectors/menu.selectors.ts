@@ -30,3 +30,24 @@ export const selectMenuItemsSortedByCategory = createSelector(
     return itemsMap;
   },
 );
+
+export const selectSelectedMenuItem = createSelector(
+  selectMenu,
+  (menu) => menu.selectedItem,
+);
+
+export const selectedSelectedMenuItemIngredients = createSelector(
+  selectSelectedMenuItem,
+  (item) => {
+    const ingredientMap = new Map<string, number>();
+    if (!item || item.extra_ingredient_groups.length === 0) {
+      return ingredientMap;
+    }
+    for (let group of item.extra_ingredient_groups) {
+      for (let ingredient of group.ingredients) {
+        ingredientMap.set(ingredient.id, ingredient.defaultPrice);
+      }
+    }
+    return ingredientMap;
+  },
+);

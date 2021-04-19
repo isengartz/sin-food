@@ -39,7 +39,23 @@ export const seedMenuItems = async (
               },
             ]
           : [];
-        // const variations: never[] = [];
+
+        const extra_ingredients_group_1 = _.uniq([
+          randomIdGenerator(restaurantsIngredients),
+          randomIdGenerator(restaurantsIngredients),
+          randomIdGenerator(restaurantsIngredients),
+          randomIdGenerator(restaurantsIngredients),
+          randomIdGenerator(restaurantsIngredients),
+        ]);
+
+        // each group should contain unique ids
+        const extra_ingredients_group_2 = _.uniq([
+          randomIdGenerator(restaurantsIngredients),
+          randomIdGenerator(restaurantsIngredients),
+          randomIdGenerator(restaurantsIngredients),
+          randomIdGenerator(restaurantsIngredients),
+          randomIdGenerator(restaurantsIngredients),
+        ]).filter((id) => !extra_ingredients_group_1.includes(id));
 
         const main_ingredients = _.uniq([
           randomIdGenerator(restaurantsIngredients),
@@ -52,23 +68,11 @@ export const seedMenuItems = async (
         const extra_ingredient_groups = [
           {
             title: faker.commerce.productMaterial(),
-            ingredients: _.uniq([
-              randomIdGenerator(restaurantsIngredients),
-              randomIdGenerator(restaurantsIngredients),
-              randomIdGenerator(restaurantsIngredients),
-              randomIdGenerator(restaurantsIngredients),
-              randomIdGenerator(restaurantsIngredients),
-            ]),
+            ingredients: extra_ingredients_group_1,
           },
           {
             title: faker.commerce.productMaterial(),
-            ingredients: _.uniq([
-              randomIdGenerator(restaurantsIngredients),
-              randomIdGenerator(restaurantsIngredients),
-              randomIdGenerator(restaurantsIngredients),
-              randomIdGenerator(restaurantsIngredients),
-              randomIdGenerator(restaurantsIngredients),
-            ]),
+            ingredients: extra_ingredients_group_2,
           },
         ];
 

@@ -8,8 +8,8 @@ export const seedMenuItemCategories = async (
   const categories = ['Pizza', 'Pasta', 'Sweets'];
 
   const result = [];
-  // eslint-disable-next-line no-plusplus
-  for (let i = 0; i < categories.length; i++) {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const category of categories) {
     // eslint-disable-next-line no-restricted-syntax
     for (const restaurant of restaurants) {
       const {
@@ -18,7 +18,7 @@ export const seedMenuItemCategories = async (
         },
         // eslint-disable-next-line no-await-in-loop
       } = await instance.post(`${BASE_API_URL}/menu/categories/`, {
-        name: categories[i],
+        name: category,
         userId: restaurant.id,
       });
 

@@ -9,6 +9,7 @@ interface MenuState {
   items: MenuItemInterface[];
   loading: boolean;
   errors: ErrorType;
+  selectedItem: MenuItemInterface | null;
 }
 
 const initialState: MenuState = {
@@ -16,6 +17,7 @@ const initialState: MenuState = {
   items: [],
   loading: false,
   errors: [],
+  selectedItem: null,
 };
 
 const menuReducer = (state = initialState, action: MenuAction) => {
@@ -32,6 +34,8 @@ const menuReducer = (state = initialState, action: MenuAction) => {
       return { ...state, loading: false, items: action.payload };
     case MenuTypes.GET_MENU_ITEMS_ERROR:
       return { ...state, loading: false, errors: action.payload };
+    case MenuTypes.SET_SELECTED_MENU_ITEM:
+      return { ...state, selectedItem: action.payload };
     default:
       return state;
   }

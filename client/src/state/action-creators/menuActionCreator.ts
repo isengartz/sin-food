@@ -1,9 +1,10 @@
 import { AppThunk } from '../../util/types/AppThunk';
 import { Dispatch } from 'redux';
-import { MenuAction } from '../actions';
+import { MenuAction, SetSelectedMenuItem } from '../actions';
 import { MenuTypes } from '../action-types';
 import axiosMenuService from '../../apis/instances/menu';
 import { handleAxiosErrorMessage } from '../../util/handleAxiosErrorMessage';
+import { MenuItemInterface } from '../../util/interfaces/MenuItemInterface';
 
 /**
  * Fetch Menu Categories
@@ -57,5 +58,14 @@ export const getMenuItems = (restaurantId: string): AppThunk => {
         payload: handleAxiosErrorMessage(e),
       });
     }
+  };
+};
+
+export const setSelectedMenuItem = (
+  item: MenuItemInterface,
+): SetSelectedMenuItem => {
+  return {
+    type: MenuTypes.SET_SELECTED_MENU_ITEM,
+    payload: item,
   };
 };

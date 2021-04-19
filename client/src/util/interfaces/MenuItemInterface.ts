@@ -7,6 +7,7 @@ export interface IngredientInterface {
   name: string;
   category: string;
   defaultPrice: number;
+  id: string;
 }
 export interface ExtraGroupsInterfaces {
   title: string;
@@ -20,7 +21,7 @@ export interface MenuItemInterface {
   base_price: number;
   menu_category: string;
   variations: VariationInterface[];
-  main_ingredients: string[];
+  main_ingredients: IngredientInterface[];
   extra_ingredient_groups: ExtraGroupsInterfaces[];
   image?: string;
 }

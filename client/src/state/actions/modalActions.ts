@@ -4,7 +4,9 @@ export type ModalAction =
   | ShowUserLoginModalAction
   | CloseUserLoginModalAction
   | ShowUserAddressModalAction
-  | CloseUserAddressModalAction;
+  | CloseUserAddressModalAction
+  | ShowMenuItemModalAction
+  | CloseMenuItemModalAction;
 
 /**
  * User Login Modal Actions
@@ -24,4 +26,15 @@ export interface ShowUserAddressModalAction {
 }
 export interface CloseUserAddressModalAction {
   type: ModalTypes.CLOSE_USER_ADDRESS_MODAL;
+}
+
+/**
+ * Menu Item Modal Actions
+ */
+export interface ShowMenuItemModalAction {
+  type: ModalTypes.OPEN_MENU_ITEM_MODAL;
+}
+
+export interface CloseMenuItemModalAction {
+  type: ModalTypes.CLOSE_MENU_ITEM_MODAL;
 }

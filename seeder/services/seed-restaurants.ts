@@ -93,6 +93,7 @@ export const seedRestaurants = async (
         categories[categoryOneIndex].id,
         categories[categoryTwoIndex].id,
       ],
+      minimum_order: Math.floor(Math.random() * 5),
     };
 
     const {

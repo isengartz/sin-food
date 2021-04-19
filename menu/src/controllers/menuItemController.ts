@@ -16,6 +16,7 @@ export const findAllMenuItems = findAll<MenuItemDoc, MenuItemModel>(MenuItem, [
     path: 'variations',
   },
   { path: 'main_ingredients' },
+  { path: 'extra_ingredient_groups.ingredients' },
 ]);
 
 /**

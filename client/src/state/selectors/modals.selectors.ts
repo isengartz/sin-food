@@ -12,3 +12,8 @@ export const selectUserAddressModal = createSelector(
   selectModals,
   (modals) => modals.userAddressModal,
 );
+
+export const selectMenuItemModal = createSelector(
+  selectModals,
+  (modals) => modals.menuItemModal,
+);

@@ -2,6 +2,9 @@ import React from 'react';
 import { Divider, Space, Typography } from 'antd';
 import { VariationInterface } from '../../../../util/interfaces/MenuItemInterface';
 import { formatMoney } from '../../../../util/formatMoney';
+import { useActions } from '../../../../hooks/useActions';
+import { useTypedSelector } from '../../../../hooks/useTypedSelector';
+import { selectMenuItems } from '../../../../state';
 
 interface RestaurantMenuListItemProps {
   id: string;
@@ -18,6 +21,8 @@ const RestaurantMenuListItem: React.FC<RestaurantMenuListItemProps> = ({
   variations,
   basePrice,
 }) => {
+  const { setSelectedMenuItem, showMenuItemModal } = useActions();
+  const menuItems = useTypedSelector(selectMenuItems);
   // if we have variations find the lowest price from variations
   // Else just use the basePrice
   const itemPrice =
@@ -29,7 +34,14 @@ const RestaurantMenuListItem: React.FC<RestaurantMenuListItemProps> = ({
   const itemPrefix = variations && variations.length > 0 ? 'From ' : '';
 
   const onItemClick = (id: string) => {
-    console.log(id);
+    const found = menuItems.find((item) => item.id === id);
+    if (found) {
+      setSelectedMenuItem(found);
+      showMenuItemModal();
+    } else {
+      // @todo: add a set_menu_error action and dispatch that instead xD
+      alert('Something went really wrong mate xD');
+    }
   };
 
   return (
