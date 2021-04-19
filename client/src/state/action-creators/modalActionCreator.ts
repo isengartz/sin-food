@@ -1,6 +1,8 @@
 import {
+  CloseMenuItemModalAction,
   CloseUserAddressModalAction,
   CloseUserLoginModalAction,
+  ShowMenuItemModalAction,
   ShowUserAddressModalAction,
   ShowUserLoginModalAction,
 } from '../actions';
@@ -26,5 +28,17 @@ export const showUserAddressModal = (): ShowUserAddressModalAction => {
 export const closeUserAddressModal = (): CloseUserAddressModalAction => {
   return {
     type: ModalTypes.CLOSE_USER_ADDRESS_MODAL,
+  };
+};
+
+export const showMenuItemModal = (): ShowMenuItemModalAction => {
+  return {
+    type: ModalTypes.OPEN_MENU_ITEM_MODAL,
+  };
+};
+
+export const closeMenuItemModal = (): CloseMenuItemModalAction => {
+  return {
+    type: ModalTypes.CLOSE_MENU_ITEM_MODAL,
   };
 };

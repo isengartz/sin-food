@@ -7,4 +7,7 @@ export enum RestaurantTypes {
   SEARCH_RESTAURANTS_SUCCESS = 'restaurants/search_restaurants_success',
   SEARCH_RESTAURANTS_ERROR = 'restaurants/search_restaurants_error',
   CLEAR_RESTAURANT_ERROR = 'restaurants/clear_restaurant_error',
+  GET_RESTAURANT_START = 'restaurants/get_restaurant_start',
+  GET_RESTAURANT_SUCCESS = 'restaurants/get_restaurant_success',
+  GET_RESTAURANT_ERROR = 'restaurants/get_restaurant_error',
 }

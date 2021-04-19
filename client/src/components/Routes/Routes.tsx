@@ -8,6 +8,7 @@ import UnAuthRoute from './UnAuthRoute/UnAuthRoute';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
 import { selectCurrentUser } from '../../state';
 import AuthRoute from './AuthRoute/AuthRoute';
+import RestaurantPage from '../../pages/restaurant-page';
 
 /**
  * Application Routes
@@ -22,6 +23,9 @@ const Routes: React.FC = () => {
       </Route>
       <AuthRoute redirectTo="/" isLogged={!!user} exact path="/search-stores">
         <SearchStores />
+      </AuthRoute>
+      <AuthRoute redirectTo="/" isLogged={!!user} exact path="/restaurant/:id">
+        <RestaurantPage />
       </AuthRoute>
       <UnAuthRoute redirectTo="/" isLogged={!!user} exact path="/register">
         <RegisterUserPage />

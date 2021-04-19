@@ -10,6 +10,7 @@ declare global {
     interface Global {
       signin(): string[];
       signinAdmin(): string[];
+      signinUser(): string[];
     }
   }
 }
@@ -58,6 +59,17 @@ global.signin = () => {
     id: new mongoose.Types.ObjectId().toHexString(),
     email: 'test@test.com',
     role: UserRole.Restaurant,
+  };
+  return buildPayload(payload);
+};
+
+global.signinUser = () => {
+  // So we can use it more than one to generate random users
+  // Build a JWT payload.  { id, email }
+  const payload = {
+    id: new mongoose.Types.ObjectId().toHexString(),
+    email: 'test@test.com',
+    role: UserRole.User,
   };
   return buildPayload(payload);
 };

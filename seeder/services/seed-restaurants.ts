@@ -4,10 +4,17 @@ import { BASE_API_URL } from '../utils/const';
 
 const NUMBER_OF_RECORDS = 20;
 
+/**
+ *
+ * @param categories
+ * @param alwaysOpen
+ */
 export const seedRestaurants = async (
   categories: { id: string; name: string }[],
+  alwaysOpen = false,
 ) => {
   const result = [];
+
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < NUMBER_OF_RECORDS; i++) {
     const categoryOneIndex = Math.floor(Math.random() * categories.length);
@@ -45,37 +52,37 @@ export const seedRestaurants = async (
         {
           day: 1,
           open: 0,
-          close: Math.floor(Math.random() * 1440),
+          close: alwaysOpen ? 1440 : Math.floor(Math.random() * 1440),
         },
         {
           day: 2,
           open: 0,
-          close: Math.floor(Math.random() * 1440),
+          close: alwaysOpen ? 1440 : Math.floor(Math.random() * 1440),
         },
         {
           day: 3,
           open: 0,
-          close: Math.floor(Math.random() * 1440),
+          close: alwaysOpen ? 1440 : Math.floor(Math.random() * 1440),
         },
         {
           day: 4,
           open: 0,
-          close: Math.floor(Math.random() * 1440),
+          close: alwaysOpen ? 1440 : Math.floor(Math.random() * 1440),
         },
         {
           day: 5,
           open: 0,
-          close: Math.floor(Math.random() * 1440),
+          close: alwaysOpen ? 1440 : Math.floor(Math.random() * 1440),
         },
         {
           day: 6,
           open: 0,
-          close: Math.floor(Math.random() * 1440),
+          close: alwaysOpen ? 1440 : Math.floor(Math.random() * 1440),
         },
         {
           day: 0,
           open: 0,
-          close: Math.floor(Math.random() * 1440),
+          close: alwaysOpen ? 1440 : Math.floor(Math.random() * 1440),
         },
       ],
       holidays: [
@@ -86,6 +93,7 @@ export const seedRestaurants = async (
         categories[categoryOneIndex].id,
         categories[categoryTwoIndex].id,
       ],
+      minimum_order: Math.floor(Math.random() * 5),
     };
 
     const {

@@ -1,9 +1,15 @@
 import express from 'express';
-import { currentUser, restrictTo, UserRole } from '@sin-nombre/sinfood-common';
+import {
+  currentUser,
+  restrictTo,
+  UserRole,
+  filterByReqParam,
+} from '@sin-nombre/sinfood-common';
 import {
   createOneCategory,
   deleteOneCategory,
   findAllCategories,
+  findAllCategoriesFromUser,
   findOneCategory,
   updateOneCategory,
 } from '../controllers/menuItemCategoryController';
@@ -38,5 +44,12 @@ Router.route('/')
     restrictTo([UserRole.Restaurant, UserRole.Admin]),
     findAllCategories,
   );
+
+Router.route('/filter/:userId').get(
+  currentUser,
+  restrictTo([UserRole.Admin, UserRole.User]),
+  filterByReqParam('userId'),
+  findAllCategoriesFromUser,
+);
 
 export { Router as menuItemCategoriesRoutes };

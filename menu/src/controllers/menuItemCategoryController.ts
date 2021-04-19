@@ -20,6 +20,11 @@ export const findAllCategories = findAll<
   MenuItemCategoryModel
 >(MenuItemCategory, {}, 'userId');
 
+export const findAllCategoriesFromUser = findAll<
+  MenuItemCategoryDoc,
+  MenuItemCategoryModel
+>(MenuItemCategory, {});
+
 /**
  * Returns an MenuItem category
  */

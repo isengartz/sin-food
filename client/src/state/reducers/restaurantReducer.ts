@@ -3,6 +3,7 @@ import { RestaurantTypes } from '../action-types';
 import { ErrorType } from '../../util/types/ErrorType';
 import { RestaurantSearchFilters } from '../../util/interfaces/RestaurantSearchFilters';
 import { RestaurantListItemInterface } from '../../util/interfaces/RestaurantListItemInterface';
+import { RestaurantInterface } from '../../util/interfaces/RestaurantInterface';
 
 interface RestaurantState {
   loading: boolean;
@@ -12,6 +13,7 @@ interface RestaurantState {
     open: RestaurantListItemInterface[];
     closed: RestaurantListItemInterface[];
   };
+  selectedRestaurant: RestaurantInterface | null;
   categories: {
     id: string;
     name: string;
@@ -32,6 +34,7 @@ const initialState: RestaurantState = {
     open: [],
     closed: [],
   },
+  selectedRestaurant: null,
 };
 
 const reducer = (state = initialState, action: RestaurantAction) => {
@@ -52,6 +55,12 @@ const reducer = (state = initialState, action: RestaurantAction) => {
       return { ...state, loading: false, errors: action.payload };
     case RestaurantTypes.CLEAR_RESTAURANT_ERROR:
       return { ...state, errors: [] };
+    case RestaurantTypes.GET_RESTAURANT_START:
+      return { ...state, loading: true, errors: [] };
+    case RestaurantTypes.GET_RESTAURANT_SUCCESS:
+      return { ...state, loading: false, selectedRestaurant: action.payload };
+    case RestaurantTypes.GET_RESTAURANT_ERROR:
+      return { ...state, loading: false, errors: action.payload };
     default:
       return state;
   }

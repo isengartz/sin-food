@@ -13,6 +13,7 @@ import {
   signinRestaurant,
   deleteRestaurant,
   filterRestaurants,
+  getRestaurant,
 } from '../controllers/restaurantController';
 import { seedRestaurants } from '../utils/seeder';
 
@@ -36,5 +37,11 @@ router
     requireAuth,
     restrictTo([UserRole.Admin]),
     deleteRestaurant,
+  )
+  .get(
+    currentUser,
+    requireAuth,
+    restrictTo([UserRole.Admin, UserRole.User]),
+    getRestaurant,
   );
 export { router as restaurantRoutes };

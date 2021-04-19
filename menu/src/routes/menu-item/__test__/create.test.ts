@@ -174,6 +174,7 @@ it('should return a full valid payload', async () => {
     ingredientBacon.body.data.ingredients.id,
   );
   expect(variations[0].name).toEqual('Small Size');
+  expect(variations[1].name).toEqual('Big Size');
 
   expect(natsWrapper.client.publish).toHaveBeenCalled();
   const eventsPublished = (natsWrapper.client.publish as jest.Mock).mock.calls;

@@ -5,10 +5,15 @@ const initialState = {
   categories: [],
   loading: false,
   errors: [],
+  restaurants: {
+    closed: [],
+    open: [],
+  },
   searchFilters: {
     categories: [],
     address: '',
   },
+  selectedRestaurant: null,
 };
 
 describe('Tests the Restaurant Reducer', () => {

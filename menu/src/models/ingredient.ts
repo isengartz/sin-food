@@ -4,6 +4,8 @@ import { IngredientDeletedPublisher } from '../events/publishers/ingredient-dele
 import { natsWrapper } from '../events/nats-wrapper';
 import { IngredientUpdatedPublisher } from '../events/publishers/ingredient-updated-publisher';
 import { IngredientCreatedPublisher } from '../events/publishers/ingredient-created-publisher';
+// eslint-disable-next-line import/no-cycle
+import { MenuItemDoc } from './menu-item';
 
 export interface IngredientAttrs {
   userId: string;
@@ -92,7 +94,6 @@ ingredientSchema.post<IngredientDoc>('save', async function (doc, next) {
   next();
 });
 
-
 // Publish an Event on delete
 ingredientSchema.post<IngredientDoc>('remove', async function (doc, next) {
   new IngredientDeletedPublisher(natsWrapper.client).publish({
@@ -106,7 +107,7 @@ ingredientSchema.post<IngredientDoc>('remove', async function (doc, next) {
 
 // Remove the ingredient from main_ingredients
 ingredientSchema.post<IngredientDoc>('remove', async function (doc, next) {
-  const menuItemModel = mongoose.model('Menu_Item');
+  const menuItemModel = mongoose.model<MenuItemDoc>('Menu_Item');
   await menuItemModel.updateMany(
     { main_ingredients: { $in: doc._id } },
     {
@@ -120,11 +121,12 @@ ingredientSchema.post<IngredientDoc>('remove', async function (doc, next) {
 
 // Remove the ingredient from extra_ingredient_groups
 ingredientSchema.post<IngredientDoc>('remove', async function (doc, next) {
-  const menuItemModel = mongoose.model('Menu_Item');
+  const menuItemModel = mongoose.model<MenuItemDoc>('Menu_Item');
   await menuItemModel.updateMany(
     { 'extra_ingredient_groups.ingredients': { $in: doc._id } },
     {
       $pull: {
+        // @ts-ignore
         'extra_ingredient_groups.$[].ingredients': doc._id,
       },
     },

@@ -11,10 +11,13 @@ import { MenuItem, MenuItemDoc, MenuItemModel } from '../models/menu-item';
 /**
  * Returns all MenuItems
  */
-export const findAllMenuItems = findAll<MenuItemDoc, MenuItemModel>(
-  MenuItem,
-  {},
-);
+export const findAllMenuItems = findAll<MenuItemDoc, MenuItemModel>(MenuItem, [
+  {
+    path: 'variations',
+  },
+  { path: 'main_ingredients' },
+  { path: 'extra_ingredient_groups.ingredients' },
+]);
 
 /**
  * Returns a MenuItem

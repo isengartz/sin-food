@@ -6,7 +6,7 @@ import {
   SetRestaurantSearchFilters,
 } from '../actions';
 import { RestaurantTypes } from '../action-types';
-import axios from '../../apis/instances/restaurant';
+import axiosRestaurantService from '../../apis/instances/restaurant';
 import axiosQueryService from '../../apis/instances/query';
 import { handleAxiosErrorMessage } from '../../util/handleAxiosErrorMessage';
 import { RestaurantSearchFilters } from '../../util/interfaces/RestaurantSearchFilters';
@@ -22,7 +22,7 @@ export const getRestaurantCategories = (): AppThunk => {
         data: {
           data: { restaurant_categories },
         },
-      } = await axios.get('/categories');
+      } = await axiosRestaurantService.get('/categories');
       dispatch({
         type: RestaurantTypes.GET_RESTAURANT_CATEGORIES_SUCCESS,
         payload: restaurant_categories,
@@ -40,6 +40,10 @@ export const getRestaurantCategories = (): AppThunk => {
   };
 };
 
+/**
+ * Set up Search Filters
+ * @param filters
+ */
 export const setRestaurantSearchFilters = (
   filters: RestaurantSearchFilters,
 ): SetRestaurantSearchFilters => ({
@@ -47,10 +51,17 @@ export const setRestaurantSearchFilters = (
   payload: filters,
 });
 
+/**
+ * Clear Restaurant Errors
+ */
 export const clearRestaurantErrors = (): ClearRestaurantErrors => ({
   type: RestaurantTypes.CLEAR_RESTAURANT_ERROR,
 });
 
+/**
+ * Fetches Restaurants based on filters
+ * @param filterString
+ */
 export const searchRestaurants = (filterString: string): AppThunk => {
   return async (dispatch: Dispatch<RestaurantAction>) => {
     dispatch({ type: RestaurantTypes.SEARCH_RESTAURANTS_START });
@@ -67,6 +78,32 @@ export const searchRestaurants = (filterString: string): AppThunk => {
     } catch (e) {
       dispatch({
         type: RestaurantTypes.SEARCH_RESTAURANTS_ERROR,
+        payload: handleAxiosErrorMessage(e),
+      });
+    }
+  };
+};
+
+/**
+ * Get the information of a restaurant
+ * @param id
+ */
+export const getRestaurant = (id: string): AppThunk => {
+  return async (dispatch: Dispatch<RestaurantAction>) => {
+    dispatch({ type: RestaurantTypes.GET_RESTAURANT_START });
+    try {
+      const {
+        data: {
+          data: { restaurant },
+        },
+      } = await axiosRestaurantService.get(`/${id}`);
+      dispatch({
+        type: RestaurantTypes.GET_RESTAURANT_SUCCESS,
+        payload: restaurant,
+      });
+    } catch (e) {
+      dispatch({
+        type: RestaurantTypes.GET_RESTAURANT_ERROR,
         payload: handleAxiosErrorMessage(e),
       });
     }

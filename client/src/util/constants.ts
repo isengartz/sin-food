@@ -1,4 +1,5 @@
 export const API_USER_SERVICE_BASE_URL = '/api/v1/users';
+export const API_MENU_SERVICE_BASE_URL = '/api/v1/menu';
 export const API_RESTAURANT_SERVICE_BASE_URL = '/api/v1/restaurants';
 export const API_QUERY_SERVICE_BASE_URL = '/api/v1/query';
 

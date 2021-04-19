@@ -1,6 +1,7 @@
 import { RestaurantTypes } from '../action-types';
 import { ErrorType } from '../../util/types/ErrorType';
 import { RestaurantListItemInterface } from '../../util/interfaces/RestaurantListItemInterface';
+import { RestaurantInterface } from '../../util/interfaces/RestaurantInterface';
 
 export type RestaurantAction =
   | GetRestaurantCategoriesStart
@@ -10,7 +11,10 @@ export type RestaurantAction =
   | SearchRestaurantsStart
   | SearchRestaurantsSuccess
   | SearchRestaurantsError
-  | ClearRestaurantErrors;
+  | ClearRestaurantErrors
+  | GetRestaurantStart
+  | GetRestaurantSuccess
+  | GetRestaurantError;
 
 interface GetRestaurantCategoriesStart {
   type: RestaurantTypes.GET_RESTAURANT_CATEGORIES_START;
@@ -54,4 +58,18 @@ export interface SearchRestaurantsError {
 
 export interface ClearRestaurantErrors {
   type: RestaurantTypes.CLEAR_RESTAURANT_ERROR;
+}
+
+export interface GetRestaurantStart {
+  type: RestaurantTypes.GET_RESTAURANT_START;
+}
+
+export interface GetRestaurantSuccess {
+  type: RestaurantTypes.GET_RESTAURANT_SUCCESS;
+  payload: RestaurantInterface;
+}
+
+export interface GetRestaurantError {
+  type: RestaurantTypes.GET_RESTAURANT_ERROR;
+  payload: ErrorType;
 }
