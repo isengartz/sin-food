@@ -19,7 +19,7 @@ const RestaurantMenuCategoryList = () => {
   }, [selectedRestaurant, getMenuCategories]);
 
   return (
-    <Col span={4}>
+    <Col style={{ marginTop: '20px' }} span={6}>
       <Anchor offsetTop={20}>
         <Title style={{ textAlign: 'center' }} level={5}>
           Categories

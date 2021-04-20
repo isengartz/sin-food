@@ -12,6 +12,7 @@ interface OrderedMenuItemsOptions {
   extra_ingredients: string[];
   quantity: number;
   variation?: string;
+  comments?: string;
 }
 
 export interface OrderAttrs {
@@ -85,6 +86,7 @@ const orderSchema = new mongoose.Schema(
           ],
           quantity: Number,
           variation: String,
+          comments: String,
         },
       },
     ],

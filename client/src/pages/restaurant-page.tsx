@@ -14,6 +14,7 @@ import Loader from '../components/layout/Loader/Loader';
 import RestaurantMenuCategoryList from '../components/menu/RestaurantMenuCategoryList/RestaurantMenuCategoryList';
 import RestaurantMenuList from '../components/menu/RestaurantMenuList/RestaurantMenuList';
 import MenuItemModal from '../components/forms/menu/MenuItemModal/MenuItemModal';
+import Cart from '../components/store/Cart/Cart';
 
 const { Content } = Layout;
 const RestaurantPage: React.FC = () => {
@@ -39,6 +40,7 @@ const RestaurantPage: React.FC = () => {
         <Row gutter={[16, 16]}>
           <RestaurantMenuCategoryList />
           <RestaurantMenuList />
+          <Cart />
         </Row>
       </Content>
       {loading && <Loader />}

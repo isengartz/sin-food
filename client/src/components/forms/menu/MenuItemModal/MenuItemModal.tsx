@@ -1,33 +1,45 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { FormEventHandler, useEffect, useState } from 'react';
+import { useActions } from '../../../../hooks/useActions';
+import { useTypedSelector } from '../../../../hooks/useTypedSelector';
+import {
+  selectedSelectedMenuItemIngredients,
+  selectedSelectedMenuItemIngredientsNames,
+  selectMenuItemModal,
+  selectSelectedMenuItem,
+  selectSelectedRestaurant,
+} from '../../../../state';
+import { formatMoney } from '../../../../util/formatMoney';
+import MenuItemFormVariations from './sub-elements/MenuItemFormVariations';
+import { CartItemInterface } from '../../../../util/interfaces/CartItemInterface';
+import MenuItemFormIngredients from './sub-elements/MenuItemFormIngredients';
 import {
   Button,
   Col,
+  Divider,
   Form,
+  Input,
   InputNumber,
   Modal,
   Row,
   Space,
   Typography,
 } from 'antd';
-import { useActions } from '../../../../hooks/useActions';
-import { useTypedSelector } from '../../../../hooks/useTypedSelector';
-import {
-  selectedSelectedMenuItemIngredients,
-  selectMenuItemModal,
-  selectSelectedMenuItem,
-} from '../../../../state';
-import { formatMoney } from '../../../../util/formatMoney';
-import MenuItemFormVariations from './sub-elements/MenuItemFormVariations';
-import { CartItemInterface } from '../../../../util/interfaces/CartItemInterface';
-import MenuItemFormIngredients from './sub-elements/MenuItemFormIngredients';
 
+/**
+ * Modal that handles adding a new item in cart
+ * @constructor
+ */
 const MenuItemModal: React.FC = () => {
-  const { closeMenuItemModal } = useActions();
+  const { closeMenuItemModal, addItemToCart } = useActions();
+  const selectedRestaurant = useTypedSelector(selectSelectedRestaurant);
   const isVisible = useTypedSelector(selectMenuItemModal);
   const selectedItem = useTypedSelector(selectSelectedMenuItem);
   const ingredientPrices = useTypedSelector(
     selectedSelectedMenuItemIngredients,
+  );
+  const ingredientNames = useTypedSelector(
+    selectedSelectedMenuItemIngredientsNames,
   );
   const [formRef] = Form.useForm();
   const [itemPrice, setItemPrice] = useState<number>(0);
@@ -40,6 +52,10 @@ const MenuItemModal: React.FC = () => {
       extra_ingredients: [],
       quantity: 1,
       variation: '',
+      comments: '',
+      price: 0,
+      name: '',
+      description: '',
     },
   };
   const [orderItem, setOrderItem] = useState<CartItemInterface>(initialState);
@@ -47,15 +63,44 @@ const MenuItemModal: React.FC = () => {
   const visible = isVisible && selectedItem !== null;
 
   const calculateCurrentPrice = () => {
+    // itemBasePrice = variation price or base price if item doesnt have a variation
+    // itemPrice = price from extra ingredients
     return (itemBasePrice + itemPrice) * orderItem.item_options.quantity;
   };
 
-  // Initialize the State
+  const generateItemDescription = () => {
+    let baseDescription = orderItem.item_options.variation
+      ? `${orderItem.item_options.variation} `
+      : '';
+    const baseIngredients =
+      selectedItem?.main_ingredients
+        .flatMap((ingr) => ingr.id)
+        .filter(
+          (ingr) => !orderItem.item_options.excluded_ingredients.includes(ingr),
+        ) || [];
+    const allIngredients = Array.from(
+      new Set([
+        ...baseIngredients,
+        ...orderItem.item_options.extra_ingredients,
+      ]),
+    );
+
+    const description = allIngredients
+      .map((ingr) => ingredientNames.get(ingr) || '')
+      .join(', ');
+
+    return baseDescription + description;
+  };
+
+  // Initialize the State. Runs only when selectedItem changes
   useEffect(() => {
     if (!selectedItem) return;
 
-    setOrderItem(initialState);
-    console.log(selectedItem);
+    setOrderItem({
+      ...initialState,
+      item_options: { ...initialState.item_options, name: selectedItem.name },
+    });
+
     // Add the Base price based on variation or item basePrice
     if (selectedItem.variations && selectedItem.variations.length > 0) {
       setItemBasePrice(selectedItem.variations[0].price);
@@ -76,6 +121,7 @@ const MenuItemModal: React.FC = () => {
   }, [selectedItem]);
 
   // Updates the itemPrice based on Ingredients Value
+  // Triggers only when extra_ingredients state changes
   useEffect(() => {
     const newPrice = orderItem.item_options.extra_ingredients.reduce(
       (acc, current) => {
@@ -87,12 +133,53 @@ const MenuItemModal: React.FC = () => {
     setItemPrice(newPrice);
   }, [orderItem.item_options.extra_ingredients]);
 
-  const onSubmit = (values: any) => {
-    console.log(values);
+  // Update items Description
+  // Triggers when extra/excluded ingredients and variation changes
+  useEffect(() => {
+    const description = generateItemDescription();
+
+    setOrderItem((prevState) => ({
+      ...prevState,
+      item_options: { ...prevState.item_options, description },
+    }));
+  }, [
+    orderItem.item_options.extra_ingredients,
+    orderItem.item_options.excluded_ingredients,
+    orderItem.item_options.variation,
+  ]);
+
+  // Handles Form Submission
+  const onSubmit = () => {
+    // Calculate the final price and add it to cart item
+    // We gonna recalculate the final price before order completion through API
+    // So we dont care for user manipulation here. It just makes our life easier.
+
+    const finalPrice = calculateCurrentPrice();
+    addItemToCart(
+      {
+        ...orderItem,
+        item_options: { ...orderItem.item_options, price: finalPrice },
+      },
+      selectedRestaurant!.id,
+    );
+    closeMenuItemModal();
   };
 
+  // Event Handler when any input of form changes
   const onFormChange: FormEventHandler<HTMLFormElement> = (event) => {
     const target = event.target as HTMLInputElement;
+
+    if (target.name === 'comments') {
+      setOrderItem((prevState) => ({
+        ...prevState,
+        item_options: {
+          ...prevState.item_options,
+          comments: target.value,
+        },
+      }));
+      return;
+    }
+    // For the next 2 I could possibly forward the formRef into child components and manually add the values to form
 
     if (target.name === 'excluded_ingredients') {
       handleMainIngredientChange(target.value);
@@ -204,6 +291,7 @@ const MenuItemModal: React.FC = () => {
       <Form
         style={{ margin: '20px' }}
         form={formRef}
+        layout="vertical"
         name="menu_item_form"
         onFinish={onSubmit}
         onChange={onFormChange}
@@ -225,10 +313,11 @@ const MenuItemModal: React.FC = () => {
                     {selectedItem.description}
                   </Typography.Text>
                 )}
-                <Typography.Paragraph>
+                <Typography.Text strong>
                   {formatMoney(calculateCurrentPrice())}
-                </Typography.Paragraph>
+                </Typography.Text>
               </Space>
+              <Divider />
             </Col>
             <Space direction="vertical">
               {selectedItem.variations &&
@@ -271,6 +360,16 @@ const MenuItemModal: React.FC = () => {
                     items={group.ingredients}
                   />
                 ))}
+
+              <Col span={24}>
+                <Form.Item label="Comments">
+                  <Input.TextArea
+                    name="comments"
+                    rows={4}
+                    placeholder="Any special instructions goes here..."
+                  />
+                </Form.Item>
+              </Col>
             </Space>
           </Row>
         )}

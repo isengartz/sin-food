@@ -3,3 +3,4 @@ export * from './modals.selectors';
 export * from './util.selector';
 export * from './restaurant.selectors';
 export * from './menu.selectors';
+export * from './order.selector';
