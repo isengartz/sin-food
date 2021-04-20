@@ -51,3 +51,22 @@ export const selectedSelectedMenuItemIngredients = createSelector(
     return ingredientMap;
   },
 );
+
+export const selectedSelectedMenuItemIngredientsNames = createSelector(
+  selectSelectedMenuItem,
+  (item) => {
+    const ingredientMap = new Map<string, string>();
+    if (!item) {
+      return ingredientMap;
+    }
+    for (let group of item.extra_ingredient_groups) {
+      for (let ingredient of group.ingredients) {
+        ingredientMap.set(ingredient.id, ingredient.name);
+      }
+    }
+    for (let ingredient of item.main_ingredients) {
+      ingredientMap.set(ingredient.id, ingredient.name);
+    }
+    return ingredientMap;
+  },
+);

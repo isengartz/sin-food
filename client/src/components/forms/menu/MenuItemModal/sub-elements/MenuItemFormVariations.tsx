@@ -36,7 +36,7 @@ const MenuItemFormVariations: React.FC<MenuItemFormVariationsProps> = ({
         {variations.map((variation) => (
           <Radio key={variation.name} value={variation.name}>
             {variation.name} -
-            <Typography.Text>{formatMoney(variation.price)}</Typography.Text>
+            <Typography.Text> {formatMoney(variation.price)}</Typography.Text>
           </Radio>
         ))}
       </Radio.Group>

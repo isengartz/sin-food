@@ -10,6 +10,9 @@ import axiosRestaurantService from '../../apis/instances/restaurant';
 import axiosQueryService from '../../apis/instances/query';
 import { handleAxiosErrorMessage } from '../../util/handleAxiosErrorMessage';
 import { RestaurantSearchFilters } from '../../util/interfaces/RestaurantSearchFilters';
+import { CacheHelper } from '../../util/cacheHelper';
+import { StoredCartItemInterface } from '../../util/interfaces/CartItemInterface';
+import { clearCartData } from './orderActionCreator';
 
 /**
  * Fetch Restaurant Categories
@@ -97,6 +100,18 @@ export const getRestaurant = (id: string): AppThunk => {
           data: { restaurant },
         },
       } = await axiosRestaurantService.get(`/${id}`);
+
+      const cacheHelper = new CacheHelper();
+      const cart = (await cacheHelper.getItem<{
+        items: StoredCartItemInterface[];
+        restaurant: string;
+      }>('cart')) || { items: [], restaurant: '' };
+
+      // Clear Cart Data when switching restaurants
+      if (cart.restaurant && cart.restaurant !== restaurant.id) {
+        //@ts-ignore
+        dispatch(clearCartData());
+      }
       dispatch({
         type: RestaurantTypes.GET_RESTAURANT_SUCCESS,
         payload: restaurant,

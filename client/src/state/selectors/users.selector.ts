@@ -26,6 +26,16 @@ export const selectCurrentUserAddressesFormatted = createSelector(
       text: address.full_address,
     })) || [],
 );
+export const selectCurrentSelectedAddress = createSelector(
+  selectUser,
+  (user) =>
+    (user.addresses &&
+      user.selectedAddress &&
+      user.addresses?.filter(
+        (address) => address.id === user.selectedAddress,
+      )[0]) ||
+    {},
+);
 
 export const selectUserErrors = createSelector(
   selectUser,
