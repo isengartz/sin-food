@@ -5,6 +5,7 @@ export interface StoredCartItemInterface extends CartItemInterface {
 export interface CartItemInterface {
   item: string;
   item_options: CartItemOptionsInterface;
+  uuid?: string;
 }
 
 interface CartItemOptionsInterface {

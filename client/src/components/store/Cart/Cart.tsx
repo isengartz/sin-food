@@ -21,7 +21,7 @@ const Cart: React.FC = () => {
   const cartItems = useTypedSelector(selectCartItems);
   const cartTotalCost = useTypedSelector(selectCartTotalPrice);
 
-  console.log(cartItems);
+  // console.log(cartItems);
   const isButtonEnabled =
     cartItems.length > 0 &&
     selectedRestaurant &&
@@ -59,10 +59,13 @@ const Cart: React.FC = () => {
               cartItems.length > 0 &&
               cartItems.map((item) => (
                 <CartItem
+                  key={item.uuid}
                   name={item.item_options.name}
                   description={item.item_options.description}
                   price={item.item_options.price}
-                  id={item.uuid}
+                  uuid={item.uuid}
+                  id={item.item}
+                  quantity={item.item_options.quantity}
                 />
               ))}
             <Typography.Title level={5}>

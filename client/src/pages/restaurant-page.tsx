@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTypedSelector } from '../hooks/useTypedSelector';
 import {
+  selectMenuIsLoading,
   selectRestaurantErrors,
   selectRestaurantSearchIsLoading,
   selectSelectedRestaurant,
@@ -22,6 +23,7 @@ const RestaurantPage: React.FC = () => {
   const selectedRestaurant = useTypedSelector(selectSelectedRestaurant);
   const errors = useTypedSelector(selectRestaurantErrors);
   const loading = useTypedSelector(selectRestaurantSearchIsLoading);
+  const menuIsLoading = useTypedSelector(selectMenuIsLoading);
   useErrorMessage(errors, clearRestaurantErrors);
   const { getRestaurant } = useActions();
 
@@ -43,7 +45,7 @@ const RestaurantPage: React.FC = () => {
           <Cart />
         </Row>
       </Content>
-      {loading && <Loader />}
+      {(loading || menuIsLoading) && <Loader />}
       <MenuItemModal />
     </Layout>
   );

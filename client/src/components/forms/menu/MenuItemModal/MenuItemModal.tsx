@@ -3,15 +3,20 @@ import React, { FormEventHandler, useEffect, useState } from 'react';
 import { useActions } from '../../../../hooks/useActions';
 import { useTypedSelector } from '../../../../hooks/useTypedSelector';
 import {
+  selectEditingMenuItem,
   selectedSelectedMenuItemIngredients,
   selectedSelectedMenuItemIngredientsNames,
+  selectMenuIsLoading,
   selectMenuItemModal,
   selectSelectedMenuItem,
   selectSelectedRestaurant,
 } from '../../../../state';
 import { formatMoney } from '../../../../util/formatMoney';
 import MenuItemFormVariations from './sub-elements/MenuItemFormVariations';
-import { CartItemInterface } from '../../../../util/interfaces/CartItemInterface';
+import {
+  CartItemInterface,
+  StoredCartItemInterface,
+} from '../../../../util/interfaces/CartItemInterface';
 import MenuItemFormIngredients from './sub-elements/MenuItemFormIngredients';
 import {
   Button,
@@ -25,28 +30,41 @@ import {
   Space,
   Typography,
 } from 'antd';
+import {
+  ExtraGroupsInterfaces,
+  IngredientInterface,
+} from '../../../../util/interfaces/MenuItemInterface';
 
 /**
  * Modal that handles adding a new item in cart
  * @constructor
  */
 const MenuItemModal: React.FC = () => {
-  const { closeMenuItemModal, addItemToCart } = useActions();
+  const {
+    closeMenuItemModal,
+    addItemToCart,
+    unsetMenuEditingItem,
+    updateCartItem,
+    unsetSelectedItem,
+  } = useActions();
   const selectedRestaurant = useTypedSelector(selectSelectedRestaurant);
   const isVisible = useTypedSelector(selectMenuItemModal);
   const selectedItem = useTypedSelector(selectSelectedMenuItem);
+  const editingItem = useTypedSelector(selectEditingMenuItem);
   const ingredientPrices = useTypedSelector(
     selectedSelectedMenuItemIngredients,
   );
   const ingredientNames = useTypedSelector(
     selectedSelectedMenuItemIngredientsNames,
   );
+  const loading = useTypedSelector(selectMenuIsLoading);
   const [formRef] = Form.useForm();
   const [itemPrice, setItemPrice] = useState<number>(0);
   const [itemBasePrice, setItemBasePrice] = useState<number>(0);
 
   const initialState = {
     item: '',
+    uuid: '',
     item_options: {
       excluded_ingredients: [],
       extra_ingredients: [],
@@ -60,41 +78,28 @@ const MenuItemModal: React.FC = () => {
   };
   const [orderItem, setOrderItem] = useState<CartItemInterface>(initialState);
 
-  const visible = isVisible && selectedItem !== null;
+  const visible = !loading && isVisible && selectedItem !== null;
 
-  const calculateCurrentPrice = () => {
-    // itemBasePrice = variation price or base price if item doesnt have a variation
-    // itemPrice = price from extra ingredients
-    return (itemBasePrice + itemPrice) * orderItem.item_options.quantity;
-  };
-
-  const generateItemDescription = () => {
-    let baseDescription = orderItem.item_options.variation
-      ? `${orderItem.item_options.variation} `
-      : '';
-    const baseIngredients =
-      selectedItem?.main_ingredients
-        .flatMap((ingr) => ingr.id)
-        .filter(
-          (ingr) => !orderItem.item_options.excluded_ingredients.includes(ingr),
-        ) || [];
-    const allIngredients = Array.from(
-      new Set([
-        ...baseIngredients,
-        ...orderItem.item_options.extra_ingredients,
-      ]),
-    );
-
-    const description = allIngredients
-      .map((ingr) => ingredientNames.get(ingr) || '')
-      .join(', ');
-
-    return baseDescription + description;
-  };
-
-  // Initialize the State. Runs only when selectedItem changes
+  // Initialize the State. Runs only when selectedItem or editingItem changes
   useEffect(() => {
     if (!selectedItem) return;
+
+    // Initialize state when we edit an item
+    if (editingItem && !orderItem.item) {
+      setOrderItem(editingItem);
+      // Initialize the price based on variation or price
+      if (editingItem.item_options.variation) {
+        const variationPrice =
+          selectedItem.variations.find(
+            (variation) =>
+              variation.name === editingItem.item_options.variation,
+          )?.price || 0;
+        setItemBasePrice(variationPrice);
+      } else {
+        setItemBasePrice(selectedItem.base_price);
+      }
+      return;
+    }
 
     setOrderItem({
       ...initialState,
@@ -118,10 +123,10 @@ const MenuItemModal: React.FC = () => {
         item: selectedItem.id,
       }));
     }
-  }, [selectedItem]);
+  }, [selectedItem, editingItem]);
 
   // Updates the itemPrice based on Ingredients Value
-  // Triggers only when extra_ingredients state changes
+  // Triggers only when extra_ingredients or editing item state changes
   useEffect(() => {
     const newPrice = orderItem.item_options.extra_ingredients.reduce(
       (acc, current) => {
@@ -131,11 +136,13 @@ const MenuItemModal: React.FC = () => {
       0,
     );
     setItemPrice(newPrice);
-  }, [orderItem.item_options.extra_ingredients]);
+  }, [orderItem.item_options.extra_ingredients, editingItem]);
 
   // Update items Description
   // Triggers when extra/excluded ingredients and variation changes
   useEffect(() => {
+    if (!orderItem.item) return;
+
     const description = generateItemDescription();
 
     setOrderItem((prevState) => ({
@@ -148,24 +155,83 @@ const MenuItemModal: React.FC = () => {
     orderItem.item_options.variation,
   ]);
 
-  // Handles Form Submission
+  /**
+   * Calculates current price of item
+   */
+  const calculateCurrentPrice = () => {
+    // itemBasePrice = variation price or base price if item doesnt have a variation
+    // itemPrice = price from extra ingredients
+    return (itemBasePrice + itemPrice) * orderItem.item_options.quantity;
+  };
+
+  /**
+   * Close Modal Event Handler
+   */
+  const modalCloseHandler = () => {
+    if (editingItem) {
+      unsetMenuEditingItem();
+    }
+    unsetSelectedItem();
+    closeMenuItemModal();
+    setOrderItem(initialState);
+  };
+
+  /**
+   * Generates the item description based on variation and ingredients
+   */
+  const generateItemDescription = () => {
+    let baseDescription = orderItem.item_options.variation
+      ? `${orderItem.item_options.variation} `
+      : '';
+    const baseIngredients =
+      selectedItem?.main_ingredients
+        .flatMap((ingr: IngredientInterface) => ingr.id)
+        .filter(
+          (ingr: string) =>
+            !orderItem.item_options.excluded_ingredients.includes(ingr),
+        ) || [];
+    const allIngredients = Array.from(
+      new Set([
+        ...baseIngredients,
+        ...orderItem.item_options.extra_ingredients,
+      ]),
+    );
+
+    const description = allIngredients
+      .map((ingr) => ingredientNames.get(ingr) || '')
+      .join(', ');
+
+    return baseDescription + description;
+  };
+
+  /**
+   * Handles Form Submission
+   */
   const onSubmit = () => {
     // Calculate the final price and add it to cart item
     // We gonna recalculate the final price before order completion through API
     // So we dont care for user manipulation here. It just makes our life easier.
-
     const finalPrice = calculateCurrentPrice();
-    addItemToCart(
-      {
-        ...orderItem,
-        item_options: { ...orderItem.item_options, price: finalPrice },
-      },
-      selectedRestaurant!.id,
-    );
+    const finalItemPayload = {
+      ...orderItem,
+      item_options: { ...orderItem.item_options, price: finalPrice },
+    };
+
+    if (editingItem) {
+      unsetMenuEditingItem();
+      updateCartItem(finalItemPayload as StoredCartItemInterface);
+    } else {
+      addItemToCart(finalItemPayload, selectedRestaurant!.id);
+    }
+
     closeMenuItemModal();
+    setOrderItem(initialState);
   };
 
-  // Event Handler when any input of form changes
+  /**
+   * Event Handler when any input of form changes
+   * @param event
+   */
   const onFormChange: FormEventHandler<HTMLFormElement> = (event) => {
     const target = event.target as HTMLInputElement;
 
@@ -265,7 +331,7 @@ const MenuItemModal: React.FC = () => {
   return (
     <Modal
       visible={visible}
-      onCancel={closeMenuItemModal}
+      onCancel={modalCloseHandler}
       centered={true}
       footer={[
         <InputNumber
@@ -340,9 +406,11 @@ const MenuItemModal: React.FC = () => {
                     showPrices={false}
                     // onChange={onMainIngredientChange}
                     value={selectedItem.main_ingredients
-                      .flatMap((ingredient) => ingredient.id)
+                      .flatMap(
+                        (ingredient: IngredientInterface) => ingredient.id,
+                      )
                       .filter(
-                        (ingr) =>
+                        (ingr: string) =>
                           !orderItem.item_options.excluded_ingredients.includes(
                             ingr,
                           ),
@@ -351,15 +419,17 @@ const MenuItemModal: React.FC = () => {
                 )}
 
               {selectedItem.extra_ingredient_groups &&
-                selectedItem.extra_ingredient_groups.map((group) => (
-                  <MenuItemFormIngredients
-                    value={orderItem.item_options.extra_ingredients}
-                    key={group.title}
-                    inputName={`extra_ingredients-${group.title}`}
-                    header={group.title}
-                    items={group.ingredients}
-                  />
-                ))}
+                selectedItem.extra_ingredient_groups.map(
+                  (group: ExtraGroupsInterfaces) => (
+                    <MenuItemFormIngredients
+                      value={orderItem.item_options.extra_ingredients}
+                      key={group.title}
+                      inputName={`extra_ingredients-${group.title}`}
+                      header={group.title}
+                      items={group.ingredients}
+                    />
+                  ),
+                )}
 
               <Col span={24}>
                 <Form.Item label="Comments">

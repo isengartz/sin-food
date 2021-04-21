@@ -1,11 +1,14 @@
 import { OrderTypes } from '../action-types';
 import { StoredCartItemInterface } from '../../util/interfaces/CartItemInterface';
+import { ErrorType } from '../../util/types/ErrorType';
 
 export type OrderAction =
   | AddItemToCartAction
   | RemoveItemFromCartAction
   | InitializeOrderDataAction
-  | ClearCartDataAction;
+  | ClearCartDataAction
+  | UpdateCartItemAction
+  | UpdateCartItemErrorAction;
 
 export interface AddItemToCartAction {
   type: OrderTypes.ADD_ITEM_TO_CART;
@@ -24,4 +27,14 @@ export interface InitializeOrderDataAction {
 
 export interface ClearCartDataAction {
   type: OrderTypes.CLEAR_CART_DATA;
+}
+
+export interface UpdateCartItemAction {
+  type: OrderTypes.UPDATE_CART_ITEM;
+  payload: StoredCartItemInterface;
+}
+
+export interface UpdateCartItemErrorAction {
+  type: OrderTypes.UPDATE_CART_ITEM_ERROR;
+  payload: ErrorType;
 }

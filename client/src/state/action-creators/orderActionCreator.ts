@@ -1,4 +1,4 @@
-import { OrderAction, RemoveItemFromCartAction } from '../actions';
+import { OrderAction } from '../actions';
 import { OrderTypes } from '../action-types';
 import {
   CartItemInterface,
@@ -9,6 +9,11 @@ import { AppThunk } from '../../util/types/AppThunk';
 import { Dispatch } from 'redux';
 import { CacheHelper } from '../../util/cacheHelper';
 
+/**
+ * Adds an item into cart and cache
+ * @param item
+ * @param restaurantId
+ */
 export const addItemToCart = (
   item: CartItemInterface,
   restaurantId: string,
@@ -32,6 +37,52 @@ export const addItemToCart = (
   };
 };
 
+/**
+ * Updates an item from cart and cache
+ * @param updatedItem
+ */
+export const updateCartItem = (
+  updatedItem: StoredCartItemInterface,
+): AppThunk => {
+  return async (dispatch: Dispatch<OrderAction>) => {
+    try {
+      const cacheHelper = new CacheHelper();
+      const storedItems = await cacheHelper.getItem<{
+        items: StoredCartItemInterface[];
+        restaurant: string;
+      }>('cart');
+      if (!storedItems) {
+        throw new Error('We got an internal error! Try again later!');
+      }
+      const foundItemIndex = storedItems.items.findIndex(
+        (item) => item.uuid === updatedItem.uuid,
+      );
+
+      if (foundItemIndex === -1) {
+        throw new Error('We got an internal error! Try again later!');
+      }
+      // Replace the item in the cache
+      storedItems.items.splice(foundItemIndex, 1, updatedItem);
+
+      await cacheHelper.setItem('cart', {
+        items: storedItems.items,
+        restaurant: storedItems.restaurant,
+      });
+
+      dispatch({ type: OrderTypes.UPDATE_CART_ITEM, payload: updatedItem });
+    } catch (e) {
+      dispatch({
+        type: OrderTypes.UPDATE_CART_ITEM_ERROR,
+        payload: [{ message: e.message }],
+      });
+    }
+  };
+};
+
+/**
+ * Deletes an item from cart and cache
+ * @param uuid
+ */
 export const removeItemFromCart = (uuid: string): AppThunk => {
   return async (dispatch: Dispatch<OrderAction>) => {
     // Check if there are any other cart data in cache
