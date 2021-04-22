@@ -13,6 +13,7 @@ interface CartItemProps {
   uuid: string;
   id: string;
   quantity: number;
+  withActions: boolean;
 }
 
 const CartItem: React.FC<CartItemProps> = ({
@@ -22,6 +23,7 @@ const CartItem: React.FC<CartItemProps> = ({
   uuid,
   id,
   quantity,
+  withActions = true,
 }) => {
   const {
     removeItemFromCart,
@@ -41,17 +43,24 @@ const CartItem: React.FC<CartItemProps> = ({
     <div className="cart-list-item">
       <Divider />
       <Typography.Title className="cart-list-item__name" level={5}>
-        <button onClick={(e) => updateItem(uuid)}>{name}</button>
+        {withActions ? (
+          <button onClick={(e) => updateItem(uuid)}>{name}</button>
+        ) : (
+          name
+        )}
       </Typography.Title>
-      <Typography.Text className="cart-list-item__button-close">
-        <Button
-          onClick={() => removeItemFromCart(uuid)}
-          type="dashed"
-          shape="circle"
-        >
-          x
-        </Button>
-      </Typography.Text>
+      {withActions && (
+        <Typography.Text className="cart-list-item__button-close">
+          <Button
+            onClick={() => removeItemFromCart(uuid)}
+            type="dashed"
+            shape="circle"
+          >
+            x
+          </Button>
+        </Typography.Text>
+      )}
+
       <Typography.Paragraph
         className="cart-list-item__description"
         type="secondary"

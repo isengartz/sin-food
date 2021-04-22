@@ -1,6 +1,6 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import { Affix, Alert, Button, Col, Empty, Space, Typography } from 'antd';
-import './cart.less';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import {
   selectCartItems,
@@ -11,8 +11,10 @@ import {
 import { UserAddress } from '../../../util/interfaces/UserAddress';
 import { formatMoney } from '../../../util/formatMoney';
 import CartItem from './CartItem/CartItem';
+import './cart.less';
 
 const Cart: React.FC = () => {
+  const history = useHistory();
   const userAddress = useTypedSelector(
     selectCurrentSelectedAddress,
   ) as UserAddress;
@@ -66,12 +68,17 @@ const Cart: React.FC = () => {
                   uuid={item.uuid}
                   id={item.item}
                   quantity={item.item_options.quantity}
+                  withActions
                 />
               ))}
             <Typography.Title level={5}>
               Total: {formatMoney(cartTotalCost)}
             </Typography.Title>
-            <Button type="primary" disabled={!isButtonEnabled}>
+            <Button
+              onClick={() => history.push('/checkout')}
+              type="primary"
+              disabled={!isButtonEnabled}
+            >
               Continue
             </Button>
           </Space>

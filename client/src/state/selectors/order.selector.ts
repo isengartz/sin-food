@@ -8,6 +8,11 @@ export const selectCartItems = createSelector(
   (order) => order.cart.items,
 );
 
+export const selectCartData = createSelector(
+  selectOrder,
+  (order) => order.cart,
+);
+
 export const selectCartTotalPrice = createSelector(selectCartItems, (items) =>
   items.reduce((acc, cur) => {
     acc += cur.item_options.price;

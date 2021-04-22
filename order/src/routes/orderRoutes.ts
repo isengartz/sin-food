@@ -28,4 +28,10 @@ Router.route('/')
   )
   .get(currentUser, requireAuth, restrictToOwnRecords, findAllOrders);
 
+// Router.post(
+//   '/validateCart',
+//   currentUser,
+//   restrictTo([UserRole.Admin, UserRole.User]),
+// );
+
 export { Router as orderRoutes };

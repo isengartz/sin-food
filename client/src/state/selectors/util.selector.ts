@@ -7,3 +7,6 @@ export const selectGlobalErrorMessages = createSelector(
   selectUtility,
   (util) => util.errors,
 );
+
+export const selectCheckoutIsLoading = (state: RootState) =>
+  state.restaurants.loading || state.user.loading || state.order.loading;

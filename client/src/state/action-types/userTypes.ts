@@ -19,4 +19,7 @@ export enum UserTypes {
   ADD_USER_ADDRESS_SUCCESS = 'user/add_user_address_success',
   ADD_USER_ADDRESS_ERROR = 'user/add_user_address_error',
   SELECT_USER_ADDRESS = 'user/select_user_address',
+  GET_CURRENT_USER_FULL_PAYLOAD_START = 'user/get_current_user_full_payload_start',
+  GET_CURRENT_USER_FULL_PAYLOAD_SUCCESS = 'user/get_current_user_full_payload_success',
+  GET_CURRENT_USER_FULL_PAYLOAD_ERROR = 'user/get_current_user_full_payload_error',
 }

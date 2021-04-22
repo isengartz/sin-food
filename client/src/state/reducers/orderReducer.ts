@@ -9,6 +9,7 @@ interface OrderState {
     items: StoredCartItemInterface[];
     restaurant: string;
   };
+  loading: boolean;
   errors: ErrorType;
 }
 
@@ -17,6 +18,7 @@ const initialState: OrderState = {
     items: [],
     restaurant: '',
   },
+  loading: false,
   errors: [],
 };
 
