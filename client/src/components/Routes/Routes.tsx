@@ -9,6 +9,7 @@ import { useTypedSelector } from '../../hooks/useTypedSelector';
 import { selectCurrentUser } from '../../state';
 import AuthRoute from './AuthRoute/AuthRoute';
 import RestaurantPage from '../../pages/restaurant-page';
+import CheckOutPage from '../../pages/checkout';
 
 /**
  * Application Routes
@@ -30,6 +31,9 @@ const Routes: React.FC = () => {
       <UnAuthRoute redirectTo="/" isLogged={!!user} exact path="/register">
         <RegisterUserPage />
       </UnAuthRoute>
+      <AuthRoute redirectTo="/" isLogged={!!user} exact path="/checkout">
+        <CheckOutPage />
+      </AuthRoute>
       <Route path="*">
         <NotFoundPage />
       </Route>

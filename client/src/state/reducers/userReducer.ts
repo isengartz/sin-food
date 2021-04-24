@@ -4,12 +4,13 @@ import { UserTypes } from '../action-types';
 import compose from 'immer';
 import { UserPayload } from '@sin-nombre/sinfood-common';
 import { UserAddress } from '../../util/interfaces/UserAddress';
+import { UserFullPayload } from '../../util/interfaces/UserFullPayload';
 
 export interface UserState {
   loading: boolean;
   authenticating: boolean;
   errors: ErrorType;
-  currentUser: UserPayload | null;
+  currentUser: UserPayload | UserFullPayload | null;
   addresses: UserAddress[];
   selectedAddress: string;
 }
@@ -118,6 +119,18 @@ const reducer = compose(
         return state;
       case UserTypes.SELECT_USER_ADDRESS:
         state.selectedAddress = action.payload;
+        return state;
+      case UserTypes.GET_CURRENT_USER_FULL_PAYLOAD_START:
+        state.loading = true;
+        state.errors = [];
+        return state;
+      case UserTypes.GET_CURRENT_USER_FULL_PAYLOAD_SUCCESS:
+        state.currentUser = action.payload;
+        state.loading = false;
+        return state;
+      case UserTypes.GET_CURRENT_USER_FULL_PAYLOAD_ERROR:
+        state.loading = false;
+        state.errors = action.payload;
         return state;
       default:
         return state;

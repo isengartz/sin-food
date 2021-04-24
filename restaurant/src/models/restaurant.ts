@@ -12,6 +12,7 @@ import { natsWrapper } from '../events/nats-wrapper';
 import { RestaurantUpdatedPublisher } from '../events/publishers/restaurant-updated-publisher';
 import { RestaurantCreatedPublisher } from '../events/publishers/restaurant-created-publisher';
 import { RestaurantDeletedPublisher } from '../events/publishers/restaurant-deleted-publisher';
+import { RestaurantCategory } from './restaurant-category';
 
 // Describes the attributes that we accept from Request
 export interface RestaurantAttrs {
@@ -196,9 +197,17 @@ restaurantSchema.pre<RestaurantDoc>('save', async function (next) {
   if (this.categories.length === 0) {
     return next();
   }
-  const relationshipHelper = new RelationHelper<RestaurantDoc>(this);
-  relationshipHelper.addRelations(restaurantRelationships);
-  relationshipHelper.insertReferencesBasedOnId();
+  // const relationshipHelper = new RelationHelper<RestaurantDoc>(this);
+  // relationshipHelper.addRelations(restaurantRelationships);
+  // relationshipHelper.insertReferencesBasedOnId();
+  await RestaurantCategory.updateMany(
+    { _id: { $in: this.categories } },
+    {
+      $addToSet: {
+        restaurants: this._id,
+      },
+    },
+  );
 
   next();
 });
@@ -222,35 +231,67 @@ restaurantSchema.post<RestaurantDoc>('save', async function (doc, next) {
   next();
 });
 
-//@ts-ignore
-restaurantSchema.post<RestaurantDoc>('findOneAndUpdate', async function (doc) {
-  if (doc) {
-    const relationshipHelper = new RelationHelper<RestaurantDoc>(doc);
-    relationshipHelper.addRelations(restaurantRelationships);
-    relationshipHelper.insertReferencesBasedOnId();
-    relationshipHelper.removeUpdatedReferencesBasedOnId();
+restaurantSchema.post<RestaurantDoc>(
+  // @ts-ignore
+  'findOneAndUpdate',
+  async function (doc, next) {
+    if (doc) {
+      // const relationshipHelper = new RelationHelper<RestaurantDoc>(doc);
+      // relationshipHelper.addRelations(restaurantRelationships);
+      // relationshipHelper.insertReferencesBasedOnId();
 
-    // Publish an Event
-    new RestaurantUpdatedPublisher(natsWrapper.client).publish({
-      id: doc._id,
-      version: doc.version,
-      delivers_to: doc.delivers_to,
-      working_hours: doc.working_hours,
-      holidays: doc.holidays,
-      categories: doc.categories,
-      logo: doc.logo,
-      minimum_order: doc.minimum_order,
-      name: doc.name,
-      enabled: doc.enabled,
-    });
-  }
-});
+      // Insert the reference from the Restaurant Category
+      await RestaurantCategory.updateMany(
+        { _id: { $in: doc.categories } },
+        {
+          $addToSet: {
+            restaurants: doc._id,
+          },
+        },
+      );
+
+      // relationshipHelper.removeUpdatedReferencesBasedOnId();
+      // Removes the reference from Restaurant Categories
+      await RestaurantCategory.updateMany(
+        { _id: { $nin: doc.categories } },
+        {
+          $pull: {
+            restaurants: doc._id,
+          },
+        },
+      );
+      // Publish an Event
+      new RestaurantUpdatedPublisher(natsWrapper.client).publish({
+        id: doc._id,
+        version: doc.version,
+        delivers_to: doc.delivers_to,
+        working_hours: doc.working_hours,
+        holidays: doc.holidays,
+        categories: doc.categories,
+        logo: doc.logo,
+        minimum_order: doc.minimum_order,
+        name: doc.name,
+        enabled: doc.enabled,
+      });
+    }
+    next();
+  },
+);
 
 // Remove the reference from the Restaurant Category
-restaurantSchema.pre<RestaurantDoc>('remove', async function (next) {
-  const relationshipHelper = new RelationHelper<RestaurantDoc>(this);
-  relationshipHelper.addRelations(restaurantRelationships);
-  relationshipHelper.removeReferencesBasedOnId();
+restaurantSchema.post<RestaurantDoc>('remove', async function (doc, next) {
+  // const relationshipHelper = new RelationHelper<RestaurantDoc>(this);
+  // relationshipHelper.addRelations(restaurantRelationships);
+  // relationshipHelper.removeReferencesBasedOnId();
+
+  await RestaurantCategory.updateMany(
+    { _id: { $in: doc.categories } },
+    {
+      $pull: {
+        restaurants: doc._id,
+      },
+    },
+  );
 
   next();
 });

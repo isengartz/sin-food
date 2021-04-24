@@ -53,7 +53,7 @@
     "camelcase": "off",
     "react/jsx-filename-extension": [
       1,
-      { "extensions": [".js", ".jsx", ".ts"] }
+      { "extensions": [".js", ".jsx", ".ts", ".tsx"] }
     ],
     "suppressImplicitAnyIndexErrors": 0,
     "prefer-object-spread/prefer-object-spread": 2,

@@ -1,13 +1,14 @@
 /* eslint-disable no-unreachable */
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { createHash } from 'crypto';
 import {
+  AuthHelper,
   BadRequestError,
   NotAuthorizedError,
   NotFoundError,
   Password,
   QueryModelHelper,
-  AuthHelper,
+  UserRole,
 } from '@sin-nombre/sinfood-common';
 
 import { User } from '../models/user';
@@ -347,4 +348,35 @@ export const updatePassword = async (
 export const signout = (req: Request, res: Response, next: NextFunction) => {
   req.session = null;
   res.send({});
+};
+
+/**
+ * Returns the whole user info
+ * @param req
+ * @param res
+ * @param next
+ */
+export const getUserFullInfo = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (
+    req.currentUser!.role === UserRole.User &&
+    req.params.id !== req.currentUser!.id
+  ) {
+    req.params.id = req.currentUser!.id;
+  }
+
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    throw new NotFoundError('User Not found');
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user: user,
+    },
+  });
 };

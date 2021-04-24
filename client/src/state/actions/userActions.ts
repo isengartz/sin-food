@@ -3,6 +3,7 @@ import { UserInterface } from '../../util/interfaces/UserInterface';
 import { ErrorType } from '../../util/types/ErrorType';
 import { UserAddress } from '../../util/interfaces/UserAddress';
 import { UserPayload } from '@sin-nombre/sinfood-common';
+import { UserFullPayload } from '../../util/interfaces/UserFullPayload';
 
 export type UserAction =
   | GetCurrentUserAction
@@ -24,7 +25,10 @@ export type UserAction =
   | AddUserAddressStartAction
   | AddUserAddressSuccessAction
   | AddUserAddressErrorAction
-  | SelectUserAddress;
+  | SelectUserAddress
+  | GetCurrentUserFullPayloadStartAction
+  | GetCurrentUserFullPayloadSuccessAction
+  | GetCurrentUserFUllPayloadErrorAction;
 
 /**
  * Get Current User Actions
@@ -132,4 +136,16 @@ export interface AddUserAddressErrorAction {
 export interface SelectUserAddress {
   type: UserTypes.SELECT_USER_ADDRESS;
   payload: string;
+}
+
+export interface GetCurrentUserFullPayloadStartAction {
+  type: UserTypes.GET_CURRENT_USER_FULL_PAYLOAD_START;
+}
+export interface GetCurrentUserFullPayloadSuccessAction {
+  type: UserTypes.GET_CURRENT_USER_FULL_PAYLOAD_SUCCESS;
+  payload: UserFullPayload;
+}
+export interface GetCurrentUserFUllPayloadErrorAction {
+  type: UserTypes.GET_CURRENT_USER_FULL_PAYLOAD_ERROR;
+  payload: ErrorType;
 }

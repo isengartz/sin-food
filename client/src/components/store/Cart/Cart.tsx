@@ -1,6 +1,6 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import { Affix, Alert, Button, Col, Empty, Space, Typography } from 'antd';
-import './cart.less';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import {
   selectCartItems,
@@ -11,8 +11,10 @@ import {
 import { UserAddress } from '../../../util/interfaces/UserAddress';
 import { formatMoney } from '../../../util/formatMoney';
 import CartItem from './CartItem/CartItem';
+import './cart.less';
 
 const Cart: React.FC = () => {
+  const history = useHistory();
   const userAddress = useTypedSelector(
     selectCurrentSelectedAddress,
   ) as UserAddress;
@@ -21,7 +23,7 @@ const Cart: React.FC = () => {
   const cartItems = useTypedSelector(selectCartItems);
   const cartTotalCost = useTypedSelector(selectCartTotalPrice);
 
-  console.log(cartItems);
+  // console.log(cartItems);
   const isButtonEnabled =
     cartItems.length > 0 &&
     selectedRestaurant &&
@@ -59,16 +61,24 @@ const Cart: React.FC = () => {
               cartItems.length > 0 &&
               cartItems.map((item) => (
                 <CartItem
+                  key={item.uuid}
                   name={item.item_options.name}
                   description={item.item_options.description}
                   price={item.item_options.price}
-                  id={item.uuid}
+                  uuid={item.uuid}
+                  id={item.item}
+                  quantity={item.item_options.quantity}
+                  withActions
                 />
               ))}
             <Typography.Title level={5}>
               Total: {formatMoney(cartTotalCost)}
             </Typography.Title>
-            <Button type="primary" disabled={!isButtonEnabled}>
+            <Button
+              onClick={() => history.push('/checkout')}
+              type="primary"
+              disabled={!isButtonEnabled}
+            >
               Continue
             </Button>
           </Space>

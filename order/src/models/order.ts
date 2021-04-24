@@ -15,6 +15,14 @@ interface OrderedMenuItemsOptions {
   comments?: string;
 }
 
+interface OrderAddressInfo {
+  full_address: string;
+  bell_name: string;
+  floor: string;
+  phone?: string;
+  comments?: string;
+}
+
 export interface OrderAttrs {
   userId: string;
   restaurantId: string;
@@ -24,6 +32,7 @@ export interface OrderAttrs {
     item: string;
     item_options: OrderedMenuItemsOptions;
   }[];
+  address_info: OrderAddressInfo;
 }
 
 export interface OrderDoc extends mongoose.Document {
@@ -38,6 +47,7 @@ export interface OrderDoc extends mongoose.Document {
   version: number;
   createdAt: Date;
   updatedAt: Date;
+  address_info: OrderAddressInfo;
 }
 
 export interface OrderModel extends mongoose.Model<OrderDoc> {
@@ -63,6 +73,26 @@ const orderSchema = new mongoose.Schema(
       required: true,
       enum: Object.values(OrderStatus),
       default: OrderStatus.Created,
+    },
+    address_info: {
+      full_address: {
+        type: String,
+        required: true,
+      },
+      bell_name: {
+        type: String,
+        required: true,
+      },
+      floor: {
+        type: String,
+        required: true,
+      },
+      phone: {
+        type: String,
+      },
+      comments: {
+        type: String,
+      },
     },
     menu_items: [
       {

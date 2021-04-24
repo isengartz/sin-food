@@ -5,6 +5,8 @@ import { MenuTypes } from '../action-types';
 import axiosMenuService from '../../apis/instances/menu';
 import { handleAxiosErrorMessage } from '../../util/handleAxiosErrorMessage';
 import { MenuItemInterface } from '../../util/interfaces/MenuItemInterface';
+import { CacheHelper } from '../../util/cacheHelper';
+import { StoredCartItemInterface } from '../../util/interfaces/CartItemInterface';
 
 /**
  * Fetch Menu Categories
@@ -69,3 +71,48 @@ export const setSelectedMenuItem = (
     payload: item,
   };
 };
+
+export const startUpdatingMenuItem = (
+  selectedItem: MenuItemInterface,
+  uuid: string,
+): AppThunk => {
+  return async (dispatch: Dispatch<MenuAction>) => {
+    dispatch({ type: MenuTypes.START_UPDATING_MENU_ITEM_START });
+    try {
+      const cacheHelper = new CacheHelper();
+      const storedItems = await cacheHelper.getItem<{
+        items: StoredCartItemInterface[];
+        restaurant: string;
+      }>('cart');
+      if (!storedItems) {
+        throw new Error('We got an internal error! Try again later!');
+      }
+      const foundItem = storedItems.items.find((item) => item.uuid === uuid);
+      console.log('foundItem', foundItem);
+      if (!foundItem) {
+        throw new Error('We got an internal error! Try again later!');
+      }
+
+      dispatch({
+        type: MenuTypes.START_UPDATING_MENU_ITEM_SUCCESS,
+        payload: {
+          selectedItem,
+          editingItem: foundItem,
+        },
+      });
+    } catch (e) {
+      dispatch({
+        type: MenuTypes.START_UPDATING_MENU_ITEM_ERROR,
+        payload: [{ message: e.message }],
+      });
+    }
+  };
+};
+
+export const unsetMenuEditingItem = () => ({
+  type: MenuTypes.UNSET_UPDATING_ITEM,
+});
+
+export const unsetSelectedItem = () => ({
+  type: MenuTypes.UNSET_SELECTED_ITEM,
+});

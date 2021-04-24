@@ -1,8 +1,9 @@
 import { createSelector } from 'reselect';
 import { RootState } from '../reducers';
 import { MenuItemInterface } from '../../util/interfaces/MenuItemInterface';
+import { MenuState } from '../reducers/menuReducer';
 
-export const selectMenu = (state: RootState) => state.menu;
+export const selectMenu = (state: RootState): MenuState => state.menu;
 
 export const selectMenuCategories = createSelector(
   selectMenu,
@@ -69,4 +70,14 @@ export const selectedSelectedMenuItemIngredientsNames = createSelector(
     }
     return ingredientMap;
   },
+);
+
+export const selectEditingMenuItem = createSelector(
+  selectMenu,
+  (menu) => menu.editingItem,
+);
+
+export const selectMenuIsLoading = createSelector(
+  selectMenu,
+  (menu) => menu.loading,
 );

@@ -3,13 +3,15 @@ import { MenuItemInterface } from '../../util/interfaces/MenuItemInterface';
 import { MenuAction } from '../actions';
 import { MenuTypes } from '../action-types';
 import { ErrorType } from '../../util/types/ErrorType';
+import { StoredCartItemInterface } from '../../util/interfaces/CartItemInterface';
 
-interface MenuState {
+export interface MenuState {
   categories: MenuCategoriesInterface[];
   items: MenuItemInterface[];
   loading: boolean;
   errors: ErrorType;
   selectedItem: MenuItemInterface | null;
+  editingItem: StoredCartItemInterface | null;
 }
 
 const initialState: MenuState = {
@@ -18,6 +20,7 @@ const initialState: MenuState = {
   loading: false,
   errors: [],
   selectedItem: null,
+  editingItem: null,
 };
 
 const menuReducer = (state = initialState, action: MenuAction) => {
@@ -36,6 +39,21 @@ const menuReducer = (state = initialState, action: MenuAction) => {
       return { ...state, loading: false, errors: action.payload };
     case MenuTypes.SET_SELECTED_MENU_ITEM:
       return { ...state, selectedItem: action.payload };
+    case MenuTypes.START_UPDATING_MENU_ITEM_START:
+      return { ...state, loading: true };
+    case MenuTypes.START_UPDATING_MENU_ITEM_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        selectedItem: action.payload.selectedItem,
+        editingItem: action.payload.editingItem,
+      };
+    case MenuTypes.START_UPDATING_MENU_ITEM_ERROR:
+      return { ...state, loading: false, errors: action.payload };
+    case MenuTypes.UNSET_UPDATING_ITEM:
+      return { ...state, editingItem: null };
+    case MenuTypes.UNSET_SELECTED_ITEM:
+      return { ...state, selectedItem: false };
     default:
       return state;
   }

@@ -2,7 +2,7 @@ import { ErrorType } from '../../util/types/ErrorType';
 import { UtilActions } from '../actions';
 import { UtilTypes } from '../action-types';
 
-interface UtilReducerState {
+export interface UtilReducerState {
   errors: ErrorType;
   notification: string | null;
 }

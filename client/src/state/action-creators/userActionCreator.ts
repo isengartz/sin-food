@@ -224,3 +224,28 @@ export const selectUserAddress = (address: string): SelectUserAddress => {
     payload: address,
   };
 };
+
+/**
+ * Gets the full user payload
+ */
+export const getCurrentUserFullPayload = (id: string): AppThunk => {
+  return async (dispatch: Dispatch<UserAction>) => {
+    dispatch({ type: UserTypes.GET_CURRENT_USER_FULL_PAYLOAD_START });
+    try {
+      const {
+        data: {
+          data: { user },
+        },
+      } = await axios.get(`/${id}`);
+      dispatch({
+        type: UserTypes.GET_CURRENT_USER_FULL_PAYLOAD_SUCCESS,
+        payload: user,
+      });
+    } catch (e) {
+      dispatch({
+        type: UserTypes.GET_CURRENT_USER_FULL_PAYLOAD_ERROR,
+        payload: handleAxiosErrorMessage(e),
+      });
+    }
+  };
+};

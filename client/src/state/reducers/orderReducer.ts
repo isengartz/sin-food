@@ -2,12 +2,17 @@ import { StoredCartItemInterface } from '../../util/interfaces/CartItemInterface
 import { OrderAction } from '../actions';
 import produce from 'immer';
 import { OrderTypes } from '../action-types';
+import { ErrorType } from '../../util/types/ErrorType';
+import { PaymentMethod } from '@sin-nombre/sinfood-common';
 
-interface OrderState {
+export interface OrderState {
   cart: {
     items: StoredCartItemInterface[];
     restaurant: string;
   };
+  payment_method: PaymentMethod;
+  loading: boolean;
+  errors: ErrorType;
 }
 
 const initialState: OrderState = {
@@ -15,6 +20,9 @@ const initialState: OrderState = {
     items: [],
     restaurant: '',
   },
+  payment_method: PaymentMethod.CASH,
+  loading: false,
+  errors: [],
 };
 
 const reducer = produce(
@@ -33,6 +41,27 @@ const reducer = produce(
         return state;
       case OrderTypes.CLEAR_CART_DATA:
         state.cart = initialState.cart;
+        return state;
+      case OrderTypes.UPDATE_CART_ITEM:
+        const itemIndex = state.cart.items.findIndex(
+          (item) => item.uuid === action.payload.uuid,
+        );
+        if (itemIndex !== -1) {
+          state.cart.items[itemIndex] = action.payload;
+        }
+        return state;
+      case OrderTypes.UPDATE_CART_ITEM_ERROR:
+        state.errors = action.payload;
+        return state;
+      case OrderTypes.SET_ORDER_ERRORS:
+        state.errors = action.payload;
+        return state;
+      case OrderTypes.CLEAR_ORDER_ERRORS:
+        state.errors = [];
+        state.loading = false;
+        return state;
+      case OrderTypes.UPDATE_ORDER_PAYMENT_METHOD:
+        state.payment_method = action.payload;
         return state;
       default:
         return state;
