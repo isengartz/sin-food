@@ -1,31 +1,33 @@
 import React from 'react';
-import { Card, Form, FormInstance, Input, Typography } from 'antd';
+import { Card, Radio, Typography } from 'antd';
+import { PaymentMethod } from '@sin-nombre/sinfood-common';
+import { useTypedSelector } from '../../../hooks/useTypedSelector';
+import { selectOrderPaymentMethod } from '../../../state';
+import { useActions } from '../../../hooks/useActions';
 
-interface PaymentOptionsProps {
-  options?: string[];
-  form: FormInstance;
-}
+const PaymentOptions: React.FC = () => {
+  const selectActivePaymentMethod = useTypedSelector(selectOrderPaymentMethod);
+  const { updatePaymentMethod } = useActions();
+  const radioStyle = {
+    display: 'block',
+    height: '30px',
+    lineHeight: '30px',
+  };
 
-// const PaymentOptions = React.forwardRef<FormInstance, PaymentOptionsProps>(
-//   (props, ref) => {
-//     return (
-//       <Card>
-//         <Typography.Title level={5}>2. Payment Options</Typography.Title>
-//         <Form ref={ref}></Form>
-//       </Card>
-//     );
-//   },
-// );
-
-const PaymentOptions: React.FC<PaymentOptionsProps> = ({ form }) => {
   return (
     <Card>
       <Typography.Title level={5}>2. Payment Options</Typography.Title>
-      <Form form={form}>
-        <Form.Item label="test">
-          <Input name="test" />
-        </Form.Item>
-      </Form>
+      <Radio.Group
+        onChange={(e) => updatePaymentMethod(e.target.value)}
+        value={selectActivePaymentMethod}
+      >
+        <Radio value={PaymentMethod.CASH} style={radioStyle}>
+          Pay with Cash
+        </Radio>
+        <Radio style={radioStyle} value={PaymentMethod.STRIPE}>
+          Pay with Credit Card
+        </Radio>
+      </Radio.Group>
     </Card>
   );
 };

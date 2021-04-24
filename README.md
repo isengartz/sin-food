@@ -35,10 +35,33 @@ $ kubectl create secret generic admin-allow-password --from-literal ADMIN_ALLOW_
 $ kubectl create secret generic jwt-secret --from-literal JWT_KEY=KEY
 $ kubectl create secret generic transporter-email-username --from-literal TRANSPORTER_EMAIL_USERNAME=KEY
 $ kubectl create secret generic transporter-email-password --from-literal TRANSPORTER_EMAIL_PASSWORD=KEY
+$ kubectl create secret generic stripe-secret-key --from-literal STRIPE_SECRET_KEY=KEY
 ```
+##:exclamation: Local ENV Variables :exclamation:
+
+###Client
+`cd client/`
+
+`mv .env.example .env`
+
+Define:
+
+`REACT_APP_GOOGLE_MAPS_API_KEY` **( Google maps api key that has the geocode library enabled )**
+`REACT_APP_STRIPE_PUBLIC_KEY` ( Stripe Publishable Key )
 
 
-Seeder
+###Payment
+In order to test the payment libraries jest require access to the secret api keys. You can always comment out those tests if you want.
+
+`cd payment/`
+
+`mv .env.example .env`
+
+Put the same value to `STRIPE_SECRET_KEY` as defined in the Kubernetes secrets
+
+
+
+###Seeder
 
 `cd seeder/`
 
@@ -50,7 +73,7 @@ Put the same value to `ADMIN_ALLOW_PASSWORD` as defined in the Kubernetes secret
 
 `node-ts index.ts`
 
-Run Skaffold
+###Run Skaffold
 
 ```sh
 $ cd/

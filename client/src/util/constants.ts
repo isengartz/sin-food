@@ -2,6 +2,7 @@ export const API_USER_SERVICE_BASE_URL = '/api/v1/users';
 export const API_MENU_SERVICE_BASE_URL = '/api/v1/menu';
 export const API_RESTAURANT_SERVICE_BASE_URL = '/api/v1/restaurants';
 export const API_QUERY_SERVICE_BASE_URL = '/api/v1/query';
+export const API_ORDER_SERVICE_BASE_URL = '/api/v1/orders';
 
 export const ALL_CATEGORIES_CHECKBOX_VALUE = 'All';
 

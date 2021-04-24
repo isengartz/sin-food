@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { MenuItem } from '../menu-item';
 import { Ingredient } from '../ingredient';
 import { Order } from '../order';
+import { ADDRESS_INFO_PAYLOAD } from '../../utils/constants';
 
 it('should implements OOC', async (done) => {
   const ingredient = await Ingredient.build({
@@ -24,6 +25,7 @@ it('should implements OOC', async (done) => {
   const order = await Order.build({
     userId: new mongoose.Types.ObjectId().toHexString(),
     restaurantId: new mongoose.Types.ObjectId().toHexString(),
+    address_info: ADDRESS_INFO_PAYLOAD,
     menu_items: [
       {
         item: menuItem.id!,
@@ -76,6 +78,7 @@ it('should increment the version number on multiple saves', async () => {
   const order = await Order.build({
     userId: new mongoose.Types.ObjectId().toHexString(),
     restaurantId: new mongoose.Types.ObjectId().toHexString(),
+    address_info: ADDRESS_INFO_PAYLOAD,
     menu_items: [
       {
         item: menuItem.id!,
@@ -138,6 +141,7 @@ it('should correctly calculate the order price', async () => {
   const order = await Order.build({
     userId: new mongoose.Types.ObjectId().toHexString(),
     restaurantId: new mongoose.Types.ObjectId().toHexString(),
+    address_info: ADDRESS_INFO_PAYLOAD,
     menu_items: [
       {
         item: menuItem.id!,

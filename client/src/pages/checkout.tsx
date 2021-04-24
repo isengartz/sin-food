@@ -3,9 +3,7 @@ import {
   Card,
   Col,
   Divider,
-  Form,
   FormInstance,
-  Input,
   Layout,
   Row,
   Typography,
@@ -16,6 +14,7 @@ import {
   selectCheckoutIsLoading,
   selectCurrentSelectedAddress,
   selectCurrentUser,
+  selectOrderErrors,
   selectSelectedRestaurant,
 } from '../state';
 import { useActions } from '../hooks/useActions';
@@ -25,15 +24,24 @@ import { UserAddress } from '../util/interfaces/UserAddress';
 import { UserFullPayload } from '../util/interfaces/UserFullPayload';
 import PaymentOptions from '../components/checkout/PaymentOptions/PaymentOptions';
 import CompleteCheckout from '../components/checkout/CompleteCheckout/CompleteCheckout';
-
+import AddressInfo from '../components/checkout/AdressInfo/AddressInfo';
+import { useErrorMessage } from '../hooks/useErrorMessage';
+import { UserRole } from '@sin-nombre/sinfood-common';
 const { Content } = Layout;
+
+console.log(UserRole.User);
 
 const CheckOutPage: React.FC = () => {
   const history = useHistory();
-  const [addressInfoForm] = Form.useForm();
-  const [paymentOptionForm] = Form.useForm();
+  const addressInfoForm = useRef<FormInstance>(null);
 
-  const { getRestaurant, getCurrentUserFullPayload } = useActions();
+  const {
+    getRestaurant,
+    getCurrentUserFullPayload,
+    createOrder,
+    clearOrderErrors,
+  } = useActions();
+  const errors = useTypedSelector(selectOrderErrors);
   const loading = useTypedSelector(selectCheckoutIsLoading);
   const user = useTypedSelector(selectCurrentUser) as UserFullPayload;
   const cartData = useTypedSelector(selectCartData);
@@ -41,6 +49,8 @@ const CheckOutPage: React.FC = () => {
   const userAddress = useTypedSelector(
     selectCurrentSelectedAddress,
   ) as UserAddress;
+
+  useErrorMessage(errors, clearOrderErrors);
 
   // Redirect if cart is empty
   useEffect(() => {
@@ -59,21 +69,28 @@ const CheckOutPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cartData]);
 
-  console.log(cartData, restaurant);
-  console.log(userAddress);
-  console.log(user);
+  // console.log(cartData, restaurant);
+  // console.log(userAddress);
+  // console.log(user);
 
-  const onCheckoutClick = () => {
+  const onCheckoutClick = async () => {
     console.log('Checking out...');
-    console.log(addressInfoForm.getFieldsValue(true));
-    console.log(addressInfoForm.getFieldsValue(['phone']));
-    console.log(paymentOptionForm.getFieldsValue(true));
-    // addressInfoRef.current!.submit();
-    // const instance = addressInfoRef.current!.getFieldInstance();
-  };
 
-  const onFormSubmit = (values: any) => {
-    console.log(values);
+    const payload = {
+      userId: user.id,
+      restaurantId: cartData.restaurant,
+      menu_items: cartData.items,
+      address_info: {
+        ...addressInfoForm.current?.getFieldsValue(true),
+        full_address: userAddress.full_address,
+      },
+    };
+    const test = await createOrder(payload);
+    console.log(test);
+    console.log(addressInfoForm.current?.getFieldsValue(true));
+    // console.log(paymentOptionForm.current?.getFieldsValue(true));
+
+    // const instance = addressInfoRef.current!.getFieldInstance();
   };
 
   return (
@@ -93,63 +110,18 @@ const CheckOutPage: React.FC = () => {
                 {userAddress && userAddress.full_address}
               </Typography.Text>
               <Divider />
-              <Form
-                form={addressInfoForm}
-                name="address_info_form"
-                layout="vertical"
-              >
-                <Form.Item label="Name in Door's Bell" required>
-                  <Input
-                    name="bell_name"
-                    value={
-                      user && user.first_name && user.last_name
-                        ? `${user.first_name} ${user.last_name}`
-                        : ''
-                    }
-                  />
-                </Form.Item>
-                <Input.Group>
-                  <Form.Item
-                    wrapperCol={{ span: 12 }}
-                    labelCol={{ span: 12 }}
-                    label="Floor"
-                    required
-                    style={{
-                      display: 'inline-block',
-                      width: 'calc(50% - 8px)',
-                    }}
-                  >
-                    <Input
-                      name="floor"
-                      value={userAddress ? userAddress.floor : ''}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    label="Phone"
-                    style={{
-                      display: 'inline-block',
-                      width: 'calc(50% - 8px)',
-                      margin: '0 8px',
-                    }}
-                  >
-                    <Input
-                      name="phone"
-                      value={user && user.phone ? user.phone : ''}
-                    />
-                  </Form.Item>
-                </Input.Group>
-
-                <Form.Item label="Address Comments">
-                  <Input.TextArea
-                    name="comments"
-                    placeholder="For example call me instead of using door bell"
-                  />
-                </Form.Item>
-              </Form>
+              {user && userAddress && !loading && (
+                <AddressInfo
+                  ref={addressInfoForm}
+                  floor={userAddress.floor}
+                  phone={user.phone}
+                  full_name={`${user.first_name} ${user.last_name}`}
+                />
+              )}
             </Card>
           </Col>
           <Col span={4}>
-            <PaymentOptions form={paymentOptionForm} />
+            <PaymentOptions />
           </Col>
 
           <Col span={4}>

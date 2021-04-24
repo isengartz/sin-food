@@ -1,5 +1,6 @@
 import {
   clearGlobalErrorMessage,
+  clearOrderErrors,
   clearRestaurantErrors,
   clearUserErrors,
 } from '../../state/action-creators';
@@ -7,4 +8,5 @@ import {
 export type ErrorClearFunc =
   | typeof clearGlobalErrorMessage
   | typeof clearUserErrors
-  | typeof clearRestaurantErrors;
+  | typeof clearRestaurantErrors
+  | typeof clearOrderErrors;

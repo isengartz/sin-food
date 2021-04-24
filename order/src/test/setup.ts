@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import { Order, OrderAttrs, OrderDoc } from '../models/order';
 import { Ingredient } from '../models/ingredient';
 import { MenuItem } from '../models/menu-item';
+import { ADDRESS_INFO_PAYLOAD } from '../utils/constants';
 
 jest.mock('../events/nats-wrapper'); // Mock file into the fake
 
@@ -130,6 +131,7 @@ global.createOrderPayload = async (): Promise<OrderAttrs> => {
   const order = {
     userId: new mongoose.Types.ObjectId().toHexString(),
     restaurantId: new mongoose.Types.ObjectId().toHexString(),
+    address_info: ADDRESS_INFO_PAYLOAD,
     menu_items: [
       {
         item: menuItem.id!,

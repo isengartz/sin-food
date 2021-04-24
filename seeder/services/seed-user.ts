@@ -40,6 +40,9 @@ export const seedUser = async () => {
     .catch((err) => console.log(err.response.data || err.message));
 
   if (user) {
-    console.log(`User Created with Credentials: ${userEmail} ${password}`);
+    console.log(
+      `%cUser Created with Credentials: ${userEmail} ${password}`,
+      'color:red,font-weight:bold',
+    );
   }
 };

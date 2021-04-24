@@ -8,6 +8,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { AppThunk } from '../../util/types/AppThunk';
 import { Dispatch } from 'redux';
 import { CacheHelper } from '../../util/cacheHelper';
+import { handleAxiosErrorMessage } from '../../util/handleAxiosErrorMessage';
+import { axiosOrderInstance } from '../../apis/instances/order';
+import { PaymentMethod } from '@sin-nombre/sinfood-common';
 
 /**
  * Adds an item into cart and cache
@@ -113,3 +116,29 @@ export const clearCartData = (): AppThunk => {
     dispatch({ type: OrderTypes.CLEAR_CART_DATA });
   };
 };
+
+export const createOrder = (orderItems: any): AppThunk => {
+  return async (dispatch: Dispatch<OrderAction>) => {
+    try {
+      console.log(orderItems);
+      const {
+        data: { data },
+      } = await axiosOrderInstance.post('/', orderItems);
+      const response = await axiosOrderInstance.post('/', orderItems);
+      console.log(response.data);
+      return data;
+    } catch (e) {
+      dispatch({
+        type: OrderTypes.SET_ORDER_ERRORS,
+        payload: handleAxiosErrorMessage(e),
+      });
+    }
+  };
+};
+
+export const clearOrderErrors = () => ({ type: OrderTypes.CLEAR_ORDER_ERRORS });
+
+export const updatePaymentMethod = (method: PaymentMethod) => ({
+  type: OrderTypes.UPDATE_ORDER_PAYMENT_METHOD,
+  payload: method,
+});

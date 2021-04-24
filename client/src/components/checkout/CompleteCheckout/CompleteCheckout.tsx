@@ -1,9 +1,20 @@
 import React from 'react';
 import { Button, Card, Space, Typography } from 'antd';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
-import { selectCartItems, selectCartTotalPrice } from '../../../state';
+import {
+  selectCartItems,
+  selectCartTotalPrice,
+  selectOrderPaymentMethod,
+} from '../../../state';
 import { formatMoney } from '../../../util/formatMoney';
 import CartItem from '../../store/Cart/CartItem/CartItem';
+import { PaymentMethod } from '@sin-nombre/sinfood-common';
+import StripeCheckout from '../StripeCheckout/StripeCheckout';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+const stripePromise = loadStripe(
+  process.env.REACT_APP_STRIPE_PUBLIC_KEY as string,
+);
 
 interface CompleteCheckoutProps {
   onClick: () => void;
@@ -12,6 +23,7 @@ interface CompleteCheckoutProps {
 const CompleteCheckout: React.FC<CompleteCheckoutProps> = ({ onClick }) => {
   const cartItems = useTypedSelector(selectCartItems);
   const totalPrice = useTypedSelector(selectCartTotalPrice);
+  const paymentMethod = useTypedSelector(selectOrderPaymentMethod);
 
   return (
     <Card>
@@ -21,11 +33,18 @@ const CompleteCheckout: React.FC<CompleteCheckoutProps> = ({ onClick }) => {
           <span style={{ float: 'left' }}>Total:</span>{' '}
           <span style={{ float: 'right' }}>{formatMoney(totalPrice)}</span>
         </Typography.Title>
-        <div style={{ textAlign: 'center' }}>
-          <Button size="large" onClick={onClick} type="primary">
-            Complete
-          </Button>
-        </div>
+        <Elements stripe={stripePromise}>
+          {paymentMethod && paymentMethod === PaymentMethod.STRIPE && (
+            <StripeCheckout />
+          )}
+        </Elements>
+        {paymentMethod && paymentMethod === PaymentMethod.CASH && (
+          <div style={{ textAlign: 'center' }}>
+            <Button size="large" onClick={onClick} type="primary">
+              Complete
+            </Button>
+          </div>
+        )}
       </Space>
       {cartItems &&
         cartItems.length > 0 &&
