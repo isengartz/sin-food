@@ -8,4 +8,10 @@ export enum OrderTypes {
   SET_ORDER_ERRORS = 'order/set_order_errors',
   CLEAR_ORDER_ERRORS = 'order/clear_order_errors',
   UPDATE_ORDER_PAYMENT_METHOD = 'order/update_order_payment_method',
+  ORDER_CREATION_START = 'order/order_creation_start',
+  ORDER_CREATION_SUCCESS = 'order/order_creation_success',
+  ORDER_CREATION_ERROR = 'order/order_creation_error',
+  ORDER_PAYMENT_START = 'order/order_payment_start',
+  ORDER_PAYMENT_SUCCESS = 'order/order_payment_success',
+  ORDER_PAYMENT_ERROR = 'order/order_payment_error',
 }

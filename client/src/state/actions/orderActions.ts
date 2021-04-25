@@ -12,7 +12,13 @@ export type OrderAction =
   | UpdateCartItemErrorAction
   | ClearOrderErrorsAction
   | SetOrderErrorsAction
-  | UpdateOrderPaymentMethodAction;
+  | UpdateOrderPaymentMethodAction
+  | OrderCreationStartAction
+  | OrderCreationSuccessAction
+  | OrderCreationErrorAction
+  | OrderPaymentStartAction
+  | OrderPaymentSuccessAction
+  | OrderPaymentErrorAction;
 
 export interface AddItemToCartAction {
   type: OrderTypes.ADD_ITEM_TO_CART;
@@ -54,4 +60,30 @@ export interface ClearOrderErrorsAction {
 export interface UpdateOrderPaymentMethodAction {
   type: OrderTypes.UPDATE_ORDER_PAYMENT_METHOD;
   payload: PaymentMethod;
+}
+
+export interface OrderCreationStartAction {
+  type: OrderTypes.ORDER_CREATION_START;
+}
+
+export interface OrderCreationSuccessAction {
+  type: OrderTypes.ORDER_CREATION_SUCCESS;
+}
+
+export interface OrderCreationErrorAction {
+  type: OrderTypes.ORDER_CREATION_ERROR;
+  payload: ErrorType;
+}
+
+export interface OrderPaymentStartAction {
+  type: OrderTypes.ORDER_PAYMENT_START;
+}
+
+export interface OrderPaymentSuccessAction {
+  type: OrderTypes.ORDER_PAYMENT_SUCCESS;
+}
+
+export interface OrderPaymentErrorAction {
+  type: OrderTypes.ORDER_PAYMENT_ERROR;
+  payload: ErrorType;
 }

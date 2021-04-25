@@ -2,6 +2,8 @@ import React, { useRef, useState } from 'react';
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
 import { StripeCardElement } from '@stripe/stripe-js';
 import { Typography } from 'antd';
+import { useTypedSelector } from '../../../hooks/useTypedSelector';
+import { selectOrderIsLoading } from '../../../state';
 
 const options = {
   style: {
@@ -25,10 +27,14 @@ const ErrorMessage: React.FC = ({ children }) => (
 );
 
 interface StripeCheckoutProps {
-  onFinish?: (id: string) => void;
+  onFinish?: (token: string) => void;
+  loading: boolean;
 }
 
-const StripeCheckout: React.FC<StripeCheckoutProps> = ({ onFinish }) => {
+const StripeCheckout: React.FC<StripeCheckoutProps> = ({
+  loading = false,
+  onFinish,
+}) => {
   const stripe = useStripe();
   const elements = useElements();
   const [error, setError] = useState<any>(null);
@@ -65,6 +71,7 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({ onFinish }) => {
     } else {
       console.log('[PaymentMethod]', payload);
       if (onFinish) {
+        console.log(payload);
         onFinish(payload.paymentMethod.id);
       }
     }
@@ -91,9 +98,9 @@ const StripeCheckout: React.FC<StripeCheckoutProps> = ({ onFinish }) => {
           style={{ marginTop: '20px' }}
           type="submit"
           className="ant-btn ant-btn-primary ant-btn-lg"
-          disabled={!stripe || processing}
+          disabled={!stripe || processing || loading}
         >
-          {processing ? 'Processing...' : 'Complete'}
+          {processing || loading ? 'Processing...' : 'Complete'}
         </button>
       </div>
     </form>

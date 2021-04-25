@@ -30,3 +30,8 @@ export const selectOrderPaymentMethod = createSelector(
   selectOrder,
   (order) => order.payment_method,
 );
+
+export const selectOrderIsLoading = createSelector(
+  selectOrder,
+  (order) => order.loading,
+);

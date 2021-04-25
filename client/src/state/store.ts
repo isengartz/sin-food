@@ -21,6 +21,8 @@ export const preloadState = (): AppThunk => {
 };
 
 const store = createStore(reducers, {}, applyMiddleware(thunk, logger));
+
+export type AppDispatch = typeof store.dispatch;
 // @ts-ignore
 store.dispatch(preloadState());
 export { store };

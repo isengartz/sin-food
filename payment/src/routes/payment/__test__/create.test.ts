@@ -1,4 +1,4 @@
-import { OrderStatus, PaymentMethods } from '@sin-nombre/sinfood-common';
+import { OrderStatus, PaymentMethod } from '@sin-nombre/sinfood-common';
 import mongoose from 'mongoose';
 import request from 'supertest';
 import { app } from '../../../app';
@@ -85,7 +85,7 @@ it('should return 201 with valid input and Payment type as Stripe', async () => 
     .send({
       orderId: order.id,
       token: 'tok_visa',
-      payment_method: PaymentMethods.STRIPE,
+      payment_method: PaymentMethod.STRIPE,
     })
     .expect(201);
 
@@ -121,7 +121,7 @@ it('should return 201 with valid input and Payment type as Cash', async () => {
     .set('Cookie', cookie)
     .send({
       orderId: order.id,
-      payment_method: PaymentMethods.CASH,
+      payment_method: PaymentMethod.CASH,
     })
     .expect(201);
 

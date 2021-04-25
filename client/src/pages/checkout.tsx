@@ -16,6 +16,7 @@ import {
   selectCurrentUser,
   selectOrderErrors,
   selectSelectedRestaurant,
+  selectOrderPaymentMethod,
 } from '../state';
 import { useActions } from '../hooks/useActions';
 import { useHistory } from 'react-router-dom';
@@ -26,10 +27,7 @@ import PaymentOptions from '../components/checkout/PaymentOptions/PaymentOptions
 import CompleteCheckout from '../components/checkout/CompleteCheckout/CompleteCheckout';
 import AddressInfo from '../components/checkout/AdressInfo/AddressInfo';
 import { useErrorMessage } from '../hooks/useErrorMessage';
-import { UserRole } from '@sin-nombre/sinfood-common';
 const { Content } = Layout;
-
-console.log(UserRole.User);
 
 const CheckOutPage: React.FC = () => {
   const history = useHistory();
@@ -37,11 +35,12 @@ const CheckOutPage: React.FC = () => {
 
   const {
     getRestaurant,
-    getCurrentUserFullPayload,
     createOrder,
     clearOrderErrors,
+    createPayment,
   } = useActions();
   const errors = useTypedSelector(selectOrderErrors);
+  const paymentMethod = useTypedSelector(selectOrderPaymentMethod);
   const loading = useTypedSelector(selectCheckoutIsLoading);
   const user = useTypedSelector(selectCurrentUser) as UserFullPayload;
   const cartData = useTypedSelector(selectCartData);
@@ -54,7 +53,6 @@ const CheckOutPage: React.FC = () => {
 
   // Redirect if cart is empty
   useEffect(() => {
-    getCurrentUserFullPayload(user!.id);
     if (!cartData) {
       history.push('/');
     }
@@ -69,13 +67,14 @@ const CheckOutPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cartData]);
 
-  // console.log(cartData, restaurant);
-  // console.log(userAddress);
-  // console.log(user);
-
-  const onCheckoutClick = async () => {
+  /**
+   * Handles Payment and Order Creation
+   * @param token
+   */
+  const onCheckoutClick = async (token: string = '') => {
     console.log('Checking out...');
 
+    // Build Payload
     const payload = {
       userId: user.id,
       restaurantId: cartData.restaurant,
@@ -85,12 +84,26 @@ const CheckOutPage: React.FC = () => {
         full_address: userAddress.full_address,
       },
     };
-    const test = await createOrder(payload);
-    console.log(test);
-    console.log(addressInfoForm.current?.getFieldsValue(true));
-    // console.log(paymentOptionForm.current?.getFieldsValue(true));
 
-    // const instance = addressInfoRef.current!.getFieldInstance();
+    // Create a new order
+    const order = await createOrder(payload);
+
+    // Try to pay for the order
+    if (order) {
+      const payment = await createPayment(
+        // @ts-ignore
+        order.id,
+        paymentMethod,
+        token || '',
+      );
+
+      // Redirect to thank you page
+      // @ts-ignore
+      if (payment.status! === 'success') {
+        //@ts-ignore
+        history.push(`/thank-you/${payment.data.payment.orderId}`);
+      }
+    }
   };
 
   return (

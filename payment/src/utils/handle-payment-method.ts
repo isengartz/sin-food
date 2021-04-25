@@ -35,12 +35,18 @@ export const handlePaymentMethod = async (
  * @param token
  */
 const handleStripeCharge = async (price: number, token: string) => {
-  const charge = await stripe.charges?.create({
-    amount: price * 100,
-    currency: 'eur',
-    source: token,
-  });
-  return { id: charge.id, success: true };
+  try {
+    const charge = await stripe.paymentIntents.create({
+      amount: price * 100,
+      currency: 'eur',
+      description: 'Paid for food Delivery !',
+      payment_method: token,
+      confirm: true,
+    });
+    return { id: charge.id, success: true };
+  } catch (e) {
+    throw new BadRequestError(`Could not Charge your card:  ${e.message}`);
+  }
 };
 
 const handleCashCharge = () => {

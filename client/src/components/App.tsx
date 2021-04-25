@@ -9,17 +9,20 @@ import { Layout } from 'antd';
 import Routes from './Routes/Routes';
 import '../assets/less/imports.less';
 import DisplayGlobalMessage from './DisplayGlobalMessage/DisplayGlobalMessage';
+import { UserFullPayload } from '../util/interfaces/UserFullPayload';
 
 const { Header, Footer } = Layout;
 
 const App: React.FC = () => {
   const { getCurrentUser } = useActions();
-  const user = useTypedSelector(selectCurrentUser);
+  const user = useTypedSelector(selectCurrentUser) as UserFullPayload;
 
   // Check for currentUser
   useEffect(() => {
-    getCurrentUser();
-  }, [getCurrentUser]);
+    if (!user?.id) {
+      getCurrentUser();
+    }
+  }, [getCurrentUser,user]);
 
   return (
     <BrowserRouter>
@@ -27,13 +30,8 @@ const App: React.FC = () => {
         <Header>
           <LayoutHeader />
         </Header>
-        {/*<Suspense fallback={<div>Loading...</div>}>*/}
-        {/*  {isCurrentlyAuthenticating ? <Loader /> : <Routes />}*/}
-        {/*</Suspense>*/}
         <Routes />
-
         <Footer style={{ position: 'sticky', bottom: '0' }}>Footer</Footer>
-
         {!user && <LoginForm />}
       </Layout>
       <DisplayGlobalMessage />

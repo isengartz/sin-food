@@ -4,6 +4,7 @@ import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import {
   selectCartItems,
   selectCartTotalPrice,
+  selectOrderIsLoading,
   selectOrderPaymentMethod,
 } from '../../../state';
 import { formatMoney } from '../../../util/formatMoney';
@@ -17,10 +18,11 @@ const stripePromise = loadStripe(
 );
 
 interface CompleteCheckoutProps {
-  onClick: () => void;
+  onClick: (token?: string) => void;
 }
 
 const CompleteCheckout: React.FC<CompleteCheckoutProps> = ({ onClick }) => {
+  const loading = useTypedSelector(selectOrderIsLoading);
   const cartItems = useTypedSelector(selectCartItems);
   const totalPrice = useTypedSelector(selectCartTotalPrice);
   const paymentMethod = useTypedSelector(selectOrderPaymentMethod);
@@ -35,12 +37,17 @@ const CompleteCheckout: React.FC<CompleteCheckoutProps> = ({ onClick }) => {
         </Typography.Title>
         <Elements stripe={stripePromise}>
           {paymentMethod && paymentMethod === PaymentMethod.STRIPE && (
-            <StripeCheckout />
+            <StripeCheckout loading={loading} onFinish={onClick} />
           )}
         </Elements>
         {paymentMethod && paymentMethod === PaymentMethod.CASH && (
           <div style={{ textAlign: 'center' }}>
-            <Button size="large" onClick={onClick} type="primary">
+            <Button
+              disabled={loading}
+              size="large"
+              onClick={() => onClick()}
+              type="primary"
+            >
               Complete
             </Button>
           </div>

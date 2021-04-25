@@ -39,11 +39,15 @@ export const getCurrentUser = (): AppThunk => {
           data: { currentUser },
         },
       } = await axios.get('/currentUser');
-      dispatch({
-        type: UserTypes.GET_CURRENT_USER_SUCCESS,
-        payload: currentUser,
-      });
-      localStorage.setItem('user', JSON.stringify(currentUser));
+
+      // @ts-ignore
+      dispatch(getCurrentUserFullPayload(currentUser.id));
+
+      // dispatch({
+      //   type: UserTypes.GET_CURRENT_USER_SUCCESS,
+      //   payload: currentUser,
+      // });
+      // localStorage.setItem('user', JSON.stringify(currentUser));
     } catch (e) {
       dispatch({
         type: UserTypes.GET_CURRENT_USER_ERROR,
@@ -241,6 +245,7 @@ export const getCurrentUserFullPayload = (id: string): AppThunk => {
         type: UserTypes.GET_CURRENT_USER_FULL_PAYLOAD_SUCCESS,
         payload: user,
       });
+      localStorage.setItem('user', JSON.stringify(user));
     } catch (e) {
       dispatch({
         type: UserTypes.GET_CURRENT_USER_FULL_PAYLOAD_ERROR,

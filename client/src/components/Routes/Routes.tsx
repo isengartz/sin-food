@@ -10,6 +10,7 @@ import { selectCurrentUser } from '../../state';
 import AuthRoute from './AuthRoute/AuthRoute';
 import RestaurantPage from '../../pages/restaurant-page';
 import CheckOutPage from '../../pages/checkout';
+import ThankYouPage from '../../pages/thank-you';
 
 /**
  * Application Routes
@@ -33,6 +34,14 @@ const Routes: React.FC = () => {
       </UnAuthRoute>
       <AuthRoute redirectTo="/" isLogged={!!user} exact path="/checkout">
         <CheckOutPage />
+      </AuthRoute>
+      <AuthRoute
+        redirectTo={'/'}
+        isLogged={!!user}
+        exact
+        path="/thank-you/:orderId"
+      >
+        <ThankYouPage />
       </AuthRoute>
       <Route path="*">
         <NotFoundPage />

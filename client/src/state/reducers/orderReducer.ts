@@ -63,6 +63,26 @@ const reducer = produce(
       case OrderTypes.UPDATE_ORDER_PAYMENT_METHOD:
         state.payment_method = action.payload;
         return state;
+      case OrderTypes.ORDER_CREATION_START:
+        state.loading = true;
+        return state;
+      case OrderTypes.ORDER_CREATION_SUCCESS:
+        state.loading = false;
+        return state;
+      case OrderTypes.ORDER_CREATION_ERROR:
+        state.loading = true;
+        state.errors = action.payload;
+        return state;
+      case OrderTypes.ORDER_PAYMENT_START:
+        state.loading = true;
+        return state;
+      case OrderTypes.ORDER_PAYMENT_SUCCESS:
+        state.loading = false;
+        return state;
+      case OrderTypes.ORDER_PAYMENT_ERROR:
+        state.loading = false;
+        state.errors = action.payload;
+        return state;
       default:
         return state;
     }

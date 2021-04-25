@@ -11,6 +11,7 @@ import { CacheHelper } from '../../util/cacheHelper';
 import { handleAxiosErrorMessage } from '../../util/handleAxiosErrorMessage';
 import { axiosOrderInstance } from '../../apis/instances/order';
 import { PaymentMethod } from '@sin-nombre/sinfood-common';
+import { axiosPaymentInstance } from '../../apis/instances/payment';
 
 /**
  * Adds an item into cart and cache
@@ -117,19 +118,70 @@ export const clearCartData = (): AppThunk => {
   };
 };
 
+/**
+ *
+ * @param orderItems
+ */
 export const createOrder = (orderItems: any): AppThunk => {
   return async (dispatch: Dispatch<OrderAction>) => {
+    dispatch({
+      type: OrderTypes.ORDER_CREATION_START,
+    });
     try {
-      console.log(orderItems);
       const {
-        data: { data },
+        data: {
+          data: { orders },
+        },
       } = await axiosOrderInstance.post('/', orderItems);
-      const response = await axiosOrderInstance.post('/', orderItems);
-      console.log(response.data);
-      return data;
+      return orders;
     } catch (e) {
       dispatch({
-        type: OrderTypes.SET_ORDER_ERRORS,
+        type: OrderTypes.ORDER_CREATION_ERROR,
+        payload: handleAxiosErrorMessage(e),
+      });
+    }
+  };
+};
+
+interface PaymentResponse {
+  status: string;
+  data: {
+    payment: {
+      id: string;
+      orderId: string;
+    };
+  };
+}
+
+/**
+ *
+ * @param orderId
+ * @param payment_method
+ * @param token
+ */
+export const createPayment = (
+  orderId: string,
+  payment_method: PaymentMethod,
+  token: string = '',
+): AppThunk<Promise<PaymentResponse | undefined>> => {
+  return async (
+    dispatch: Dispatch<OrderAction>,
+  ): Promise<PaymentResponse | undefined> => {
+    dispatch({
+      type: OrderTypes.ORDER_PAYMENT_START,
+    });
+    try {
+      const payload = {
+        orderId,
+        payment_method,
+        token,
+      };
+      const response = await axiosPaymentInstance.post('/', payload);
+
+      return response.data as PaymentResponse;
+    } catch (e) {
+      dispatch({
+        type: OrderTypes.ORDER_PAYMENT_ERROR,
         payload: handleAxiosErrorMessage(e),
       });
     }
