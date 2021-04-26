@@ -37,7 +37,7 @@ $ kubectl create secret generic transporter-email-username --from-literal TRANSP
 $ kubectl create secret generic transporter-email-password --from-literal TRANSPORTER_EMAIL_PASSWORD=KEY
 $ kubectl create secret generic stripe-secret-key --from-literal STRIPE_SECRET_KEY=KEY
 ```
-##:exclamation: Local ENV Variables :exclamation:
+## :exclamation: Local ENV Variables :exclamation:
 
 ###Client
 `cd client/`

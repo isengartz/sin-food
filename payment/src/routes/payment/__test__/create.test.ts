@@ -84,12 +84,12 @@ it('should return 201 with valid input and Payment type as Stripe', async () => 
     .set('Cookie', cookie)
     .send({
       orderId: order.id,
-      token: 'tok_visa',
+      token: 'pm_card_visa',
       payment_method: PaymentMethod.STRIPE,
     })
     .expect(201);
 
-  const stripeCharges = await stripe.charges.list({ limit: 50 });
+  const stripeCharges = await stripe.charges.list({ limit: 1 });
   const stripeCharge = stripeCharges.data.find((charge) => {
     return charge.amount === order.price * 100;
   });
@@ -99,8 +99,9 @@ it('should return 201 with valid input and Payment type as Stripe', async () => 
 
   const payment = await Payment.findOne({
     orderId: order.id,
-    paymentId: stripeCharge!.id,
+    paymentId: stripeCharge!.payment_intent as string,
   });
+
   expect(payment).not.toBeNull();
 });
 

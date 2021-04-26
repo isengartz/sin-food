@@ -81,29 +81,7 @@ orderSchema.pre<OrderDoc>('save', function (next) {
   this.wasNew = this.isNew;
   next();
 });
-//
-// // emit Events on Create / Update
-// orderSchema.post<OrderDoc>('save', async function (doc, next) {
-//   if (doc.wasNew) {
-//     new OrderCreatedPublisher(natsWrapper.client).publish({
-//       id: doc._id,
-//       price: doc.price,
-//       status: doc.status,
-//       userId: doc.userId,
-//       restaurantId: doc.restaurantId,
-//     });
-//   } else {
-//     new OrderUpdatedPublisher(natsWrapper.client).publish({
-//       id: doc._id,
-//       price: doc.price,
-//       status: doc.status,
-//       userId: doc.userId,
-//       restaurantId: doc.restaurantId,
-//       version: doc.version,
-//     });
-//   }
-//   next();
-// });
+
 const Order = mongoose.model<OrderDoc, OrderModel>('Order', orderSchema);
 
 export { Order };

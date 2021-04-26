@@ -59,6 +59,9 @@ export const filterRestaurants = async (
   // @todo: refactor this so it will support Timezone
   const todayAsDate = new Date(new Date().setUTCHours(0, 0, 0, 0));
 
+  // @todo: I have to correctly calculate the Day / Time because there is an edge case
+  // @todo: When someone tries to order at 23:51+ where I should check the next day
+
   const restaurants = await Restaurant.aggregate([
     {
       $match: {

@@ -8,6 +8,8 @@ import {
 import { Order } from '../models/order';
 import { handlePaymentMethod } from '../utils/handle-payment-method';
 import { Payment } from '../models/payment';
+import { PaymentCreatedPublisher } from '../events/publishers/payment-created-publisher';
+import { natsWrapper } from '../events/nats-wrapper';
 
 /**
  *
@@ -48,6 +50,16 @@ export const createPayment = async (
   });
 
   await payment.save();
+
+  new PaymentCreatedPublisher(natsWrapper.client).publish({
+    id: payment.id,
+    version: payment.version,
+    orderId: payment.orderId,
+    payment_method: payment.payment_method,
+    paymentId: payment.paymentId,
+    createdAt: payment.createdAt,
+  });
+
   res.status(201).send({
     status: 'success',
     data: { payment },

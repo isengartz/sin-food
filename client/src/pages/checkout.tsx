@@ -101,7 +101,7 @@ const CheckOutPage: React.FC = () => {
 
       // Redirect to thank you page
       // @ts-ignore
-      if (payment.status! === 'success') {
+      if (payment && payment.status! === 'success') {
         //@ts-ignore
         history.push(`/thank-you/${payment.data.payment.orderId}`);
       }

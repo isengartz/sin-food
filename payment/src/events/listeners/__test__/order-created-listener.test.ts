@@ -1,4 +1,4 @@
-import mongoose, { set } from 'mongoose';
+import mongoose from 'mongoose';
 import { OrderCreatedEvent, OrderStatus } from '@sin-nombre/sinfood-common';
 import { Message } from 'node-nats-streaming';
 import { OrderCreatedListener } from '../order-created-listener';
@@ -33,7 +33,7 @@ it('should create new order', async () => {
   expect(order!.price).toEqual(data.price);
 });
 
-it('should create new order', async () => {
+it('should ack the message', async () => {
   const { listener, data, msg } = await setup();
 
   await listener.onMessage(data, msg);

@@ -150,13 +150,15 @@ orderSchema.pre<OrderDoc>('save', async function (next) {
 orderSchema.pre<OrderDoc>('save', function (next) {
   // @ts-ignore
   this.wasNew = this.isNew;
+
   next();
 });
 
 // emit Events on Create / Update
 orderSchema.post<OrderDoc>('save', async function (doc, next) {
   if (doc.wasNew) {
-    new OrderCreatedPublisher(natsWrapper.client).publish({
+    // we await this so the order is created inside payment service
+    await new OrderCreatedPublisher(natsWrapper.client).publish({
       id: doc._id,
       price: doc.price,
       status: doc.status,
@@ -164,14 +166,15 @@ orderSchema.post<OrderDoc>('save', async function (doc, next) {
       restaurantId: doc.restaurantId,
     });
   } else {
-    new OrderUpdatedPublisher(natsWrapper.client).publish({
-      id: doc._id,
-      price: doc.price,
-      status: doc.status,
-      userId: doc.userId,
-      restaurantId: doc.restaurantId,
-      version: doc.version,
-    });
+    // comment this out cause it triggers on expiration status
+    // new OrderUpdatedPublisher(natsWrapper.client).publish({
+    //   id: doc._id,
+    //   price: doc.price,
+    //   status: doc.status,
+    //   userId: doc.userId,
+    //   restaurantId: doc.restaurantId,
+    //   version: doc.version,
+    // });
   }
   next();
 });

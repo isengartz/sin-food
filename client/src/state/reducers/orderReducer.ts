@@ -41,6 +41,7 @@ const reducer = produce(
         return state;
       case OrderTypes.CLEAR_CART_DATA:
         state.cart = initialState.cart;
+        state.loading = false;
         return state;
       case OrderTypes.UPDATE_CART_ITEM:
         const itemIndex = state.cart.items.findIndex(

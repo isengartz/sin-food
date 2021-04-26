@@ -78,7 +78,7 @@ export const signInUser = (data: SignInUserForm): AppThunk => {
       });
 
       // @ts-ignore
-      dispatch(getCurrentUserFullPayload(currentUser.id));
+      dispatch(getCurrentUserFullPayload(user.id));
 
       dispatch({
         type: ModalTypes.CLOSE_USER_LOGIN_MODAL,

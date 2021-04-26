@@ -5,6 +5,8 @@ import { MenuItemCreatedListener } from './events/listeners/menu-item-created-li
 import { MenuItemUpdatedListener } from './events/listeners/menu-item-updated-listener';
 import { IngredientCreatedListener } from './events/listeners/ingredient-created-listener';
 import { IngredientUpdatedListener } from './events/listeners/ingredient-updated-listener';
+import { PaymentCreatedListener } from './events/listeners/payment-created-listener';
+import { ExpirationCompletedListener } from './events/listeners/expiration-completed-listener';
 
 const start = async () => {
   // Check for ENV Vars so TS stfu and also throw an error if we forgot to define them in Kubernetes
@@ -53,6 +55,8 @@ const start = async () => {
     new MenuItemUpdatedListener(natsWrapper.client).listen();
     new IngredientCreatedListener(natsWrapper.client).listen();
     new IngredientUpdatedListener(natsWrapper.client).listen();
+    new PaymentCreatedListener(natsWrapper.client).listen();
+    new ExpirationCompletedListener(natsWrapper.client).listen();
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);

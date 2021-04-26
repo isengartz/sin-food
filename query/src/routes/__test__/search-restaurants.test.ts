@@ -16,7 +16,7 @@ it('should return 1 result when the lat & long intersects with delivers_to Polyg
     )
     .send({})
     .expect(200);
-  expect(response.body.data.restaurants.length).toEqual(1);
+  expect(response.body.data.restaurants.open.length).toEqual(1);
 });
 it('should filter with category too', async () => {
   await Restaurant.build(RESTAURANT_CREATE_VALID_PAYLOAD).save();
@@ -28,12 +28,12 @@ it('should filter with category too', async () => {
     .send({})
     .expect(200);
 
-  expect(response.body.data.restaurants.length).toEqual(1);
+  expect(response.body.data.restaurants.open.length).toEqual(1);
 });
 it('should return 0 results when the category doesnt exist in document payload', async () => {
   // I hardcoded the lat & long cause they match the Polygon of RESTAURANT_VALID_CREATE_PAYLOAD
   // Dont insert the second category
-  const restaurant = await Restaurant.build({
+  await Restaurant.build({
     ...RESTAURANT_CREATE_VALID_PAYLOAD,
     categories: ['category1'],
   }).save();

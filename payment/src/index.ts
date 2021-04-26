@@ -3,6 +3,8 @@ import { app } from './app';
 import { natsWrapper } from './events/nats-wrapper';
 import { OrderCreatedListener } from './events/listeners/order-created-listener';
 import { OrderUpdatedListener } from './events/listeners/order-updated-listener';
+import { OrderCompletedListener } from './events/listeners/order-completed-listener';
+import { OrderCancelledListener } from './events/listeners/order-cancelled-listener';
 
 const start = async () => {
   // Check for ENV Vars so TS stfu and also throw an error if we forgot to define them in Kubernetes
@@ -51,6 +53,8 @@ const start = async () => {
 
     new OrderCreatedListener(natsWrapper.client).listen();
     new OrderUpdatedListener(natsWrapper.client).listen();
+    new OrderCompletedListener(natsWrapper.client).listen();
+    new OrderCancelledListener(natsWrapper.client).listen();
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);

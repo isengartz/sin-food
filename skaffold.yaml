@@ -12,6 +12,8 @@ deploy:
       - ./infra/k8s/user/user-depl.yaml
       - ./infra/k8s/query/query-depl.yaml
       - ./infra/k8s/payment/payment-depl.yaml
+      - ./infra/k8s/expiration/expiration-redis-depl.yaml
+      - ./infra/k8s/expiration/expiration-depl.yaml
       - ./infra/k8s-dev/*
       - ./infra/k8s/database-pvc.yaml #added it to refresh schemas
       - ./infra/k8s/menu/menu-mongo-depl.yaml #added it to refresh schemas
@@ -74,6 +76,14 @@ build:
             dest: .
     - image: isengart/food-query
       context: query
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
+    - image: isengart/food-expiration
+      context: expiration
       docker:
         dockerfile: Dockerfile
       sync:
