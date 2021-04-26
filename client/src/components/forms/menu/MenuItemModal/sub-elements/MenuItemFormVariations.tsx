@@ -11,6 +11,15 @@ interface MenuItemFormVariationsProps {
   name: string;
 }
 
+/**
+ * Render a list of variations as Radio Buttons
+ * @param variations
+ * @param selectedItem
+ * @param value
+ * @param onChange
+ * @param name
+ * @constructor
+ */
 const MenuItemFormVariations: React.FC<MenuItemFormVariationsProps> = ({
   variations,
   selectedItem,

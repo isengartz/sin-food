@@ -18,14 +18,6 @@ const renderItem = (title: string, payload: google.maps.GeocoderResult) => ({
   ),
 });
 
-// @ts-ignore
-// const options = [
-//   {
-//     label: renderTitle('Test'),
-//     options: [renderItem('Test Item')],
-//   },
-// ];
-
 interface AutoCompleteOptions {
   label: JSX.Element;
   options: {
@@ -39,6 +31,11 @@ interface GeocodingAutoCompleteProps {
   onComplete: (data: any) => void;
 }
 
+/**
+ * Custom Geocoding Component. NOT USED ANY MORE
+ * @param onComplete
+ * @constructor
+ */
 const GeocodingAutoComplete: React.FC<GeocodingAutoCompleteProps> = ({
   onComplete,
 }) => {

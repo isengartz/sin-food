@@ -16,6 +16,17 @@ interface CartItemProps {
   withActions: boolean;
 }
 
+/**
+ * Single cart item.
+ * @param name
+ * @param description
+ * @param price
+ * @param uuid
+ * @param id
+ * @param quantity
+ * @param withActions Used to enable disable the click functionality ( for edit )
+ * @constructor
+ */
 const CartItem: React.FC<CartItemProps> = ({
   name,
   description,

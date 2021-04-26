@@ -3,6 +3,11 @@ import { Col, Row } from 'antd';
 import { Layout } from 'antd';
 import RegisterForm from '../components/forms/user/RegisterForm/registerForm';
 const { Content } = Layout;
+
+/**
+ * User Registration Page
+ * @constructor
+ */
 const RegisterUserPage: React.FC = () => {
   return (
     <Content>

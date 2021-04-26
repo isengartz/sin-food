@@ -11,6 +11,14 @@ interface RestaurantMenuListWrapperProps {
 }
 
 const { Title } = Typography;
+
+/**
+ * Renders a list of menu items
+ * @param id
+ * @param name
+ * @param items
+ * @constructor
+ */
 const RestaurantMenuListWrapper: React.FC<RestaurantMenuListWrapperProps> = ({
   id,
   name,

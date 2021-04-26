@@ -29,7 +29,9 @@ const RestaurantList: React.FC = () => {
       history.push('/');
     }
     // Check if address is a valid user address
-    if (!userAddresses.flatMap((x) => x.id).includes(filters.address)) {
+    if (
+      !userAddresses.flatMap((address) => address.id).includes(filters.address)
+    ) {
       alert('not a valid address');
       return;
     }

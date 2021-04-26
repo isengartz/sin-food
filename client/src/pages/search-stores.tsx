@@ -13,6 +13,10 @@ import { useActions } from '../hooks/useActions';
 
 const { Content, Sider } = Layout;
 
+/**
+ * Display a list with restaurants and filters
+ * @constructor
+ */
 const SearchStores: React.FC = () => {
   const loading = useTypedSelector(selectRestaurantSearchIsLoading);
   const errors = useTypedSelector(selectRestaurantErrors);

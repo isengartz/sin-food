@@ -12,6 +12,7 @@ import { handleAxiosErrorMessage } from '../../util/handleAxiosErrorMessage';
 import axios from '../../apis/instances/user';
 import { AppThunk } from '../../util/types/AppThunk';
 import { UserAddress } from '../../util/interfaces/UserAddress';
+import { clearCartData } from './orderActionCreator';
 
 // How using the HandleApiMiddleware action would look like if I wired it
 // export const getCurrentUser = () => ({
@@ -75,11 +76,13 @@ export const signInUser = (data: SignInUserForm): AppThunk => {
         type: UserTypes.SIGN_IN_USER_SUCCESS,
         payload: user,
       });
+
+      // @ts-ignore
+      dispatch(getCurrentUserFullPayload(currentUser.id));
+
       dispatch({
         type: ModalTypes.CLOSE_USER_LOGIN_MODAL,
       });
-
-      localStorage.setItem('user', JSON.stringify(user));
     } catch (e) {
       // Push the error at the global Error Stack
       dispatch({
@@ -130,6 +133,9 @@ export const signOutUser = (): AppThunk => {
         type: UserTypes.SIGN_OUT_USER_SUCCESS,
       });
       localStorage.clear();
+
+      // @ts-ignore
+      dispatch(clearCartData());
     } catch (e) {
       dispatch({
         type: UserTypes.SIGN_OUT_USER_ERROR,
@@ -139,6 +145,10 @@ export const signOutUser = (): AppThunk => {
   };
 };
 
+/**
+ * Return all user addresses
+ * @param userId
+ */
 export const getCurrentUserAddresses = (userId: string): AppThunk => {
   return async (dispatch: Dispatch<UserAction>) => {
     dispatch({
@@ -195,7 +205,7 @@ export const addUserAddress = (data: UserAddress): AppThunk => {
 
       // If there are no addresses set it
       if (!localStorage.getItem('userAddresses')) {
-        localStorage.setItem('addresses', JSON.stringify([address]));
+        localStorage.setItem('userAddresses', JSON.stringify([address]));
       } else {
         // else push it in the current array
         const addresses = JSON.parse(
@@ -206,8 +216,6 @@ export const addUserAddress = (data: UserAddress): AppThunk => {
           JSON.stringify([...addresses, address]),
         );
       }
-
-      // localStorage.setItem('addresses', JSON.stringify(addresses));
     } catch (e) {
       dispatch({
         type: UserTypes.ADD_USER_ADDRESS_ERROR,

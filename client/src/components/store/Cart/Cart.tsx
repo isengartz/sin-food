@@ -13,6 +13,12 @@ import { formatMoney } from '../../../util/formatMoney';
 import CartItem from './CartItem/CartItem';
 import './cart.less';
 
+/**
+ * Shows the items added to cart and total price
+ * If the total price of items are lower than the restaurant minimum order price
+ * It disables the button. The same goes when no items are added in cart.
+ * @constructor
+ */
 const Cart: React.FC = () => {
   const history = useHistory();
   const userAddress = useTypedSelector(
@@ -23,13 +29,11 @@ const Cart: React.FC = () => {
   const cartItems = useTypedSelector(selectCartItems);
   const cartTotalCost = useTypedSelector(selectCartTotalPrice);
 
-  // console.log(cartItems);
   const isButtonEnabled =
     cartItems.length > 0 &&
     selectedRestaurant &&
     cartTotalCost >= selectedRestaurant!.minimum_order;
 
-  // @ts-ignore
   return (
     <Col style={{ marginTop: '20px' }} span={6}>
       <Affix offsetTop={20}>

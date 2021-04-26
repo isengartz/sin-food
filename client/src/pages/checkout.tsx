@@ -88,6 +88,8 @@ const CheckOutPage: React.FC = () => {
     // Create a new order
     const order = await createOrder(payload);
 
+    // @todo: Fix the issue with Redux Typings and remove the @ts-ignore
+
     // Try to pay for the order
     if (order) {
       const payment = await createPayment(

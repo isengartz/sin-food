@@ -6,6 +6,14 @@ interface AuthRouteProps extends RouteProps {
   isLogged: boolean;
 }
 
+/**
+ * Route that can only be access from ** LOGGED IN USERS **
+ * @param redirectTo
+ * @param isLogged
+ * @param children
+ * @param rest
+ * @constructor
+ */
 const AuthRoute: React.FC<AuthRouteProps> = ({
   redirectTo = '/',
   isLogged = false,

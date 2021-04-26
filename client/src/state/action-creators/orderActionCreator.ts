@@ -55,9 +55,13 @@ export const updateCartItem = (
         items: StoredCartItemInterface[];
         restaurant: string;
       }>('cart');
+
+      // The below checks should never ever happen normally.
+      // In order to bug it someone has to manually delete IndexDB stuff from the browser
       if (!storedItems) {
         throw new Error('We got an internal error! Try again later!');
       }
+
       const foundItemIndex = storedItems.items.findIndex(
         (item) => item.uuid === updatedItem.uuid,
       );
@@ -110,6 +114,9 @@ export const removeItemFromCart = (uuid: string): AppThunk => {
   };
 };
 
+/**
+ * Empty the whole cart
+ */
 export const clearCartData = (): AppThunk => {
   return async (dispatch: Dispatch<OrderAction>) => {
     const cacheHelper = new CacheHelper();
@@ -119,7 +126,8 @@ export const clearCartData = (): AppThunk => {
 };
 
 /**
- *
+ * Generate an orderId and return it back
+ * We dont store anything in Redux here
  * @param orderItems
  */
 export const createOrder = (orderItems: any): AppThunk => {
@@ -154,7 +162,8 @@ interface PaymentResponse {
 }
 
 /**
- *
+ * Creates a payment and return it back
+ * We dont store anything in Redux here
  * @param orderId
  * @param payment_method
  * @param token
@@ -188,8 +197,15 @@ export const createPayment = (
   };
 };
 
+/**
+ * Clear all order errors
+ */
 export const clearOrderErrors = () => ({ type: OrderTypes.CLEAR_ORDER_ERRORS });
 
+/**
+ * Updates the current selected payment method
+ * @param method
+ */
 export const updatePaymentMethod = (method: PaymentMethod) => ({
   type: OrderTypes.UPDATE_ORDER_PAYMENT_METHOD,
   payload: method,

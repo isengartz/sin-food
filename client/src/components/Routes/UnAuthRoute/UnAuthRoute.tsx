@@ -6,6 +6,15 @@ interface UnAuthRouteProps extends RouteProps {
   isLogged: boolean;
 }
 
+/**
+ * Route that can only be accessed from **NON LOGGED IN USER**
+ * Examples : Register Page
+ * @param redirectTo
+ * @param isLogged
+ * @param children
+ * @param rest
+ * @constructor
+ */
 const UnAuthRoute: React.FC<UnAuthRouteProps> = ({
   redirectTo = '/',
   isLogged = false,

@@ -101,6 +101,8 @@ const MenuItemModal: React.FC = () => {
       return;
     }
 
+    // If we are adding a new item
+
     setOrderItem({
       ...initialState,
       item_options: { ...initialState.item_options, name: selectedItem.name },
@@ -183,6 +185,9 @@ const MenuItemModal: React.FC = () => {
     let baseDescription = orderItem.item_options.variation
       ? `${orderItem.item_options.variation} `
       : '';
+
+    // Create an array of unique ids from non-excluded base ingredients
+    // And extra selected ingredients
     const baseIngredients =
       selectedItem?.main_ingredients
         .flatMap((ingr: IngredientInterface) => ingr.id)
@@ -196,7 +201,7 @@ const MenuItemModal: React.FC = () => {
         ...orderItem.item_options.extra_ingredients,
       ]),
     );
-
+    // Return a coma separated string from all ingredient names
     const description = allIngredients
       .map((ingr) => ingredientNames.get(ingr) || '')
       .join(', ');
@@ -246,7 +251,8 @@ const MenuItemModal: React.FC = () => {
       return;
     }
     // For the next 2 I could possibly forward the formRef into child components and manually add the values to form
-
+    // But too much work for nothing. Maybe change it in the future
+    // @todo: Refactor this later
     if (target.name === 'excluded_ingredients') {
       handleMainIngredientChange(target.value);
       return;
@@ -404,7 +410,6 @@ const MenuItemModal: React.FC = () => {
                     items={selectedItem.main_ingredients}
                     inputName="excluded_ingredients"
                     showPrices={false}
-                    // onChange={onMainIngredientChange}
                     value={selectedItem.main_ingredients
                       .flatMap(
                         (ingredient: IngredientInterface) => ingredient.id,

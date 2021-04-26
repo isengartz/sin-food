@@ -6,6 +6,11 @@ import { selectMenuCategories, selectSelectedRestaurant } from '../../../state';
 
 const { Link } = Anchor;
 const { Title } = Typography;
+
+/**
+ * Renders a Fixed List with restaurant menu categories
+ * @constructor
+ */
 const RestaurantMenuCategoryList = () => {
   const { getMenuCategories } = useActions();
   const menuCategories = useTypedSelector(selectMenuCategories);

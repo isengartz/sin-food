@@ -9,13 +9,16 @@ import {
 } from '../../../state';
 import RestaurantMenuListWrapper from './RestaurantMenuListWrapper/RestaurantMenuListWrapper';
 
+/**
+ * Renders a list of menu **CATEGORIES**
+ * @constructor
+ */
 const RestaurantMenuList = () => {
   const { getMenuItems } = useActions();
   const selectedRestaurant = useTypedSelector(selectSelectedRestaurant);
   const menuCategories = useTypedSelector(selectMenuCategoriesAsMap);
   const menuItems = useTypedSelector(selectMenuItemsSortedByCategory);
 
-  // console.log(menuItems, items);
   useEffect(() => {
     if (!selectedRestaurant) {
       return;
@@ -32,8 +35,7 @@ const RestaurantMenuList = () => {
           <RestaurantMenuListWrapper
             key={id}
             id={id}
-            // @ts-ignore
-            name={menuCategories.get(id)}
+            name={menuCategories.get(id) as string}
             items={item}
           />,
         );

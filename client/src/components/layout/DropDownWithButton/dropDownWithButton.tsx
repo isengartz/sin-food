@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from 'antd';
 import './dropDownWithButton.less';
+
 interface DropDownWithButtonProps {
   options?: {
     value: string;
@@ -10,6 +11,15 @@ interface DropDownWithButtonProps {
   onBtnClick: (value: string | undefined) => void;
   defaultSelectedOption?: string;
 }
+
+/**
+ * Renders a dropdown list with a button on the right
+ * @param options
+ * @param buttonText
+ * @param onBtnClick
+ * @param defaultSelectedOption
+ * @constructor
+ */
 const DropDownWithButton: React.FC<DropDownWithButtonProps> = ({
   options,
   buttonText,

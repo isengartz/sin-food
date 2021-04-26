@@ -5,6 +5,10 @@ import HomeUserAddressSection from '../components/page-specific/home/HomeUserAdd
 
 const { Content } = Layout;
 
+/**
+ * Home Page
+ * @constructor
+ */
 const HomePage: React.FC = () => {
   return (
     <Content>

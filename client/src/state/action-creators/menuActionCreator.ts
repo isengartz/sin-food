@@ -9,7 +9,8 @@ import { CacheHelper } from '../../util/cacheHelper';
 import { StoredCartItemInterface } from '../../util/interfaces/CartItemInterface';
 
 /**
- * Fetch Menu Categories
+ * Fetch restaurants menu categories
+ * @param restaurantId
  */
 export const getMenuCategories = (restaurantId: string): AppThunk => {
   return async (dispatch: Dispatch<MenuAction>) => {
@@ -24,10 +25,6 @@ export const getMenuCategories = (restaurantId: string): AppThunk => {
         type: MenuTypes.GET_MENU_CATEGORIES_SUCCESS,
         payload: menu_item_categories,
       });
-      // localStorage.setItem(
-      //   'restaurantCategories',
-      //   JSON.stringify(menu_item_categories),
-      // );
     } catch (e) {
       dispatch({
         type: MenuTypes.GET_MENU_CATEGORIES_ERROR,
@@ -38,7 +35,8 @@ export const getMenuCategories = (restaurantId: string): AppThunk => {
 };
 
 /**
- * Fetch Menu Items
+ * Fetch Restaurants menu items
+ * @param restaurantId
  */
 export const getMenuItems = (restaurantId: string): AppThunk => {
   return async (dispatch: Dispatch<MenuAction>) => {
@@ -53,7 +51,6 @@ export const getMenuItems = (restaurantId: string): AppThunk => {
         type: MenuTypes.GET_MENU_ITEMS_SUCCESS,
         payload: menu_items,
       });
-      // localStorage.setItem('restaurantCategories', JSON.stringify(menu_items));
     } catch (e) {
       dispatch({
         type: MenuTypes.GET_MENU_ITEMS_ERROR,
@@ -63,6 +60,10 @@ export const getMenuItems = (restaurantId: string): AppThunk => {
   };
 };
 
+/**
+ * Set the menu item as selected
+ * @param item
+ */
 export const setSelectedMenuItem = (
   item: MenuItemInterface,
 ): SetSelectedMenuItem => {
@@ -72,6 +73,11 @@ export const setSelectedMenuItem = (
   };
 };
 
+/**
+ * Update the state in order to show the menu item edit modal
+ * @param selectedItem
+ * @param uuid
+ */
 export const startUpdatingMenuItem = (
   selectedItem: MenuItemInterface,
   uuid: string,
@@ -84,11 +90,13 @@ export const startUpdatingMenuItem = (
         items: StoredCartItemInterface[];
         restaurant: string;
       }>('cart');
+
+      // The below checks should never ever happen normally.
+      // In order to bug it someone has to manually delete IndexDB stuff from the browser
       if (!storedItems) {
         throw new Error('We got an internal error! Try again later!');
       }
       const foundItem = storedItems.items.find((item) => item.uuid === uuid);
-      console.log('foundItem', foundItem);
       if (!foundItem) {
         throw new Error('We got an internal error! Try again later!');
       }
@@ -109,10 +117,16 @@ export const startUpdatingMenuItem = (
   };
 };
 
+/**
+ * Clear the selected item for update from state
+ */
 export const unsetMenuEditingItem = () => ({
   type: MenuTypes.UNSET_UPDATING_ITEM,
 });
 
+/**
+ * Clear the selected menu item from state
+ */
 export const unsetSelectedItem = () => ({
   type: MenuTypes.UNSET_SELECTED_ITEM,
 });

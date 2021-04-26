@@ -7,6 +7,9 @@ interface AddressInfoProps {
   phone?: string;
 }
 
+/**
+ * Shows a Card with Address information of user
+ */
 const AddressInfo = React.forwardRef<FormInstance, AddressInfoProps>(
   ({ full_name, floor, phone }, ref) => {
     return (

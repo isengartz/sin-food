@@ -1,5 +1,10 @@
 import { useEffect, useRef } from 'react';
 
+/**
+ * Hook that only re-renders on deps updates and not on initial mount
+ * @param effect
+ * @param deps
+ */
 export const useUpdateEffect: typeof useEffect = (effect, deps) => {
   const isFirstMount = useRef(true);
 

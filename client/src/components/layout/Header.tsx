@@ -8,6 +8,10 @@ import { UserOutlined, UserAddOutlined } from '@ant-design/icons';
 
 const { SubMenu, Item } = Menu;
 
+/**
+ * Header and Menu
+ * @constructor
+ */
 const Header: React.FC = () => {
   const user = useTypedSelector(selectCurrentUser);
   const { showLoginModal, signOutUser } = useActions();

@@ -14,6 +14,16 @@ interface RestaurantMenuListItemProps {
   variations?: VariationInterface[];
 }
 const { Title, Text } = Typography;
+
+/**
+ * Single Menu item
+ * @param id
+ * @param name
+ * @param description
+ * @param variations
+ * @param basePrice
+ * @constructor
+ */
 const RestaurantMenuListItem: React.FC<RestaurantMenuListItemProps> = ({
   id,
   name,
@@ -39,6 +49,7 @@ const RestaurantMenuListItem: React.FC<RestaurantMenuListItemProps> = ({
       setSelectedMenuItem(found);
       showMenuItemModal();
     } else {
+      // this should never ever happen tho xD
       // @todo: add a set_menu_error action and dispatch that instead xD
       alert('Something went really wrong mate xD');
     }

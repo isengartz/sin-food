@@ -18,6 +18,11 @@ import MenuItemModal from '../components/forms/menu/MenuItemModal/MenuItemModal'
 import Cart from '../components/store/Cart/Cart';
 
 const { Content } = Layout;
+
+/**
+ * Single Restaurant Page
+ * @constructor
+ */
 const RestaurantPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const selectedRestaurant = useTypedSelector(selectSelectedRestaurant);

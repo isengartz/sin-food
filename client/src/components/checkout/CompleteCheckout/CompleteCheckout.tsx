@@ -21,6 +21,12 @@ interface CompleteCheckoutProps {
   onClick: (token?: string) => void;
 }
 
+/**
+ * Shows Cart content and renders the right payment component
+ * Based on current selected payment method
+ * @param onClick
+ * @constructor
+ */
 const CompleteCheckout: React.FC<CompleteCheckoutProps> = ({ onClick }) => {
   const loading = useTypedSelector(selectOrderIsLoading);
   const cartItems = useTypedSelector(selectCartItems);

@@ -13,6 +13,17 @@ interface MenuItemFormIngredientsProps {
   showPrices?: boolean;
 }
 
+/**
+ * Shows a list of ingredients as checkboxes
+ * @param header
+ * @param items
+ * @param selectedItems
+ * @param inputName
+ * @param onChange
+ * @param value
+ * @param showPrices
+ * @constructor
+ */
 const MenuItemFormIngredients: React.FC<MenuItemFormIngredientsProps> = ({
   header,
   items,

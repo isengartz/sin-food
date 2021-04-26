@@ -15,6 +15,10 @@ import UserAddressModal from './userAddressModal';
 
 const { Option } = Select;
 
+/**
+ * Register Form
+ * @constructor
+ */
 const RegisterForm = () => {
   const visible = useTypedSelector(selectUserAddressModal);
   const { errors } = useTypedSelector(selectUser);

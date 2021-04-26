@@ -4,6 +4,11 @@ import { Button, Layout, Result } from 'antd';
 import { useActions } from '../hooks/useActions';
 
 const { Content } = Layout;
+
+/**
+ * Thank you page
+ * @constructor
+ */
 const ThankYouPage = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const history = useHistory();

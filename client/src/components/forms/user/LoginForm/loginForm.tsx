@@ -7,6 +7,10 @@ import { SignInUserForm } from '../../../../util/interfaces/forms/SignInUserForm
 import { useTypedSelector } from '../../../../hooks/useTypedSelector';
 import { selectCurrentUser, selectUserLoginModal } from '../../../../state';
 
+/**
+ * Login form Modal
+ * @constructor
+ */
 const LoginForm = () => {
   const [formRef] = Form.useForm();
   let history = useHistory();

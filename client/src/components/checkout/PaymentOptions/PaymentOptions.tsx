@@ -5,6 +5,10 @@ import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import { selectOrderPaymentMethod } from '../../../state';
 import { useActions } from '../../../hooks/useActions';
 
+/**
+ * Shows different payment methods
+ * @constructor
+ */
 const PaymentOptions: React.FC = () => {
   const selectActivePaymentMethod = useTypedSelector(selectOrderPaymentMethod);
   const { updatePaymentMethod } = useActions();

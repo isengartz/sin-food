@@ -4,7 +4,6 @@ import { Form, Input, Modal, Divider } from 'antd';
 import SimpleGoogleMap, {
   GoogleMapMarker,
 } from '../../../maps/simpleGoogleMap';
-// import GeocodingAutoComplete from '../../../maps/geocodingAutoComplete';
 import GooglePlacesAutocomplete, {
   geocodeByAddress,
 } from 'react-google-places-autocomplete';
