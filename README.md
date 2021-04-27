@@ -39,7 +39,7 @@ $ kubectl create secret generic stripe-secret-key --from-literal STRIPE_SECRET_K
 ```
 ## :exclamation: Local ENV Variables :exclamation:
 
-###Client
+### Client
 `cd client/`
 
 `mv .env.example .env`
@@ -50,7 +50,8 @@ Define:
 `REACT_APP_STRIPE_PUBLIC_KEY` ( Stripe Publishable Key )
 
 
-###Payment
+### Payment
+
 In order to test the payment libraries jest require access to the secret api keys. You can always comment out those tests if you want.
 
 `cd payment/`
@@ -61,7 +62,7 @@ Put the same value to `STRIPE_SECRET_KEY` as defined in the Kubernetes secrets
 
 
 
-###Seeder
+### Seeder
 
 `cd seeder/`
 
@@ -73,7 +74,7 @@ Put the same value to `ADMIN_ALLOW_PASSWORD` as defined in the Kubernetes secret
 
 `node-ts index.ts`
 
-###Run Skaffold
+### Run Skaffold
 
 ```sh
 $ cd/
