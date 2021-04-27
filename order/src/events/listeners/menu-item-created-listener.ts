@@ -1,4 +1,5 @@
 import {
+  handleListenerError,
   Listener,
   MenuItemCreatedEvent,
   Subjects,
@@ -13,15 +14,19 @@ export class MenuItemCreatedListener extends Listener<MenuItemCreatedEvent> {
   queueGroupName = queueGroupName;
 
   async onMessage(data: MenuItemCreatedEvent['data'], msg: Message) {
-    const { id, name, base_price, variations } = data;
-    const menuItem = MenuItem.build({
-      id,
-      name,
-      base_price,
-      variations,
-    });
-    await menuItem.save();
+    try {
+      const { id, name, base_price, variations } = data;
+      const menuItem = MenuItem.build({
+        id,
+        name,
+        base_price,
+        variations,
+      });
+      await menuItem.save();
 
-    msg.ack();
+      msg.ack();
+    } catch (e) {
+      handleListenerError(e, msg);
+    }
   }
 }

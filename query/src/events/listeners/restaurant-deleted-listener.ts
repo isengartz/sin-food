@@ -1,4 +1,5 @@
 import {
+  handleListenerError,
   Listener,
   RestaurantDeletedEvent,
   Subjects,
@@ -13,18 +14,22 @@ export class RestaurantDeletedListener extends Listener<RestaurantDeletedEvent> 
   queueGroupName = queueGroupName;
 
   async onMessage(data: RestaurantDeletedEvent['data'], msg: Message) {
-    const { id, version } = data;
-    const restaurant = await Restaurant.findByEvent({
-      id,
-      version,
-    });
+    try {
+      const { id, version } = data;
+      const restaurant = await Restaurant.findByEvent({
+        id,
+        version,
+      });
 
-    if (!restaurant) {
-      throw new Error('Restaurant not found');
+      if (!restaurant) {
+        throw new Error('Restaurant not found');
+      }
+
+      await restaurant.remove();
+
+      msg.ack();
+    } catch (e) {
+      handleListenerError(e, msg);
     }
-
-    await restaurant.remove();
-
-    msg.ack();
   }
 }

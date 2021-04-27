@@ -1,4 +1,5 @@
 import {
+  handleListenerError,
   Listener,
   Subjects,
   UserAddressUpdatedEvent,
@@ -13,19 +14,23 @@ export class UserAddressUpdatedListener extends Listener<UserAddressUpdatedEvent
   queueGroupName = queueGroupName;
 
   async onMessage(data: UserAddressUpdatedEvent['data'], msg: Message) {
-    const { id, version, location } = data;
-    const userAddress = await UserAddress.findByEvent({
-      id,
-      version,
-    });
+    try {
+      const { id, version, location } = data;
+      const userAddress = await UserAddress.findByEvent({
+        id,
+        version,
+      });
 
-    if (!userAddress) {
-      throw new Error('User Address not found');
+      if (!userAddress) {
+        throw new Error('User Address not found');
+      }
+
+      userAddress.set({ location });
+      await userAddress.save();
+
+      msg.ack();
+    } catch (e) {
+      handleListenerError(e, msg);
     }
-
-    userAddress.set({ location });
-    await userAddress.save();
-
-    msg.ack();
   }
 }

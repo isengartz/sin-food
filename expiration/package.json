@@ -19,7 +19,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@sin-nombre/sinfood-common": "^1.0.75",
+    "@sin-nombre/sinfood-common": "^1.0.76",
     "@types/bull": "^3.15.1",
     "bull": "^3.22.3",
     "node-nats-streaming": "^0.3.2",

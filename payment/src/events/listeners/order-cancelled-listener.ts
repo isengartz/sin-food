@@ -1,4 +1,5 @@
 import {
+  handleListenerError,
   Listener,
   NotFoundError,
   OrderCancelledEvent,
@@ -15,19 +16,20 @@ export class OrderCancelledListener extends Listener<OrderCancelledEvent> {
   subject: Subjects.OrderCancelled = Subjects.OrderCancelled;
 
   async onMessage(data: OrderCancelledEvent['data'], msg: Message) {
-    const { orderId, version } = data;
-    console.log({ orderId, version });
-    const testOrder = await Order.findById(orderId);
-    console.log(testOrder);
-    const order = await Order.findByEvent({ id: orderId, version });
+    try {
+      const { orderId, version } = data;
+      const order = await Order.findByEvent({ id: orderId, version });
 
-    if (!order) {
-      throw new NotFoundError('Order Not found');
+      if (!order) {
+        throw new NotFoundError('Order Not found');
+      }
+
+      order.set('status', OrderStatus.Canceled);
+      await order.save();
+
+      msg.ack();
+    } catch (e) {
+      handleListenerError(e, msg);
     }
-
-    order.set('status', OrderStatus.Canceled);
-    await order.save();
-
-    msg.ack();
   }
 }

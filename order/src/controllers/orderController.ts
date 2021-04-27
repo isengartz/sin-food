@@ -2,10 +2,9 @@ import {
   createOne,
   findAll,
   findOne,
-  deleteOne,
   updateOne,
 } from '@sin-nombre/sinfood-common';
-import { Request, Response, NextFunction } from 'express';
+
 import { Order, OrderDoc, OrderModel } from '../models/order';
 
 // @todo: The below routes should be used by both users and restaurants
@@ -44,14 +43,6 @@ export const createOneOrder = createOne<OrderDoc, OrderModel>(Order, 'userId');
  * Updates an Order
  */
 export const updateOneOrder = updateOne<OrderDoc, OrderModel>(Order);
-
-// export const validateOrder = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction,
-// ) => {
-//
-// };
 
 /**
  * Deletes an Order

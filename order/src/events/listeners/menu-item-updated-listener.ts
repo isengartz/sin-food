@@ -1,4 +1,5 @@
 import {
+  handleListenerError,
   Listener,
   MenuItemUpdatedEvent,
   Subjects,
@@ -13,15 +14,19 @@ export class MenuItemUpdatedListener extends Listener<MenuItemUpdatedEvent> {
   queueGroupName = queueGroupName;
 
   async onMessage(data: MenuItemUpdatedEvent['data'], msg: Message) {
-    const { id, name, base_price, variations, version } = data;
-    const menuItem = await MenuItem.findByEvent({ id, version });
+    try {
+      const { id, name, base_price, variations, version } = data;
+      const menuItem = await MenuItem.findByEvent({ id, version });
 
-    if (!menuItem) {
-      throw new Error('Menu Item not found');
+      if (!menuItem) {
+        throw new Error('Menu Item not found');
+      }
+
+      menuItem.set({ name, base_price, variations });
+      await menuItem.save();
+      msg.ack();
+    } catch (e) {
+      handleListenerError(e, msg);
     }
-
-    menuItem.set({ name, base_price, variations });
-    await menuItem.save();
-    msg.ack();
   }
 }

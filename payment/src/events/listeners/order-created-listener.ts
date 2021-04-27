@@ -1,4 +1,5 @@
 import {
+  handleListenerError,
   Listener,
   OrderCreatedEvent,
   Subjects,
@@ -13,18 +14,22 @@ export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
   subject: Subjects.OrderCreated = Subjects.OrderCreated;
 
   async onMessage(data: OrderCreatedEvent['data'], msg: Message) {
-    const { id, userId, restaurantId, status, price } = data;
+    try {
+      const { id, userId, restaurantId, status, price } = data;
 
-    const order = Order.build({
-      id,
-      userId,
-      restaurantId,
-      status,
-      price,
-    });
+      const order = Order.build({
+        id,
+        userId,
+        restaurantId,
+        status,
+        price,
+      });
 
-    await order.save();
+      await order.save();
 
-    msg.ack();
+      msg.ack();
+    } catch (e) {
+      handleListenerError(e, msg);
+    }
   }
 }

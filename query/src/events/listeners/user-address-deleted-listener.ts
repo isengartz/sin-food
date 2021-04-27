@@ -1,4 +1,5 @@
 import {
+  handleListenerError,
   Listener,
   Subjects,
   UserAddressDeletedEvent,
@@ -13,18 +14,22 @@ export class UserAddressDeletedListener extends Listener<UserAddressDeletedEvent
   queueGroupName = queueGroupName;
 
   async onMessage(data: UserAddressDeletedEvent['data'], msg: Message) {
-    const { id, version } = data;
-    const userAddress = await UserAddress.findByEvent({
-      id,
-      version,
-    });
+    try {
+      const { id, version } = data;
+      const userAddress = await UserAddress.findByEvent({
+        id,
+        version,
+      });
 
-    if (!userAddress) {
-      throw new Error('User Address not found');
+      if (!userAddress) {
+        throw new Error('User Address not found');
+      }
+
+      await userAddress.remove();
+
+      msg.ack();
+    } catch (e) {
+      handleListenerError(e, msg);
     }
-
-    await userAddress.remove();
-
-    msg.ack();
   }
 }

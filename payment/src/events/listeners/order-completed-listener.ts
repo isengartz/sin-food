@@ -1,4 +1,5 @@
 import {
+  handleListenerError,
   Listener,
   NotFoundError,
   OrderCompletedEvent,
@@ -15,17 +16,21 @@ export class OrderCompletedListener extends Listener<OrderCompletedEvent> {
   subject: Subjects.OrderCompleted = Subjects.OrderCompleted;
 
   async onMessage(data: OrderCompletedEvent['data'], msg: Message) {
-    const { orderId, version } = data;
+    try {
+      const { orderId, version } = data;
 
-    const order = await Order.findByEvent({ id: orderId, version });
+      const order = await Order.findByEvent({ id: orderId, version });
 
-    if (!order) {
-      throw new NotFoundError('Order Not found');
+      if (!order) {
+        throw new NotFoundError('Order Not found');
+      }
+
+      order.set('status', OrderStatus.Completed);
+      await order.save();
+
+      msg.ack();
+    } catch (e) {
+      handleListenerError(e, msg);
     }
-
-    order.set('status', OrderStatus.Completed);
-    await order.save();
-
-    msg.ack();
   }
 }

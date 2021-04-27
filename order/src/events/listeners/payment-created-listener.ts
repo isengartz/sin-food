@@ -1,4 +1,5 @@
 import {
+  handleListenerError,
   Listener,
   OrderStatus,
   PaymentCreatedEvent,
@@ -16,37 +17,41 @@ export class PaymentCreatedListener extends Listener<PaymentCreatedEvent> {
   queueGroupName = queueGroupName;
 
   async onMessage(data: PaymentCreatedEvent['data'], msg: Message) {
-    const { id, orderId, payment_method, paymentId } = data;
-    const order = await Order.findById(orderId);
+    try {
+      const { orderId, payment_method } = data;
+      const order = await Order.findById(orderId);
 
-    if (!order) {
-      throw new Error('Menu Item not found');
+      if (!order) {
+        throw new Error('Menu Item not found');
+      }
+
+      order.set({ status: OrderStatus.Completed });
+      await order.save();
+
+      await order.populate('menu_items.item').execPopulate();
+
+      // Build the menu items payload
+      // We only want the item name and quantity
+      const menu_items = order.menu_items.map((menu_item) => ({
+        // @ts-ignore
+        item: menu_item.item.name,
+        quantity: menu_item.item_options.quantity,
+      }));
+
+      new OrderCompletedPublisher(natsWrapper.client).publish({
+        orderId: order.id,
+        userId: order.userId,
+        restaurantId: order.restaurantId,
+        version: order.version,
+        paid_via: payment_method,
+        price: order.price,
+        createdAt: order.createdAt,
+        menu_items,
+      });
+
+      msg.ack();
+    } catch (e) {
+      handleListenerError(e, msg);
     }
-
-    order.set({ status: OrderStatus.Completed });
-    await order.save();
-
-    await order.populate('menu_items.item').execPopulate();
-
-    // Build the menu items payload
-    // We only want the item name and quantity
-    const menu_items = order.menu_items.map((menu_item) => ({
-      // @ts-ignore
-      item: menu_item.item.name,
-      quantity: menu_item.item_options.quantity,
-    }));
-
-    new OrderCompletedPublisher(natsWrapper.client).publish({
-      orderId: order.id,
-      userId: order.userId,
-      restaurantId: order.restaurantId,
-      version: order.version,
-      paid_via: payment_method,
-      price: order.price,
-      createdAt: order.createdAt,
-      menu_items,
-    });
-
-    msg.ack();
   }
 }

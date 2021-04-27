@@ -92,19 +92,22 @@ const CheckOutPage: React.FC = () => {
 
     // Try to pay for the order
     if (order) {
-      const payment = await createPayment(
-        // @ts-ignore
-        order.id,
-        paymentMethod,
-        token || '',
-      );
+      // Add a delay to make sure OrderCreatedEvent has been processed
+      setTimeout(async () => {
+        const payment = await createPayment(
+          // @ts-ignore
+          order.id,
+          paymentMethod,
+          token || '',
+        );
 
-      // Redirect to thank you page
-      // @ts-ignore
-      if (payment && payment.status! === 'success') {
-        //@ts-ignore
-        history.push(`/thank-you/${payment.data.payment.orderId}`);
-      }
+        // Redirect to thank you page
+        // @ts-ignore
+        if (payment && payment.status! === 'success') {
+          //@ts-ignore
+          history.push(`/thank-you/${payment.data.payment.orderId}`);
+        }
+      }, 500);
     }
   };
 

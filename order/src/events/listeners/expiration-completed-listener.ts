@@ -1,5 +1,6 @@
 import {
   ExpirationCompletedEvent,
+  handleListenerError,
   Listener,
   OrderStatus,
   Subjects,
@@ -16,29 +17,33 @@ export class ExpirationCompletedListener extends Listener<ExpirationCompletedEve
   queueGroupName = queueGroupName;
 
   async onMessage(data: ExpirationCompletedEvent['data'], msg: Message) {
-    const { orderId } = data;
-    const order = await Order.findById(orderId);
+    try {
+      const { orderId } = data;
+      const order = await Order.findById(orderId);
 
-    if (!order) {
-      throw new Error('Menu Item not found');
+      if (!order) {
+        throw new Error('Menu Item not found');
+      }
+
+      // Don do anything if Order is completed or refunded
+      if (
+        order.status === OrderStatus.Completed ||
+        order.status === OrderStatus.Refunded
+      ) {
+        return msg.ack();
+      }
+
+      order.set({ status: OrderStatus.Canceled });
+      await order.save();
+
+      new OrderCancelledPublisher(natsWrapper.client).publish({
+        orderId: order.id,
+        version: order.version,
+      });
+
+      msg.ack();
+    } catch (e) {
+      handleListenerError(e, msg);
     }
-
-    // Don do anything if Order is completed or refunded
-    if (
-      order.status === OrderStatus.Completed ||
-      order.status === OrderStatus.Refunded
-    ) {
-      return msg.ack();
-    }
-
-    order.set({ status: OrderStatus.Canceled });
-    await order.save();
-
-    new OrderCancelledPublisher(natsWrapper.client).publish({
-      orderId: order.id,
-      version: order.version,
-    });
-
-    msg.ack();
   }
 }

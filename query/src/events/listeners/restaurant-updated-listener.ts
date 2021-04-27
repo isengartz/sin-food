@@ -1,4 +1,5 @@
 import {
+  handleListenerError,
   Listener,
   RestaurantUpdatedEvent,
   Subjects,
@@ -13,39 +14,43 @@ export class RestaurantUpdatedListener extends Listener<RestaurantUpdatedEvent> 
   queueGroupName = queueGroupName;
 
   async onMessage(data: RestaurantUpdatedEvent['data'], msg: Message) {
-    const {
-      id,
-      working_hours,
-      categories,
-      holidays,
-      delivers_to,
-      version,
-      enabled,
-      minimum_order,
-      logo,
-      name,
-    } = data;
+    try {
+      const {
+        id,
+        working_hours,
+        categories,
+        holidays,
+        delivers_to,
+        version,
+        enabled,
+        minimum_order,
+        logo,
+        name,
+      } = data;
 
-    const restaurant = await Restaurant.findByEvent({
-      id,
-      version,
-    });
+      const restaurant = await Restaurant.findByEvent({
+        id,
+        version,
+      });
 
-    if (!restaurant) {
-      throw new Error('Restaurant Not found');
+      if (!restaurant) {
+        throw new Error('Restaurant Not found');
+      }
+      restaurant.set({
+        working_hours,
+        categories,
+        holidays,
+        delivers_to,
+        enabled,
+        minimum_order,
+        logo,
+        name,
+      });
+      await restaurant.save();
+
+      msg.ack();
+    } catch (e) {
+      handleListenerError(e, msg);
     }
-    restaurant.set({
-      working_hours,
-      categories,
-      holidays,
-      delivers_to,
-      enabled,
-      minimum_order,
-      logo,
-      name,
-    });
-    await restaurant.save();
-
-    msg.ack();
   }
 }

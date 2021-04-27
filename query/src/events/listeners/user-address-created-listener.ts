@@ -1,4 +1,5 @@
 import {
+  handleListenerError,
   Listener,
   Subjects,
   UserAddressCreatedEvent,
@@ -13,14 +14,18 @@ export class UserAddressCreatedListener extends Listener<UserAddressCreatedEvent
   queueGroupName = queueGroupName;
 
   async onMessage(data: UserAddressCreatedEvent['data'], msg: Message) {
-    const { id, location } = data;
-    const userAddress = UserAddress.build({
-      id,
-      location,
-    });
+    try {
+      const { id, location } = data;
+      const userAddress = UserAddress.build({
+        id,
+        location,
+      });
 
-    await userAddress.save();
+      await userAddress.save();
 
-    msg.ack();
+      msg.ack();
+    } catch (e) {
+      handleListenerError(e, msg);
+    }
   }
 }

@@ -1,4 +1,5 @@
 import {
+  handleListenerError,
   Listener,
   OrderCreatedEvent,
   Subjects,
@@ -14,19 +15,23 @@ export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
   queueGroupName = queueGroupName;
 
   async onMessage(data: OrderCreatedEvent['data'], msg: Message) {
-    // 1 hour delay
-    // const delay = 3600000;
-    const delay = 10000;
+    try {
+      // 1 hour delay
+      // const delay = 3600000;
+      const delay = 10000;
 
-    await expirationQueue.add(
-      {
-        orderId: data.id,
-      },
-      {
-        delay,
-      },
-    );
+      await expirationQueue.add(
+        {
+          orderId: data.id,
+        },
+        {
+          delay,
+        },
+      );
 
-    msg.ack();
+      msg.ack();
+    } catch (e) {
+      handleListenerError(e, msg);
+    }
   }
 }
