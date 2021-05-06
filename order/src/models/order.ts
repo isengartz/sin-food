@@ -167,6 +167,7 @@ orderSchema.post<OrderDoc>('save', async function (doc, next) {
     });
   } else {
     // comment this out cause it triggers on expiration status
+    // @todo: move this inside Controller
     // new OrderUpdatedPublisher(natsWrapper.client).publish({
     //   id: doc._id,
     //   price: doc.price,

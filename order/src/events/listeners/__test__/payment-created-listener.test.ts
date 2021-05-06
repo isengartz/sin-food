@@ -4,11 +4,11 @@ import {
   OrderStatus,
   PaymentCreatedEvent,
   Subjects,
+  PaymentMethod,
 } from '@sin-nombre/sinfood-common';
 import { natsWrapper } from '../../nats-wrapper';
 import { Order } from '../../../models/order';
 import { PaymentCreatedListener } from '../payment-created-listener';
-import { PaymentMethod } from '../../../../../common/src';
 
 const setup = async () => {
   const listener = new PaymentCreatedListener(natsWrapper.client);
