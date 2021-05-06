@@ -8,15 +8,18 @@ import {
   NotFoundError,
   Password,
   QueryModelHelper,
+  Subjects,
   UserRole,
 } from '@sin-nombre/sinfood-common';
 
+import mongoose from 'mongoose';
 import { User } from '../models/user';
 import { API_ROOT_ENDPOINT } from '../utils/constants';
 import { EmailSendingPublisher } from '../events/publishers/email-sending-publisher';
 import { natsWrapper } from '../events/nats-wrapper';
 import { UserAddress, UserAddressAttrs } from '../models/user_address';
-import { UserAddressCreatedPublisher } from '../events/publishers/user-address-created-publisher';
+import { UserEvent } from '../models/user-events';
+import InternalEventEmitter from '../utils/InternalEventEmitter';
 
 /**
  * Return all users with addresses populated
@@ -85,21 +88,38 @@ export const signup = async (
       'Password & Password Confirmation must be identical',
     );
   }
-  // @todo: remove role on production
-  const user = User.build({
-    email,
-    password,
-    first_name,
-    last_name,
-    phone,
-    role,
-  });
-  await user.save();
+  // start mongoose session
+  const session = await mongoose.startSession();
 
-  // If the user send any address alongside with the initial registration save them too
-  // Although we dont want to return an error response if the UserAddress Validation Fails
-  // noinspection ES6MissingAwait
   try {
+    // Start transaction
+    await session.startTransaction();
+    // @todo: remove role on production
+    const user = User.build({
+      email,
+      password,
+      first_name,
+      last_name,
+      phone,
+      role,
+    });
+    await user.save();
+
+    const userEvent = UserEvent.build({
+      name: Subjects.UserCreated,
+      data: {
+        id: user.id,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        role: user.role,
+        version: user.version,
+      },
+    });
+
+    await userEvent.save();
+
+    // If the user send any address alongside with the initial registration save them too
     if (user && addresses) {
       user.addresses =
         addresses.map(async (address: UserAddressAttrs) => {
@@ -107,30 +127,42 @@ export const signup = async (
             ...address,
             user_id: user.id,
           }).save();
-          new UserAddressCreatedPublisher(natsWrapper.client).publish({
-            id: addr.id,
-            version: addr.version,
-            location: addr.location,
+          const addressEvent = UserEvent.build({
+            name: Subjects.UserAddressCreated,
+            data: {
+              id: addr.id,
+              version: addr.version,
+              location: addr.location,
+            },
           });
+          await addressEvent.save();
+
           return addr;
         }) || [];
     }
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.debug(e);
-  }
 
-  // Add JWT to express session
-  req.session = AuthHelper.serializeToken(
-    AuthHelper.signToken({
-      id: user.id,
-      email: user.email,
-      first_name: user.first_name,
-      role: user.role,
-    }),
-  );
-  // Send Data + JWT Back
-  AuthHelper.createSendToken(user, 201, res);
+    // Add JWT to express session
+    req.session = AuthHelper.serializeToken(
+      AuthHelper.signToken({
+        id: user.id,
+        email: user.email,
+        first_name: user.first_name,
+        role: user.role,
+      }),
+    );
+    // Send Data + JWT Back
+    AuthHelper.createSendToken(user, 201, res);
+
+    // Emit the events to NATS
+    InternalEventEmitter.emitNatsEvent();
+  } catch (e) {
+    // remove everything from db on error
+    await session.abortTransaction();
+    throw e;
+  } finally {
+    // close session on both success and error
+    await session.endSession();
+  }
 };
 
 /**

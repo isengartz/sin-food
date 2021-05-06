@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
+import cron from 'node-cron';
 import { app } from './app';
 import { natsWrapper } from './events/nats-wrapper';
+import InternalEventEmitter from './utils/InternalEventEmitter';
+import { UserEventHandler } from './utils/UserEventHandler';
+import { UserEvent } from './models/user-events';
 
 const start = async () => {
   // Check for ENV Vars so TS stfu and also throw an error if we forgot to define them in Kubernetes
@@ -50,6 +54,26 @@ const start = async () => {
     });
     process.on('SIGINT', () => natsWrapper.client.close());
     process.on('SIGTERM', () => natsWrapper.client.close());
+
+    const userEventHandler = new UserEventHandler(UserEvent);
+
+    // Crons for Events
+    const cronjob = cron.schedule('*/2 * * * *', async () => {
+      await userEventHandler.handle();
+    });
+    // Attach Listener for InternalEvents
+    InternalEventEmitter.on('newNatsEvent', async () => {
+      try {
+        cronjob.stop();
+        await userEventHandler.handle();
+      } catch (e) {
+        console.log(e.message);
+      } finally {
+        cronjob.start();
+      }
+    });
+
+    // InternalEventEmitter.emit('newNatsEvent');
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);

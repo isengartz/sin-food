@@ -12,6 +12,7 @@ import {
 import { UserDoc } from '../models/user';
 
 jest.mock('../events/nats-wrapper'); // Mock file into the fake
+jest.mock('../utils/InternalEventEmitter'); // Mock file into the fake
 
 declare global {
   namespace NodeJS {

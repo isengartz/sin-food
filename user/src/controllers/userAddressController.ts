@@ -1,10 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
-import { NotFoundError } from '@sin-nombre/sinfood-common';
+import { NotFoundError, Subjects } from '@sin-nombre/sinfood-common';
+import mongoose from 'mongoose';
 import { UserAddress } from '../models/user_address';
-import { UserAddressCreatedPublisher } from '../events/publishers/user-address-created-publisher';
 import { natsWrapper } from '../events/nats-wrapper';
 import { UserAddressDeletedPublisher } from '../events/publishers/user-address-deleted-publisher';
 import { UserAddressUpdatedPublisher } from '../events/publishers/user-address-updated-publisher';
+import { UserEvent } from '../models/user-events';
+import InternalEventEmitter from '../utils/InternalEventEmitter';
 
 export const createAddress = async (
   req: Request,
@@ -14,27 +16,44 @@ export const createAddress = async (
   const user_id = req.currentUser!.id;
   const { description, floor, full_address, location } = req.body;
 
-  // Save Address
-  const addressDoc = await UserAddress.build({
-    description,
-    floor,
-    full_address,
-    location,
-    user_id,
-  }).save();
+  const session = await mongoose.startSession();
+  try {
+    await session.startTransaction();
 
-  new UserAddressCreatedPublisher(natsWrapper.client).publish({
-    id: addressDoc.id,
-    version: addressDoc.version,
-    location: addressDoc.location,
-  });
+    // Save Address
+    const addressDoc = await UserAddress.build({
+      description,
+      floor,
+      full_address,
+      location,
+      user_id,
+    }).save();
 
-  res.status(201).send({
-    status: 'success',
-    data: {
-      address: addressDoc,
-    },
-  });
+    // Save Event
+    await UserEvent.build({
+      name: Subjects.UserAddressCreated,
+      data: {
+        id: addressDoc.id,
+        version: addressDoc.version,
+        location: addressDoc.location,
+      },
+    }).save();
+
+    res.status(201).send({
+      status: 'success',
+      data: {
+        address: addressDoc,
+      },
+    });
+
+    // Emit the events to NATS
+    InternalEventEmitter.emitNatsEvent();
+  } catch (e) {
+    await session.abortTransaction();
+    throw e;
+  } finally {
+    await session.endSession();
+  }
 };
 
 export const updateAddress = async (
@@ -54,25 +73,41 @@ export const updateAddress = async (
     throw new NotFoundError(`User Address with id ${addressId} not found`);
   }
 
-  // Update Address
-  address.description = description;
-  address.floor = floor;
-  address.full_address = full_address;
-  address.location = location;
-  await address.save();
+  const session = await mongoose.startSession();
+  try {
+    await session.startTransaction();
 
-  new UserAddressUpdatedPublisher(natsWrapper.client).publish({
-    id: address.id,
-    version: address.version,
-    location: address.location,
-  });
+    // Update Address
+    address.description = description;
+    address.floor = floor;
+    address.full_address = full_address;
+    address.location = location;
+    await address.save();
 
-  res.status(200).send({
-    status: 'success',
-    data: {
-      address,
-    },
-  });
+    // Save Event
+    await UserEvent.build({
+      name: Subjects.UserAddressUpdated,
+      data: {
+        id: address.id,
+        version: address.version,
+        location: address.location,
+      },
+    }).save();
+
+    res.status(200).send({
+      status: 'success',
+      data: {
+        address,
+      },
+    });
+    // Emit the events to NATS
+    InternalEventEmitter.emitNatsEvent();
+  } catch (e) {
+    await session.abortTransaction();
+    throw e;
+  } finally {
+    await session.endSession();
+  }
 };
 
 export const deleteAddress = async (
@@ -91,12 +126,29 @@ export const deleteAddress = async (
       `Address with id ${req.params.addressId} not found`,
     );
   }
-  new UserAddressDeletedPublisher(natsWrapper.client).publish({
-    id: address.id,
-    version: address.version,
-  });
 
-  await address.remove();
+  const session = await mongoose.startSession();
+  try {
+    await session.startTransaction();
+
+    await address.remove();
+
+    // Save Event
+    await UserEvent.build({
+      name: Subjects.UserAddressDeleted,
+      data: {
+        id: address.id,
+        version: address.version,
+      },
+    }).save();
+    // Emit the events to NATS
+    InternalEventEmitter.emitNatsEvent();
+  } catch (e) {
+    await session.abortTransaction();
+    throw e;
+  } finally {
+    await session.endSession();
+  }
 
   res.status(204).json({
     status: 'success',

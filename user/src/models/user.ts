@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import mongoose from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 import { randomBytes, createHash } from 'crypto';
 import validator from 'validator';
 import { Password, UserRole } from '@sin-nombre/sinfood-common';
@@ -26,6 +27,7 @@ export interface UserDoc extends mongoose.Document {
   addresses: UserAddressDoc[];
   phone: string;
   role: UserRole;
+  version: number;
   password_reset_token?: string;
   password_reset_expires?: number;
   password_changed_at?: number;
@@ -117,6 +119,9 @@ const userSchema = new mongoose.Schema(
   },
 );
 
+userSchema.set('versionKey', 'version');
+userSchema.plugin(updateIfCurrentPlugin);
+
 // Hash password before Save
 userSchema.pre('save', async function (next) {
   if (this.isModified('password')) {
@@ -184,4 +189,8 @@ userSchema.statics.build = (attrs: UserAttrs) => {
 };
 
 const User = mongoose.model<UserDoc, UserModel>('User', userSchema);
+
+// Change Stream
+// User.watch().on('change', (data) => console.log(new Date(), data));
+
 export { User };
