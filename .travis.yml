@@ -3,6 +3,7 @@ services:
   - docker
 
 before_install:
+  - echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker build -t isengart/food-client-test -f ./client/Dockerfile.dev ./client
   - docker build -t isengart/food-order-test -f ./order/Dockerfile.dev ./order
