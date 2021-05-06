@@ -8,6 +8,8 @@ import {
 } from '../../utils/constants';
 import { User } from '../../models/user';
 import { natsWrapper } from '../../events/nats-wrapper';
+import { UserEvent } from '../../models/user-events';
+import InternalEventEmitter from '../../utils/InternalEventEmitter';
 
 it('should return 401 when user not logged in', async () => {
   await request(app)
@@ -81,10 +83,13 @@ it('should update the userAddress on success ', async () => {
 
   expect(updatedUser!.addresses[0].description).toEqual('description changed');
 
-  expect(natsWrapper.client.publish).toHaveBeenCalled();
-  const eventsPublished = (natsWrapper.client.publish as jest.Mock).mock.calls;
-  // The last Event should be UserAddressCreated
-  expect(eventsPublished[eventsPublished.length - 1][0]).toEqual(
-    Subjects.UserAddressUpdated,
-  );
+  const events = await UserEvent.find({});
+  expect(InternalEventEmitter.emitNatsEvent).toHaveBeenCalled();
+  expect(events.length).toEqual(3);
+  // expect(natsWrapper.client.publish).toHaveBeenCalled();
+  // const eventsPublished = (natsWrapper.client.publish as jest.Mock).mock.calls;
+  // // The last Event should be UserAddressCreated
+  // expect(eventsPublished[eventsPublished.length - 1][0]).toEqual(
+  //   Subjects.UserAddressUpdated,
+  // );
 });

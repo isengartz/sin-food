@@ -27,6 +27,7 @@ router.get('/currentUser', currentUser, currentU);
 router.post('/forgotPassword', forgotPassword);
 router.patch('/resetPassword/:token', resetPassword);
 router.patch('/updatePassword', currentUser, requireAuth, updatePassword);
+// router.get('/', currentUser, allUsers);
 router.get('/', currentUser, restrictTo([UserRole.Admin]), allUsers);
 router.get(
   '/:id',

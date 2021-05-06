@@ -7,6 +7,7 @@ import { UserAddressDeletedListener } from './events/listeners/user-address-dele
 import { RestaurantCreatedListener } from './events/listeners/restaurant-created-listener';
 import { RestaurantUpdatedListener } from './events/listeners/restaurant-updated-listener';
 import { RestaurantDeletedListener } from './events/listeners/restaurant-deleted-listener';
+import { UserCreatedListener } from './events/listeners/user-created-listener';
 
 const start = async () => {
   // Check for ENV Vars so TS stfu and also throw an error if we forgot to define them in Kubernetes
@@ -57,6 +58,7 @@ const start = async () => {
     new RestaurantCreatedListener(natsWrapper.client).listen();
     new RestaurantUpdatedListener(natsWrapper.client).listen();
     new RestaurantDeletedListener(natsWrapper.client).listen();
+    new UserCreatedListener(natsWrapper.client).listen();
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);

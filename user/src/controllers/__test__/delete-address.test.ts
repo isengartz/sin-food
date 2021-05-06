@@ -7,6 +7,8 @@ import {
 } from '../../utils/constants';
 import { User } from '../../models/user';
 import { natsWrapper } from '../../events/nats-wrapper';
+import { UserEvent } from '../../models/user-events';
+import InternalEventEmitter from '../../utils/InternalEventEmitter';
 
 // it('should return 404 when different user tries to delete not owned address', async () => {
 //   const userOne = await global.signin();
@@ -49,11 +51,14 @@ it('should return 204 on success and user has 0 addresses', async () => {
   const updatedUser = await User.findById(user.id);
 
   expect(updatedUser!.addresses.length).toEqual(0);
+  const events = await UserEvent.find({});
+  expect(InternalEventEmitter.emitNatsEvent).toHaveBeenCalled();
+  expect(events.length).toEqual(3);
 
-  expect(natsWrapper.client.publish).toHaveBeenCalled();
-  const eventsPublished = (natsWrapper.client.publish as jest.Mock).mock.calls;
-  // The last Event should be UserAddressCreated
-  expect(eventsPublished[eventsPublished.length - 1][0]).toEqual(
-    Subjects.UserAddressDeleted,
-  );
+  // expect(natsWrapper.client.publish).toHaveBeenCalled();
+  // const eventsPublished = (natsWrapper.client.publish as jest.Mock).mock.calls;
+  // // The last Event should be UserAddressCreated
+  // expect(eventsPublished[eventsPublished.length - 1][0]).toEqual(
+  //   Subjects.UserAddressDeleted,
+  // );
 });
