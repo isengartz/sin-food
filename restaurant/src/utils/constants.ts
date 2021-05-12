@@ -66,3 +66,9 @@ export const RESTAURANT_CREATE_VALID_PAYLOAD = {
   ],
   holidays: [new Date('2020-11-10'), new Date('2020-11-11')],
 };
+export const REVIEW_CREATE_VALID_PAYLOAD_WITHOUT_RESTAURANT_ID = {
+  orderId: 'test12345',
+  userId: 'testUser',
+  rating: 1.5,
+  comment: 'You food sucks',
+};

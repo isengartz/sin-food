@@ -1,4 +1,5 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import jwt from 'jsonwebtoken';
 import request from 'supertest';
 import mongoose from 'mongoose';
 import { UserRole } from '@sin-nombre/sinfood-common';
@@ -17,6 +18,7 @@ declare global {
     interface Global {
       signin(): Promise<{ cookie: string[]; user: RestaurantDoc }>;
       signinAdmin(): Promise<{ cookie: string[]; user: RestaurantDoc }>;
+      signinUser(id?: string): string[];
     }
   }
 }
@@ -71,6 +73,18 @@ global.signin = async () => {
     user: response.body.data.user as RestaurantDoc,
   };
 };
+
+global.signinUser = (id?: string) => {
+  // So we can use it more than one to generate random users
+  // Build a JWT payload.  { id, email }
+  const payload = {
+    id: id || new mongoose.Types.ObjectId().toHexString(),
+    email: 'test@test.com',
+    role: UserRole.User,
+  };
+  return buildPayload(payload);
+};
+
 global.signinAdmin = async () => {
   // So we can use it more than one to generate random users
 
@@ -89,4 +103,25 @@ global.signinAdmin = async () => {
     cookie: response.get('Set-Cookie'),
     user: response.body.data.user as RestaurantDoc,
   };
+};
+
+const buildPayload = (payload: {
+  id: string;
+  email: string;
+  role: UserRole;
+}) => {
+  // Create the JWT!
+  const token = jwt.sign(payload, process.env.JWT_KEY!);
+
+  // Build session Object. { jwt: MY_JWT }
+  const session = { jwt: token };
+
+  // Turn that session into JSON
+  const sessionJSON = JSON.stringify(session);
+
+  // Take JSON and encode it as base64
+  const base64 = Buffer.from(sessionJSON).toString('base64');
+
+  // return a string thats the cookie with the encoded data
+  return [`express:sess=${base64}`];
 };

@@ -3,8 +3,12 @@ import {
   BadRequestError,
   convertObjectKeyToArray,
   DateHelper,
+  findAll,
 } from '@sin-nombre/sinfood-common';
 import { Restaurant } from '../models/restaurant';
+import { Order, OrderDoc, OrderModel } from '../models/order';
+import { generateQueryFilters } from '../utils/generate-query-filters';
+import { generatePaginationAggregateQuery } from '../utils/generate-pagination-aggregate-query';
 
 /**
  * Returns all the restaurants that delivers to specific endpoint
@@ -45,15 +49,7 @@ export const filterRestaurants = async (
     },
   };
 
-  const queryObj = convertObjectKeyToArray(req.query, ['in', 'nin']);
-
-  const queryString = JSON.stringify(queryObj).replace(
-    /\b(gte|gt|lte|lt|in|nin)\b/g,
-    (match) => {
-      return `$${match}`;
-    },
-  );
-  const extraFilterQueries = JSON.parse(queryString);
+  const extraFilterQueries = generateQueryFilters(req);
   console.log({ ...baseMatchingQuery, ...extraFilterQueries });
 
   // @todo: refactor this so it will support Timezone
@@ -138,6 +134,122 @@ export const filterRestaurants = async (
     totalCount: restaurants[0].open.length + restaurants[0].closed.length,
     data: {
       restaurants: restaurants[0],
+    },
+  });
+};
+
+/**
+ * Return the orders of the user
+ * @param req
+ * @param res
+ * @param next
+ */
+export const getUserOrders = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { limit, page } = req.query;
+
+  delete req.query.limit;
+  delete req.query.page;
+
+  const filter = generateQueryFilters(req);
+  const paginationQuery = generatePaginationAggregateQuery(
+    // @ts-ignore
+    page ? (page as number) : 1,
+    // @ts-ignore
+    limit as number,
+  );
+
+  const last30days = new Date();
+  last30days.setDate(last30days.getDate() - 30);
+
+  const orders = await Order.aggregate([
+    {
+      $match: {
+        ...filter,
+      },
+    },
+    {
+      $project: {
+        // convert restaurant_id to mongodb ObjectID so we can query it
+        objRestaurantId: {
+          $toObjectId: '$restaurantId',
+        },
+        orderIdToString: {
+          $toString: '$_id',
+        },
+        paid_via: 1,
+        _id: 1,
+        user_id: 1,
+        price: 1,
+        createdAt: 1,
+        menu_item: 1,
+        totalCount: 1,
+      },
+    },
+    {
+      $lookup: {
+        // perform a join on restaurant table
+        from: 'restaurants',
+        localField: 'objRestaurantId',
+        foreignField: '_id',
+        as: 'restaurant',
+      },
+    },
+    {
+      $lookup: {
+        // perform a join on review table
+        from: 'reviews',
+        localField: 'orderIdToString',
+        foreignField: 'orderId',
+        as: 'review',
+      },
+    },
+    {
+      // add canReview field
+      $addFields: {
+        canReview: {
+          $cond: [
+            {
+              $and: [
+                {
+                  $ifNull: ['$review._id', null], // if review_id is empty which means no active review for this order
+                },
+                {
+                  $gte: ['$createdAt', last30days], // if the order is at less or equal 30 days old
+                },
+              ],
+            },
+            true,
+            false,
+          ],
+        },
+      },
+    },
+    {
+      $facet: {
+        // count and paginate the results
+        paginatedResults: paginationQuery, // pagination
+        totalCount: [
+          {
+            $count: 'count',
+          },
+        ],
+      },
+    },
+  ]);
+
+  console.log(orders);
+
+  res.status(200).json({
+    status: 'success',
+    results:
+      orders && orders.length > 0 ? orders[0].paginatedResults.length : 0,
+    totalCount: orders && orders.length > 0 ? orders[0].totalCount[0].count : 0,
+    data: {
+      orders: orders && orders.length > 0 ? orders[0].paginatedResults : [],
     },
   });
 };

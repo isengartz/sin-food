@@ -1,9 +1,8 @@
 import mongoose from 'mongoose';
 import { randomBytes, createHash } from 'crypto';
 import validator from 'validator';
-import { Password, UserRole, RelationHelper } from '@sin-nombre/sinfood-common';
+import { Password, UserRole } from '@sin-nombre/sinfood-common';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
-import { restaurantRelationships } from '../utils/RestaurantRelations';
 import {
   RestaurantWorkingHours,
   restaurantWorkingHoursSchema,
@@ -12,6 +11,7 @@ import { natsWrapper } from '../events/nats-wrapper';
 import { RestaurantUpdatedPublisher } from '../events/publishers/restaurant-updated-publisher';
 import { RestaurantCreatedPublisher } from '../events/publishers/restaurant-created-publisher';
 import { RestaurantDeletedPublisher } from '../events/publishers/restaurant-deleted-publisher';
+// eslint-disable-next-line import/no-cycle
 import { RestaurantCategory } from './restaurant-category';
 
 // Describes the attributes that we accept from Request
@@ -63,6 +63,8 @@ export interface RestaurantDoc extends mongoose.Document {
   role: UserRole;
   working_hours: RestaurantWorkingHours[];
   holidays: Date[];
+  ratingsAverage: Number;
+  ratingsQuantity: Number;
   password_reset_token: string;
   password_reset_expires: number;
   password_changed_at: number;
@@ -156,6 +158,14 @@ const restaurantSchema = new mongoose.Schema(
     },
     working_hours: [restaurantWorkingHoursSchema],
     holidays: [Date],
+    ratingsAverage: {
+      type: Number,
+      default: 0,
+    },
+    ratingsQuantity: {
+      type: Number,
+      default: 0,
+    },
     created_at: {
       type: Date,
       default: Date.now(),
@@ -185,6 +195,16 @@ const restaurantSchema = new mongoose.Schema(
   },
 );
 
+// Virtuals
+
+restaurantSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'restaurantId',
+  localField: '_id',
+});
+
+restaurantSchema.virtual('');
+
 // Insert updateIfCurrentPlugin and change the default version key from __v to version
 restaurantSchema.set('versionKey', 'version');
 restaurantSchema.plugin(updateIfCurrentPlugin);
@@ -194,7 +214,7 @@ restaurantSchema.pre<RestaurantDoc>('save', async function (next) {
   // @ts-ignore
   this.wasNew = this.isNew;
 
-  if (this.categories.length === 0) {
+  if (!this.categories || this.categories.length === 0) {
     return next();
   }
   // const relationshipHelper = new RelationHelper<RestaurantDoc>(this);
@@ -227,56 +247,46 @@ restaurantSchema.post<RestaurantDoc>('save', async function (doc, next) {
       name: doc.name,
       enabled: doc.enabled,
     });
+  } else {
+    // Insert the reference from the Restaurant Category
+    await RestaurantCategory.updateMany(
+      { _id: { $in: doc.categories } },
+      {
+        $addToSet: {
+          restaurants: doc._id,
+        },
+      },
+    );
+    // const relationshipHelper = new RelationHelper<RestaurantDoc>(doc);
+    // relationshipHelper.addRelations(restaurantRelationships);
+    // relationshipHelper.insertReferencesBasedOnId();
+    // relationshipHelper.removeUpdatedReferencesBasedOnId();
+    // Removes the reference from Restaurant Categories
+    await RestaurantCategory.updateMany(
+      { _id: { $nin: doc.categories } },
+      {
+        $pull: {
+          restaurants: doc._id,
+        },
+      },
+    );
+
+    // Publish an Event
+    new RestaurantUpdatedPublisher(natsWrapper.client).publish({
+      id: doc._id,
+      version: doc.version,
+      delivers_to: doc.delivers_to,
+      working_hours: doc.working_hours,
+      holidays: doc.holidays,
+      categories: doc.categories,
+      logo: doc.logo,
+      minimum_order: doc.minimum_order,
+      name: doc.name,
+      enabled: doc.enabled,
+    });
   }
   next();
 });
-
-restaurantSchema.post<RestaurantDoc>(
-  // @ts-ignore
-  'findOneAndUpdate',
-  async function (doc, next) {
-    if (doc) {
-      // const relationshipHelper = new RelationHelper<RestaurantDoc>(doc);
-      // relationshipHelper.addRelations(restaurantRelationships);
-      // relationshipHelper.insertReferencesBasedOnId();
-
-      // Insert the reference from the Restaurant Category
-      await RestaurantCategory.updateMany(
-        { _id: { $in: doc.categories } },
-        {
-          $addToSet: {
-            restaurants: doc._id,
-          },
-        },
-      );
-
-      // relationshipHelper.removeUpdatedReferencesBasedOnId();
-      // Removes the reference from Restaurant Categories
-      await RestaurantCategory.updateMany(
-        { _id: { $nin: doc.categories } },
-        {
-          $pull: {
-            restaurants: doc._id,
-          },
-        },
-      );
-      // Publish an Event
-      new RestaurantUpdatedPublisher(natsWrapper.client).publish({
-        id: doc._id,
-        version: doc.version,
-        delivers_to: doc.delivers_to,
-        working_hours: doc.working_hours,
-        holidays: doc.holidays,
-        categories: doc.categories,
-        logo: doc.logo,
-        minimum_order: doc.minimum_order,
-        name: doc.name,
-        enabled: doc.enabled,
-      });
-    }
-    next();
-  },
-);
 
 // Remove the reference from the Restaurant Category
 restaurantSchema.post<RestaurantDoc>('remove', async function (doc, next) {

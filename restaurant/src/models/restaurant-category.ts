@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
-
+// eslint-disable-next-line import/no-cycle
 import { Restaurant, RestaurantDoc } from './restaurant';
 import { RestaurantUpdatedPublisher } from '../events/publishers/restaurant-updated-publisher';
 import { natsWrapper } from '../events/nats-wrapper';

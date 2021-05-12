@@ -153,28 +153,26 @@ export const updateRestaurant = async (
     holidays,
   } = req.body;
 
-  const restaurant = await Restaurant.findByIdAndUpdate(
-    req.params.id,
-    {
-      phone,
-      name,
-      description,
-      full_address,
-      location,
-      delivers_to,
-      categories,
-      working_hours,
-      holidays,
-    },
-    {
-      new: true,
-      runValidators: true,
-    },
-  );
+  const restaurant = await Restaurant.findById(req.params.id);
 
   if (!restaurant) {
     throw new BadRequestError(`Restaurant with id: ${req.params.id} not found`);
   }
+
+  restaurant.set({
+    phone,
+    name,
+    description,
+    full_address,
+    location,
+    delivers_to,
+    categories,
+    working_hours,
+    holidays,
+  });
+
+  await restaurant.save();
+
   req.session = AuthHelper.serializeToken(
     AuthHelper.signToken({
       id: restaurant.id,

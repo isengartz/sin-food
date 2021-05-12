@@ -4,6 +4,10 @@ import { Restaurant } from '../models/restaurant';
 
 const NUMBER_OF_RECORDS = 10;
 
+/**
+ * DEPRECATED xD
+ * USE SEEDER SERVICE INSTEAD !
+ */
 export const seedRestaurants = async () => {
   for (let i = 0; i < NUMBER_OF_RECORDS; i++) {
     const payload = {

@@ -18,7 +18,8 @@ export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
     try {
       // 1 hour delay
       // const delay = 3600000;
-      const delay = 10000;
+      // 1 minute delay
+      const delay = 600000;
 
       await expirationQueue.add(
         {

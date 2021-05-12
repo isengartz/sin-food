@@ -10,6 +10,7 @@ import { errorHandler, RouteNotFoundError } from '@sin-nombre/sinfood-common';
 import { API_ROOT_ENDPOINT } from './utils/constants';
 import { restaurantRoutes } from './routes/restaurantRoutes';
 import { restaurantCategoryRouter } from './routes/categoryRoutes';
+import { restaurantReviewRouter } from './routes/reviewRoutes';
 
 const app = express();
 app.set('trust proxy', true); //used for ingress-nginx
@@ -41,6 +42,10 @@ app.use(
   `${API_ROOT_ENDPOINT}/restaurants/categories/`,
   restaurantCategoryRouter,
 );
+
+// Reviews
+app.use(`${API_ROOT_ENDPOINT}/restaurants/reviews/`, restaurantReviewRouter);
+
 // Restaurant
 app.use(`${API_ROOT_ENDPOINT}/restaurants/`, restaurantRoutes);
 

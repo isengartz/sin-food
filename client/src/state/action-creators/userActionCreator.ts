@@ -41,13 +41,16 @@ export const getCurrentUser = (): AppThunk => {
         },
       } = await axios.get('/currentUser');
 
-      // @ts-ignore
-      dispatch(getCurrentUserFullPayload(currentUser.id));
+      if (currentUser) {
+        // @ts-ignore
+        dispatch(getCurrentUserFullPayload(currentUser.id));
+      } else {
+        dispatch({
+          type: UserTypes.GET_CURRENT_USER_SUCCESS,
+          payload: currentUser,
+        });
+      }
 
-      // dispatch({
-      //   type: UserTypes.GET_CURRENT_USER_SUCCESS,
-      //   payload: currentUser,
-      // });
       // localStorage.setItem('user', JSON.stringify(currentUser));
     } catch (e) {
       dispatch({

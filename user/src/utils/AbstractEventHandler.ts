@@ -23,7 +23,9 @@ export abstract class AbstractInternalEventHandler<
     console.log('----- Handling events -----');
 
     // Select unsent events
-    const newEvents = await this.model.find({ status: EventStatus.PENDING });
+    const newEvents = await this.model
+      .find({ status: EventStatus.PENDING })
+      .sort({ createdAt: -1 });
     console.log(newEvents);
     newEvents.forEach(async (event: InternalEventsDoc) => {
       try {
