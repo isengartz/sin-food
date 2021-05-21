@@ -1,55 +1,85 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ingress-service
   annotations:
-    kubernetes.io/ingress.class: nginx
+    kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/use-regex: 'true'
 spec:
   rules:
-#    - host: restaurants.sinfood.dev
-#      http:
-#        paths:
-#          - path: /?(.*)
-#            backend:
-#              serviceName: client-restaurant-srv # Name of the pod
-#              servicePort: 3000
+    - host: restaurants.sinfood.dev
+      http:
+        paths:
+          - path: /?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: client-restaurant-srv # Name of the pod
+                port:
+                  number: 8000
     - host: sinfood.dev
       http:
         paths:
           - path: /api/v1/users/?(.*)
+            pathType: Prefix
             backend:
-              serviceName: user-srv # Name of the pod
-              servicePort: 3000
+              service:
+                name: user-srv # Name of the pod
+                port:
+                  number: 3000
           - path: /api/v1/restaurants/?(.*)
+            pathType: Prefix
             backend:
-              serviceName: restaurant-srv # Name of the pod
-              servicePort: 3000
+              service:
+                name: restaurant-srv # Name of the pod
+                port:
+                  number: 3000
           - path: /api/v1/menu/?(.*)
+            pathType: Prefix
             backend:
-              serviceName: menu-srv # Name of the pod
-              servicePort: 3000
+              service:
+                name: menu-srv # Name of the pod
+                port:
+                  number: 3000
           - path: /api/v1/ingredients/?(.*)
+            pathType: Prefix
             backend:
-              serviceName: menu-srv # Name of the pod
-              servicePort: 3000
+              service:
+                name: menu-srv # Name of the pod
+                port:
+                  number: 3000
           - path: /api/v1/orders/?(.*)
+            pathType: Prefix
             backend:
-              serviceName: order-srv # Name of the pod
-              servicePort: 3000
+              service:
+                name: order-srv # Name of the pod
+                port:
+                  number: 3000
           - path: /api/v1/payments/?(.*)
+            pathType: Prefix
             backend:
-              serviceName: payment-srv # Name of the pod
-              servicePort: 3000
+              service:
+                name: payment-srv # Name of the pod
+                port:
+                  number: 3000
           - path: /api/v1/query/?(.*)
+            pathType: Prefix
             backend:
-              serviceName: query-srv # Name of the pod
-              servicePort: 3000
+              service:
+                name: query-srv # Name of the pod
+                port:
+                  number: 3000
           - path: /api/v1/notification/?(.*)
+            pathType: Prefix
             backend:
-              serviceName: notification-srv # Name of the pod
-              servicePort: 3000
+              service:
+                name: notification-srv # Name of the pod
+                port:
+                  number: 3000
           - path: /?(.*)
+            pathType: Prefix
             backend:
-              serviceName: client-srv # Name of the pod
-              servicePort: 3000
+              service:
+                name: client-srv # Name of the pod
+                port:
+                  number: 3000

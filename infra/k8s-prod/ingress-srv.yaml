@@ -7,13 +7,13 @@ metadata:
     nginx.ingress.kubernetes.io/use-regex: 'true'
 spec:
   rules:
-    #    - host: restaurants.sinfood.dev
-    #      http:
-    #        paths:
-    #          - path: /?(.*)
-    #            backend:
-    #              serviceName: client-restaurant-srv # Name of the pod
-    #              servicePort: 3000
+    - host: restaurants.sinfood.dev
+      http:
+        paths:
+          - path: /?(.*)
+            backend:
+              serviceName: client-restaurant-srv # Name of the pod
+              servicePort: 8000
     - host: sinfood.dev
       http:
         paths:
