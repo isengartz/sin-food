@@ -1,6 +1,7 @@
 /** Request 网络请求工具 更详细的 api 文档: https://github.com/umijs/umi-request */
-import { extend } from 'umi-request';
+import { extend, ResponseError } from 'umi-request';
 import { notification } from 'antd';
+import { BASE_API_URL } from '../../config/constants';
 
 const codeMessage: Record<number, string> = {
   200: '服务器成功返回请求的数据。',
@@ -10,7 +11,7 @@ const codeMessage: Record<number, string> = {
   400: '发出的请求有错误，服务器没有进行新建或修改数据的操作。',
   401: '用户没有权限（令牌、用户名、密码错误）。',
   403: '用户得到授权，但是访问是被禁止的。',
-  404: '发出的请求针对的是不存在的记录，服务器没有进行操作。',
+  404: 'Not Found',
   406: '请求的格式不可得。',
   410: '请求的资源被永久删除，且不会再得到的。',
   422: '当创建一个对象时，发生一个验证错误。',
@@ -24,15 +25,20 @@ const codeMessage: Record<number, string> = {
  * @zh-CN 异常处理程序
  * @en-US Exception handler
  */
-const errorHandler = (error: { response: Response }): Response => {
+const errorHandler = (error: ResponseError): Response => {
   const { response } = error;
   if (response && response.status) {
-    const errorText = codeMessage[response.status] || response.statusText;
-    const { status, url } = response;
+    console.debug(error.data);
+    console.log(response);
+    console.debug(response.body);
+    const errorText = error.data?.errors
+      ? error.data.errors[0].message
+      : codeMessage[response.status];
+    const { status } = response;
 
     notification.error({
-      message: `Request error ${status}: ${url}`,
-      description: errorText,
+      message: `Request error ${status}: ${errorText}`,
+      // description: errorText,
     });
   } else if (!response) {
     notification.error({
@@ -48,6 +54,9 @@ const errorHandler = (error: { response: Response }): Response => {
  * @zh-CN 配置request请求时的默认参数
  */
 const request = extend({
+  prefix: BASE_API_URL,
+  mode: 'cors',
+  // getResponse: true,
   errorHandler, // default error handling
   credentials: 'include', // Does the default request bring cookies
 });

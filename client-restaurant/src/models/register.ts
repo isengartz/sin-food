@@ -1,42 +1,36 @@
-import { stringify } from 'querystring';
 import type { Reducer, Effect } from 'umi';
 import { history } from 'umi';
-
-import { accountLogin, accountLogout } from '@/services/login';
-import { setAuthority } from '@/utils/authority';
+import { registerAccount } from '@/services/register';
 import { getPageQuery } from '@/utils/utils';
 import { message } from 'antd';
 
-export type StateType = {
+export type RegisterStateType = {
   status?: 'success' | 'error';
-  type?: string;
-  currentAuthority?: 'user' | 'restaurant' | 'admin' | 'guest';
 };
 
-export type LoginModelType = {
+export type RegisterModelType = {
   namespace: string;
-  state: StateType;
+  state: RegisterStateType;
   effects: {
-    login: Effect;
-    logout: Effect;
+    register: Effect;
   };
   reducers: {
-    changeLoginStatus: Reducer<StateType>;
+    registerUser: Reducer<RegisterStateType>;
   };
 };
 
-const Model: LoginModelType = {
-  namespace: 'login',
+const Model: RegisterModelType = {
+  namespace: 'register',
 
   state: {
     status: undefined,
   },
 
   effects: {
-    *login({ payload }, { call, put }) {
-      const response = yield call(accountLogin, payload);
+    *register({ payload }, { call, put }) {
+      const response = yield call(registerAccount, payload);
       yield put({
-        type: 'changeLoginStatus',
+        type: 'registerUser',
         payload: response,
       });
       // Login successfully
@@ -66,32 +60,13 @@ const Model: LoginModelType = {
         history.replace(redirect || '/');
       }
     },
-    *logout({ payload }, { call, put }) {
-      const { redirect } = getPageQuery();
-      yield call(accountLogout, payload);
-      localStorage.removeItem('currentUser');
-      // Note: There may be security issues, please note
-      if (window.location.pathname !== '/user/login' && !redirect) {
-        history.replace({
-          pathname: '/user/login',
-          search: stringify({
-            redirect: window.location.href,
-          }),
-        });
-      }
-    },
   },
 
   reducers: {
-    changeLoginStatus(state, { payload }) {
-      const {
-        data: { user },
-      } = payload;
-      setAuthority(user.role);
+    registerUser(state, { payload }) {
       return {
         ...state,
         status: payload.status,
-        // type: payload.type,
       };
     },
   },

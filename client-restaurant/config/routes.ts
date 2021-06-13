@@ -12,6 +12,11 @@
             path: '/user/login',
             component: './User/login',
           },
+          {
+            name: 'register',
+            path: '/user/register',
+            component: './User/register',
+          },
         ],
       },
       {
@@ -21,17 +26,39 @@
           {
             path: '/',
             component: '../layouts/BasicLayout',
-            authority: ['admin', 'user'],
             routes: [
               {
                 path: '/',
+                authority: ['admin', 'restaurant'],
                 redirect: '/welcome',
               },
               {
                 path: '/welcome',
+                authority: ['admin', 'restaurant'],
                 name: 'welcome',
                 icon: 'smile',
                 component: './Welcome',
+              },
+              {
+                path: '/menu',
+                authority: ['admin', 'restaurant'],
+                name: 'Menu',
+                icon: 'meh',
+                routes: [
+                  {
+                    path: '/menu/items',
+                    authority: ['admin', 'restaurant'],
+                    name: 'Menu Items',
+                    component: './Menu',
+                  },
+                  {
+                    path: '/menu/categories',
+                    authority: ['admin', 'restaurant'],
+                    icon: 'meh',
+                    name: 'Categories',
+                    component: './MenuCategory/',
+                  },
+                ],
               },
               {
                 path: '/admin',

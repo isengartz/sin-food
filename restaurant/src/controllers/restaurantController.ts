@@ -235,3 +235,29 @@ export const getRestaurant = async (
     data: { restaurant },
   });
 };
+
+/**
+ * Returns current restaurant
+ * @param req
+ * @param res
+ * @param next
+ */
+export const getCurrentRestaurant = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  res.send({
+    status: 'success',
+    data: { currentUser: req.currentUser || null },
+  });
+};
+
+export const logoutRestaurant = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  req.session = null;
+  res.send({});
+};

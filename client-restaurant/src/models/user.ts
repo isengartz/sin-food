@@ -1,19 +1,39 @@
 import type { Effect, Reducer } from 'umi';
-
+import { UserRole, Weekdays } from '@sin-nombre/sinfood-common';
 import { queryCurrent, query as queryUsers } from '@/services/user';
 
+export interface RestaurantWorkingHours {
+  day: Weekdays;
+  open: number;
+  close: number;
+}
+
 export type CurrentUser = {
-  avatar?: string;
-  name?: string;
-  title?: string;
-  group?: string;
-  signature?: string;
-  tags?: {
-    key: string;
-    label: string;
-  }[];
-  userid?: string;
-  unreadCount?: number;
+  id: string;
+  version: number;
+  email: string;
+  password?: string;
+  name: string;
+  description: string;
+  full_address: string;
+  minimum_order: number;
+  logo: string | null;
+  location: {
+    type: string;
+    coordinates: number[];
+  };
+  delivers_to: {
+    type: string;
+    coordinates: number[][][];
+  };
+  categories: string[];
+  phone: string;
+  enabled: boolean;
+  role: UserRole;
+  working_hours: RestaurantWorkingHours[];
+  holidays: Date[];
+  ratingsAverage: Number;
+  ratingsQuantity: Number;
 };
 
 export type UserModelState = {
@@ -29,7 +49,6 @@ export type UserModelType = {
   };
   reducers: {
     saveCurrentUser: Reducer<UserModelState>;
-    changeNotifyCount: Reducer<UserModelState>;
   };
 };
 
@@ -37,6 +56,7 @@ const UserModel: UserModelType = {
   namespace: 'user',
 
   state: {
+    // @ts-ignore
     currentUser: {},
   },
 
@@ -49,10 +69,17 @@ const UserModel: UserModelType = {
       });
     },
     *fetchCurrent(_, { call, put }) {
-      const response = yield call(queryCurrent);
+      const userCached = localStorage.getItem('currentUser');
+      let payload;
+      if (!userCached) {
+        const response = yield call(queryCurrent);
+        payload = response.data.currentUser;
+      } else {
+        payload = JSON.parse(userCached);
+      }
       yield put({
         type: 'saveCurrentUser',
-        payload: response,
+        payload: payload,
       });
     },
   },
@@ -62,21 +89,6 @@ const UserModel: UserModelType = {
       return {
         ...state,
         currentUser: action.payload || {},
-      };
-    },
-    changeNotifyCount(
-      state = {
-        currentUser: {},
-      },
-      action,
-    ) {
-      return {
-        ...state,
-        currentUser: {
-          ...state.currentUser,
-          notifyCount: action.payload.totalCount,
-          unreadCount: action.payload.unreadCount,
-        },
       };
     },
   },

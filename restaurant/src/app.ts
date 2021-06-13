@@ -5,6 +5,7 @@ import cookieSession from 'cookie-session';
 // @ts-ignore
 import xss from 'xss-clean'; // @todo: add Typescript declaration some day
 import hpp from 'hpp';
+import cors from 'cors';
 import mongoSanitize from 'express-mongo-sanitize';
 import { errorHandler, RouteNotFoundError } from '@sin-nombre/sinfood-common';
 import { API_ROOT_ENDPOINT } from './utils/constants';
@@ -16,6 +17,21 @@ const app = express();
 app.set('trust proxy', true); //used for ingress-nginx
 
 // Middleware
+const whitelist = ['https://restaurants.sinfood.dev'];
+const corsOptions = {
+  origin: function (origin: string, callback: Function) {
+    if (whitelist.indexOf(origin) !== -1 || origin === undefined) {
+      callback(null, true);
+    } else {
+      console.log(origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+};
+// @ts-ignore
+app.use(cors(corsOptions));
+
 app.use(json());
 app.use(
   cookieSession({

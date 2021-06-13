@@ -1,14 +1,20 @@
 // https://umijs.org/config/
 import { defineConfig } from 'umi';
+import dotenv from 'dotenv';
 import defaultSettings from './defaultSettings';
 import proxy from './proxy';
 import routes from './routes';
 
-const { REACT_APP_ENV } = process.env;
+dotenv.config();
+const { REACT_APP_ENV, REACT_APP_GOOGLE_MAPS_API_KEY } = process.env;
 
 export default defineConfig({
   hash: true,
   antd: {},
+  define: {
+    REACT_APP_ENV: REACT_APP_ENV || '',
+    REACT_APP_GMAPS_API_KEY: REACT_APP_GOOGLE_MAPS_API_KEY || '',
+  },
   dva: {
     hmr: true,
   },
@@ -16,8 +22,7 @@ export default defineConfig({
     type: 'browser',
   },
   locale: {
-    // default zh-CN
-    default: 'zh-CN',
+    default: 'en-US',
     antd: true,
     // default true, when it is true, will use `navigator.language` overwrite default
     baseNavigator: true,

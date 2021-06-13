@@ -6,3 +6,7 @@ module.exports = {
     REACT_APP_ENV: true,
   },
 };
+
+const fabric = require('@umijs/fabric');
+
+module.exports = fabric.eslint;

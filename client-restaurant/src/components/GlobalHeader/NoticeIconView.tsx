@@ -118,6 +118,7 @@ class GlobalHeaderRight extends Component<GlobalHeaderRightProps> {
     return (
       <NoticeIcon
         className={styles.action}
+        // @ts-ignore
         count={currentUser && currentUser.unreadCount}
         onItemClick={(item) => {
           this.changeReadState(item as NoticeItem);

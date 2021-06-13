@@ -2,6 +2,9 @@ import type { MenuDataItem, Settings as ProSettings } from '@ant-design/pro-layo
 import { GlobalModelState } from './global';
 import { UserModelState } from './user';
 import type { StateType } from './login';
+import { RegisterStateType } from './register';
+import { RestaurantCategoriesStateType } from './restaurant-categories';
+import { MenuCategoriesStateType } from './menu-categories';
 
 export { GlobalModelState, UserModelState };
 
@@ -14,6 +17,9 @@ export type Loading = {
     setting?: boolean;
     user?: boolean;
     login?: boolean;
+    register?: boolean;
+    restaurant_categories?: boolean;
+    menu_categories?: boolean;
   };
 };
 
@@ -23,6 +29,9 @@ export type ConnectState = {
   settings: ProSettings;
   user: UserModelState;
   login: StateType;
+  register: RegisterStateType;
+  restaurant_categories: RestaurantCategoriesStateType;
+  menu_categories: MenuCategoriesStateType;
 };
 
 export type Route = {
